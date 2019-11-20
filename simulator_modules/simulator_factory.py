@@ -1,5 +1,7 @@
 import sys
+import shutil
 import os
+import configparser
 
 from qa_common import *
 from qa_debug import *
@@ -11,27 +13,36 @@ from simulator_modules.tough2 import QASimulatorTOUGH2
 from simulator_modules.tough3 import QASimulatorTOUGH3
 from simulator_modules.tdycore import QASimulatorTDycore
 
-if sys.version_info[0] == 2:
-    from ConfigParser import SafeConfigParser as config_parser
-else:
-    from configparser import ConfigParser as config_parser
-
 def locate_simulators():
     debug_push('simulator_factory.locate_simulators')
     if os.path.exists('simulators.sim'):
       sim_file = 'simulators.sim'
     else:
       sim_file='default_simulators.sim'
-    config = config_parser()
+    config = configparser.ConfigParser()
     config.read(sim_file)
     simulators = config.items('simulators')
     simulator_dict = {}
     to_be_removed = []
     for simulator, path in simulators:
+        if debug_verbose():
+            print('Searching for "{}" mapped to "{}".'.format(path,simulator))
         if not os.path.isfile(path):
-            print('{} not found among simulator paths.'.format(path))
-            to_be_removed.append(simulator)
+            if debug_verbose():
+                print('  "{}" not found among simulator paths. Checking '
+                      'in machine PATH.'.format(path))
+            if shutil.which(path):
+                if debug_verbose():
+                    print('  "{}" found in PATH...'.format(path))
+                simulator_dict[simulator] = create_simulator(simulator,path)
+            else:
+                if debug_verbose():
+                    print('  "{}" not found in path either. Removing it '
+                          'from list of available simulators.'.format(path))
+                to_be_removed.append(path)
         else:
+            if debug_verbose():
+                print('  {} found...'.format(path))
             simulator_dict[simulator] = create_simulator(simulator,path)
     debug_pop()
     return simulator_dict

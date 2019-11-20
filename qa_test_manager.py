@@ -7,15 +7,13 @@ QA test class
 
 import os
 import sys
+
+import configparser
+
 from collections import OrderedDict
 from qa_test import QATest
 from qa_debug import *
 from qa_common import *
-
-if sys.version_info[0] == 2:
-    from ConfigParser import SafeConfigParser as config_parser
-else:
-    from configparser import ConfigParser as config_parser
 
 class QATestManager(object):
     """
@@ -45,7 +43,7 @@ class QATestManager(object):
         self._path, filename = os.path.split(config_file)
         os.chdir(self._path)
         self._config_filename = filename
-        config = config_parser()
+        config = configparser.ConfigParser()
         debug_push('QATestManager process_config_file parse')
         config.read(self._config_filename)
         debug_pop() #QATestManager process_config_file parse
