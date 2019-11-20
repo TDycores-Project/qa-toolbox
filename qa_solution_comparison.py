@@ -17,7 +17,6 @@ from matplotlib.ticker import FormatStrFormatter
 from qa_swapper import Swapper
 from qa_debug import *
 from qa_common import *
-#from qa_test_helper import *
 from qa_test_error import *
 
 from simulator_modules.solution import SolutionReader

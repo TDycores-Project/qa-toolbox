@@ -29,13 +29,6 @@ from qa_common import *
 from simulator_modules.simulator_factory import locate_simulators
 from regression_tests.qa_regression_test import QARegressionTest
 
-if sys.version_info[0] == 2:
-    from ConfigParser import SafeConfigParser as config_parser
-else:
-    from configparser import ConfigParser as config_parser
-
-# optional libraries
-
 def commandline_options():
     """
     Process the command line arguments and return them as a dict.
@@ -151,6 +144,9 @@ def main(options):
     return status
 
 if __name__ == "__main__":
+    if sys.version_info[0] == 2:
+        print('\n  Python2 is no longer supported. Please run with python3.\n')
+        sys.exit(0)
     cmdl_options = commandline_options()
     try:
         suite_status = main(cmdl_options)

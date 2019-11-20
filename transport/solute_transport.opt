@@ -1,0 +1,8 @@
+[output_options]
+times = 1. y
+variables = Tracer
+plot_time_units = y
+plot_dimension = 1D
+plot_title = Tracer Concentation
+plot_x_label = Distance [m]
+plot_y_label = Concentration [M]

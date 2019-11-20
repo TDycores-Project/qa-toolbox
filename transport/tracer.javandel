@@ -1,0 +1,44 @@
+import sys
+import traceback
+
+sys.path.insert(0,'..')
+
+from simulator_modules.solution import SolutionWriter
+from simulator_modules.python import *
+from analytical_modules.javandel import Javandel
+
+def main(options):
+
+    javandel = Javandel()
+
+    t = 1. # y
+    tunit = 'y'
+    sec_per_yr = 3600.*24.*365.
+
+    D = 1.e-8*sec_per_yr # 1.e-8 m^2/s
+    Darcy_velocity = 5. # m/y
+
+    javandel.set_diffusion(D)
+    javandel.set_velocity(Darcy_velocity)
+    x, c = javandel.get_solution(t)
+    x, y, z = javandel.get_cell_centered_coordinates()
+    solution_filename = get_python_solution_filename(__file__)
+    solution = SolutionWriter(solution_filename,tunit)
+    solution.write_coordinates(x,y,z)
+    solution.write_dataset(t,c,'Tracer')
+    solution.destroy()
+
+if __name__ == "__main__":
+  cmdl_options = ''
+  try:
+    suite_status = main(cmdl_options)
+    print("success")
+    sys.exit(suite_status)
+  except Exception as error:
+    print(str(error))
+#    if cmdl_options.backtrace:
+#      traceback.print_exc()
+    traceback.print_exc()
+    print("failure")
+    sys.exit(1)
+
