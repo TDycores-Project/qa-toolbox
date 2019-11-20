@@ -1,0 +1,7 @@
+[simulators]
+#pflotran = /Users/heepark/src/pflotran-opt/src/pflotran/pflotran
+pflotran = /Users/rleone/software/pflotran/src/pflotran/pflotran
+python = /usr/local/bin/python3
+#tough_eos1 = /Users/heepark/src/TOUGH3v1.0/Mac_executables/bin/tough3-eos1
+tough3 = /Users/rleone/software/TOUGH/TOUGH3v1.0/TOUGH3-CODE/esd-tough3/tough3-install/bin/tough3-eos3
+crunchflow = /Users/rleone/software/crunchtope/CrunchTope

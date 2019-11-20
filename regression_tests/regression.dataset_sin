@@ -1,0 +1,34 @@
+import numpy as np
+import sys
+import os
+import math
+
+def main(options):
+    x = np.arange(0,17*math.pi/8,math.pi/8)
+    y = np.array([0.5])
+    z = np.array([0.5])
+
+    solution_sin = np.sin(x)
+    filename='sin_dataset.h5'
+    solution = SolutionWriter(filename)
+    solution.write_coordinates(x,y,z)
+
+    solution.write_dataset(0,values,'variable','Time Slice')
+        
+    solution.write_time(x)
+    solution.write_dataset((0,0,0),values,'variable','Observation')
+        
+    solution.destroy()
+    
+    
+    
+if __name__ == "__main__":
+   cmdl_options=[]
+   try:
+      suite_status=main(cmdl_options)
+      sys.exit(suite_status)
+   except Exception as error:
+     print(str(error))
+     traceback.print_exc()
+     print("failure")
+     sys.exit(1)
