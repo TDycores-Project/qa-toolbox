@@ -1,0 +1,12 @@
+[output_options]
+times = 0.0 y
+variables = Pressure
+plot_time_units = y
+plot_title = Regression Test
+plot_dimension = 1D
+plot_x_label = Time [years], Distance x [m]
+plot_y_label = Pressure, Pressure
+plot_type = observation, time slice
+locations = 0.0 0.0 0.0
+plot_error = True
+print_error = True
