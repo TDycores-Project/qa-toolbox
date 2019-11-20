@@ -7,12 +7,8 @@ Created on Thu Dec 27 09:41:07 2018
 import re
 import sys
 import numpy as np
-from qa_debug import *
 
-if sys.version_info[0] == 2:
-    from ConfigParser import SafeConfigParser as config_parser
-else:
-    from configparser import ConfigParser as config_parser
+from qa_debug import *
 
 header_ = re.compile('-')
 

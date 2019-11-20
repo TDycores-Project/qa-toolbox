@@ -14,6 +14,8 @@ import textwrap
 import csv
 import shutil
 
+import configparser
+
 from h5py import *
 import numpy as np
 import matplotlib.pyplot as plt
@@ -25,13 +27,6 @@ from qa_common import *
 from qa_solution_comparison import *
 
 from simulator_modules.solution import SolutionReader
-
-
-
-if sys.version_info[0] == 2:
-    from ConfigParser import SafeConfigParser as config_parser
-else:
-    from configparser import ConfigParser as config_parser
 
 class QATest(object):
     """
@@ -72,7 +67,7 @@ class QATest(object):
         if not os.path.isfile(filename):
             print_err_msg('Options file name {} does not exist in folder {}'.format(filename,os.getcwd()))
 
-        config = config_parser()
+        config = configparser.ConfigParser()
         debug_push('QATest _process_opt_file parse')
         config_mapping=config
         config_mapping.optionxform = str

@@ -21,13 +21,6 @@ from qa_test_error import *
 
 from simulator_modules.solution import SolutionReader
 
-
-
-if sys.version_info[0] == 2:
-    from ConfigParser import SafeConfigParser as config_parser
-else:
-    from configparser import ConfigParser as config_parser
-    
 class QASolutionComparison(object):
     
     def __init__(self,solution_dictionary,output_options,mapped_simulator_names,template,run_number):

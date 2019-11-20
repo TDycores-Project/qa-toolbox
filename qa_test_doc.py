@@ -1,14 +1,11 @@
 import sys
 import os
+import configparser
+
 import numpy as np
 
 from qa_common import *
 from qa_debug import *
-
-if sys.version_info[0] == 2:
-    from ConfigParser import SafeConfigParser as config_parser
-else:
-    from configparser import ConfigParser as config_parser
 
 successful_tests='successful_tests.log'
     
@@ -115,7 +112,7 @@ QA Test Suite Documentation
             os.chdir(root_dir + '/' + _path)
 
 
-            config = config_parser()
+            config = configparser.ConfigParser()
             print(cfg_name)
             config.read(cfg_name.strip())
             
@@ -126,7 +123,7 @@ QA Test Suite Documentation
             for section in sections:
 
                 opt_file = section+'.opt'#root_dir+'/'+section +'.opt'
-                config_opt = config_parser()
+                config_opt = configparser.ConfigParser()
                 config_opt.read(opt_file)
                 print(opt_file)
                 output_options = \
@@ -148,7 +145,7 @@ QA Test Suite Documentation
 
             os.chdir(root_dir + '/' + self.folder)
 
-            config = config_parser()
+            config = configparser.ConfigParser()
             config.read(cfg_name.strip())
             
             sections = config.sections()
@@ -158,7 +155,7 @@ QA Test Suite Documentation
                 cfg_options = \
                      self._section_from_file(config,section)
                 opt_file = section+'.opt'
-                config_opt = config_parser()
+                config_opt = configparser.ConfigParser()
                 config_opt.read(opt_file)
                 self.output_options = \
                       self._section_from_file(config_opt,'output_options') ####faster way to do this probably...

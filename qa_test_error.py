@@ -6,11 +6,12 @@ from matplotlib.ticker import FormatStrFormatter
 
 from qa_debug import *
 from qa_common import *
-#from qa_test_helper import *
 
 class QATestError(object):
     
-    def __init__(self,converted_time=None,variable=None,template=None,run_number=None,plot_to_screen=False,units=' ',observation=False,dimension='1D'):
+    def __init__(self,converted_time=None,variable=None,template=None,
+                 run_number=None,plot_to_screen=False,units=' ',
+                 observation=False,dimension='1D'):
         debug_push('QATestError init')
         self.converted_time = converted_time
         self.variable = variable

@@ -4,8 +4,10 @@ Program to manage and run QA tests.
 
 @author: Glenn Hammond <gehammo@sandia.gov>
 """
-
 import sys
+if sys.version_info[0] < 3:
+    print('\n  Python2 is not supported. Please run with python3.\n')
+    sys.exit(1)
 
 import hashlib
 import os
@@ -144,9 +146,6 @@ def main(options):
     return status
 
 if __name__ == "__main__":
-    if sys.version_info[0] == 2:
-        print('\n  Python2 is no longer supported. Please run with python3.\n')
-        sys.exit(0)
     cmdl_options = commandline_options()
     try:
         suite_status = main(cmdl_options)
