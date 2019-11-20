@@ -5,9 +5,9 @@ import math
 import re
 
 from qa_debug import *
+from qa_solution import QASolutionWriter
 
 from simulator_modules.simulator import QASimulator
-from simulator_modules.solution import SolutionWriter
 
 obs_mapping = {}
 time_mapping = {}
@@ -38,8 +38,8 @@ class QASimulatorTDycore(QASimulator):
 
     def convert_solution_to_common_h5(self,filename):
         root = filename.rsplit('.',1)[0]
-        solution_filename='{}_tdycore.h5'.format(root)
-        solution=SolutionWriter(solution_filename)
+        solution_filename = '{}_tdycore.h5'.format(root)
+        solution = QASolutionWriter(solution_filename)
 
 #--------------------------------------------------
         # Assumptions:

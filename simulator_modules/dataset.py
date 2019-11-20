@@ -5,9 +5,9 @@ import math
 
 from qa_debug import *
 from qa_common import *
+from qa_solution import QASolutionWriter
 
 from simulator_modules.simulator import QASimulator
-from simulator_modules.solution import SolutionWriter
 
 class QASimulatorDatasetSin(QASimulator):
 
@@ -70,7 +70,7 @@ class QASimulatorDatasetCos(QASimulator):
         
 def convert_to_h5_file(filename,x,y,z,values):
     
-    solution = SolutionWriter(filename)
+    solution = QASolutionWriter(filename)
     solution.write_coordinates(x,y,z)
     
     solution.write_dataset(0.0,values,'Pressure','Time Slice')

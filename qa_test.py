@@ -23,10 +23,7 @@ import matplotlib.pyplot as plt
 from qa_swapper import Swapper
 from qa_debug import *
 from qa_common import *
-#from qa_test_helper import *
 from qa_solution_comparison import *
-
-from simulator_modules.solution import SolutionReader
 
 class QATest(object):
     """

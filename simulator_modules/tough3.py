@@ -5,9 +5,9 @@ import numpy as np
 
 from qa_debug import *
 from qa_common import *
+from qa_solution import QASolutionWriter
 
 from simulator_modules.simulator import QASimulator
-from simulator_modules.solution import SolutionWriter
 
 time_mapping = {}
 time_mapping['PRES'] = 'Liquid_Pressure'
@@ -50,7 +50,7 @@ class QASimulatorTOUGH3(QASimulator):
     def convert_solution_to_common_h5(self,filename):
         root = filename.rsplit('.',1)[0]
         solution_filename = '{}_tough3.h5'.format(root)
-        solution = SolutionWriter(solution_filename)
+        solution = QASolutionWriter(solution_filename)
         
         tough_obs = []
         for root, dire, files in os.walk('.'):

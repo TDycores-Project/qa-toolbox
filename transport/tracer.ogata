@@ -3,7 +3,7 @@ import traceback
 
 sys.path.insert(0,'..')
 
-from simulator_modules.solution import SolutionWriter
+from qa_solution import QASolutionWriter
 from simulator_modules.python import *
 from analytical_modules.ogata import Ogata
 
@@ -23,7 +23,7 @@ def main(options):
     x, c = ogata.get_solution(t)
     x, y, z = ogata.get_cell_centered_coordinates()
     solution_filename = get_python_solution_filename(__file__)
-    solution = SolutionWriter(solution_filename,tunit)
+    solution = QASolutionWriter(solution_filename,tunit)
     solution.write_coordinates(x,y,z)
     solution.write_dataset(t,c,'Tracer')
     solution.destroy()

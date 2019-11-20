@@ -10,10 +10,10 @@ from qa_common import *
 eps = 1.e-6
 eps_loc=1.e-3
 
-class SolutionWriter(object):
+class QASolutionWriter(object):
 
     def __init__(self,filename,time_unit=None,space_unit=None):
-        debug_push('SolutionWriter init')
+        debug_push('QASolutionWriter init')
         self._filename = filename
         self._f = h5py.File(filename,'w')
         self._tunit = 'y'
@@ -25,7 +25,7 @@ class SolutionWriter(object):
         debug_pop()
 
     def set_time_unit(self,time_unit):
-        debug_push('SolutionWriter set_time_unit')
+        debug_push('QASolutionWriter set_time_unit')
         time_unit=time_unit.lower()
         if not time_unit in units_dict:
             print_err_msg('Unrecognized time unit: {}'.format(time_unit))
@@ -34,13 +34,13 @@ class SolutionWriter(object):
         debug_pop()
         
     def set_spatial_unit(self,space_unit):
-        debug_push('SolutionWriter set_space_unit')
+        debug_push('QASolutionWriter set_space_unit')
         ####ever need unit conversion for spatial???
         self._sunit = space_unit
         debug_pop()
 
     def write_coordinates(self,x,y,z):
-        debug_push('SolutionWriter write_coordinates')
+        debug_push('QASolutionWriter write_coordinates')
         # x, y, z are 1D numpy arrays
         group_name = 'Time Slice/Coordinates' ##will coordinates ever be different with time slice??
         self._f[group_name+'/X'] = x
@@ -50,7 +50,7 @@ class SolutionWriter(object):
         debug_pop()
         
     def write_time(self,t):
-        debug_push('SolutionWriter write_time')
+        debug_push('QASolutionWriter write_time')
         ###observation files with different times???
         group_name = 'Observation/Time'
         self._f[group_name+'/times'] = t
@@ -59,7 +59,7 @@ class SolutionWriter(object):
 
         
     def write_dataset(self,dimension,soln,dataset_name,group='Time Slice'):
-        debug_push('SolutionWriter write_dataset')
+        debug_push('QASolutionWriter write_dataset')
         # if not 3D convert to 3D
         if soln.ndim == 1:
             soln = np.reshape(soln,(soln.shape[0],1,1))
@@ -81,7 +81,7 @@ class SolutionWriter(object):
             self._f[group_name].attrs['location unit'] = '{}'.format(self._sunit)
         else:
             print_err_msg('Unrecognized group "{}" in '.format(group),
-                            'SolutionWriter write_dataset. '
+                            'QASolutionWriter write_dataset. '
                             'Available groups include: Time Slice or Observation') 
         
         if debug_verbose():
@@ -89,15 +89,15 @@ class SolutionWriter(object):
         debug_pop()
 
     def destroy(self):
-        debug_push('SolutionWriter destroy')
+        debug_push('QASolutionWriter destroy')
         self._f.close()
         debug_pop()
 
-class SolutionReader(object):
+class QASolutionReader(object):
 
 
     def __init__(self,filename):
-        debug_push('SolutionReader init')
+        debug_push('QASolutionReader init')
         self._filename = filename
         try:
             self._f = h5py.File(filename,'r')
@@ -116,7 +116,7 @@ class SolutionReader(object):
 
         
     def process_groups(self): ###update for both
-        debug_push('SolutionReader process_groups')
+        debug_push('QASolutionReader process_groups')
 
         for key in list(self._f.keys()):
             if key.startswith('Time Slice'):
@@ -133,7 +133,7 @@ class SolutionReader(object):
                         self._time_slice_solutions.append([time,self._f[key+'/'+tkey]])
                     else:
                         print_err_msg('Unrecognized key "{}" '.format(tkey),
-                                        'in SolutionReader process_groups/',
+                                        'in QASolutionReader process_groups/',
                                         'Solutions')
                 if self._coordinates_group == None:
                     print_err_msg('No coordinates found in Time Slice h5 file {}'.format(self._filename))
@@ -150,7 +150,7 @@ class SolutionReader(object):
                         self._observation_solutions.append([location,self._f[key+'/'+lkey]])
                     else:
                         print_err_msg('Unrecognized key "{}" '.format(lkey),
-                                'in SolutionReader process_groups/',
+                                'in QASolutionReader process_groups/',
                                 'Solutions')
                 if self._observation_solutions == None:
                     print_err_msg('No time array found in Observation h5 file {}'.format(self._filename))
@@ -158,12 +158,12 @@ class SolutionReader(object):
                     print_err_msg('No solutions found in Observation h5 file {}'.format(self._filename))
             else:
                 print_err_msg('Unrecognized key "{}" in '.format(key),
-                                'SolutionReader process_groups')
+                                'QASolutionReader process_groups')
             
         debug_pop()
         
     def get_coordinates(self):
-        debug_push('SolutionReader get_coordinates')
+        debug_push('QASolutionReader get_coordinates')
         x = None
         y = None
         z = None
@@ -184,7 +184,7 @@ class SolutionReader(object):
         return x, y, z
     
     def get_time(self):
-        debug_push('SolutionReader get_time')
+        debug_push('QASolutionReader get_time')
         g = self._time_group
         
         if g == None:
@@ -201,7 +201,7 @@ class SolutionReader(object):
                     
     def get_time_unit(self):
         ###for observation points only
-        debug_push('SolutionReader get_time_unit')
+        debug_push('QASolutionReader get_time_unit')
         
         g = self._time_group
         
@@ -212,7 +212,7 @@ class SolutionReader(object):
         return time_unit
         
     def diff_coordinates(self,x2,y2,z2):
-        debug_push('SolutionReader diff_coordinates')
+        debug_push('QASolutionReader diff_coordinates')
         coord_eps = 1.e-10
         x,y,z = self.get_coordinates()
         if x.size == x2.size:
@@ -241,12 +241,12 @@ class SolutionReader(object):
         debug_pop()
     
     def get_solution(self,dimension,variable,Observation=False,Time_Slice=False):
-        debug_push('SolutionReader get_solution_3D')
+        debug_push('QASolutionReader get_solution_3D')
         
         if Time_Slice==True:
             array = self.get_solution_3D(dimension,variable)
             if not array.ndim == 3:
-                print_err_msg('Solutions read in SolutionReader.get_solution ',
+                print_err_msg('Solutions read in QASolutionReader.get_solution ',
                                 'must be 3D: {}'.format(array.ndim))
             sizex = array.shape[0]
             sizey = array.shape[1]
@@ -275,7 +275,7 @@ class SolutionReader(object):
 
             
     def get_observation_solution(self,location,variable):
-        debug_push('SolutionReader get_observation_solution')
+        debug_push('QASolutionReader get_observation_solution')
         group = None
         
         available_locations = []
@@ -308,7 +308,7 @@ class SolutionReader(object):
         return array
         
     def get_solution_3D(self,time,variable):
-        debug_push('SolutionReader get_solution_3D')
+        debug_push('QASolutionReader get_solution_3D')
         group = None
         
         available_times = [] 
@@ -340,7 +340,7 @@ class SolutionReader(object):
         return array
 
     def get_solution_2D(self,time,variable,plane,isection=None):
-        debug_push('SolutionReader get_solution_2D')
+        debug_push('QASolutionReader get_solution_2D')
         array = self.get_solution_3D(time,variable)
         array = self.convert_to_2D(array,plane,isection)
         debug_pop()
@@ -348,7 +348,7 @@ class SolutionReader(object):
 
     def get_solution_1D(self,time,variable,direction,isection1=None,
                         isection2=None):
-        debug_push('SolutionReader get_solution_1D')
+        debug_push('QASolutionReader get_solution_1D')
         array = self.get_solution_3D(time,variable)
         array = self.convert_to_1D(array,direction,isection1,isection2)
         debug_pop()
@@ -385,7 +385,7 @@ class SolutionReader(object):
         return array
 
     def destroy(self):
-        debug_push('SolutionReader destroy')
+        debug_push('QASolutionReader destroy')
         self._f.close()
         debug_pop()
         

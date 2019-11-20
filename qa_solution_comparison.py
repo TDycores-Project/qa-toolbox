@@ -18,8 +18,7 @@ from qa_swapper import Swapper
 from qa_debug import *
 from qa_common import *
 from qa_test_error import *
-
-from simulator_modules.solution import SolutionReader
+from qa_solution import QASolutionReader
 
 class QASolutionComparison(object):
     
@@ -132,7 +131,7 @@ class QASolutionComparison(object):
 
                     filename = self.solution_dictionary[simulator]
                 
-                    solution_object = SolutionReader(filename)
+                    solution_object = QASolutionReader(filename)
                     x, y, z = solution_object.get_coordinates()
 
 
@@ -332,7 +331,7 @@ class QASolutionComparison(object):
                 for simulator in self.mapped_simulator_names:
                     filename = self.solution_dictionary[simulator]
 
-                    solution_object = SolutionReader(filename)
+                    solution_object = QASolutionReader(filename)
                     time = solution_object.get_time()
                     time_unit = solution_object.get_time_unit()
                     

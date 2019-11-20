@@ -4,8 +4,8 @@ from h5py import *
 
 from qa_debug import *
 from qa_common import *
+from qa_solution import QASolutionWriter
 
-from simulator_modules.solution import SolutionWriter
 from simulator_modules.simulator import QASimulator
 
 eps = 1e-6
@@ -60,7 +60,7 @@ class QASimulatorPFLOTRAN(QASimulator):
       debug_push('QASimulatorPFLOTRAN convert_solution_to_common_h5')
       solution_filename = \
             '{}_pflotran.h5'.format(root)
-      solution = SolutionWriter(solution_filename)
+      solution = QASolutionWriter(solution_filename)
       h5_filename = '{}_pft.h5'.format(root)
       tec_filename = '{}_pft-obs-0.tec'.format(root)
       time_slice = False

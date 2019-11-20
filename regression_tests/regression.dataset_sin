@@ -3,6 +3,8 @@ import sys
 import os
 import math
 
+from qa_solution import QASolutionWriter
+
 def main(options):
     x = np.arange(0,17*math.pi/8,math.pi/8)
     y = np.array([0.5])
@@ -10,7 +12,7 @@ def main(options):
 
     solution_sin = np.sin(x)
     filename='sin_dataset.h5'
-    solution = SolutionWriter(filename)
+    solution = QASolutionWriter(filename)
     solution.write_coordinates(x,y,z)
 
     solution.write_dataset(0,values,'variable','Time Slice')

@@ -5,9 +5,9 @@ import re
 
 from qa_debug import *
 from qa_common import *
+from qa_solution import QASolutionWriter
 
 from simulator_modules.simulator import QASimulator
-from simulator_modules.solution import SolutionWriter
 
 obs_mapping = {}
 time_mapping = {}
@@ -37,8 +37,8 @@ class QASimulatorCrunchFlow(QASimulator):
 
     def convert_solution_to_common_h5(self,filename):
         root = filename.rsplit('.',1)[0]
-        solution_filename='{}_crunchflow.h5'.format(root)
-        solution=SolutionWriter(solution_filename)
+        solution_filename = '{}_crunchflow.h5'.format(root)
+        solution = QASolutionWriter(solution_filename)
 
         c_out = [] 
         obs_out = []
