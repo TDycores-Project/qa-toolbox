@@ -1,5 +1,6 @@
 #!/bin/sh
 
+python3 directory_setup.py
 python3 qa_test_suite.py
 
 EXIT_CODE=$?
