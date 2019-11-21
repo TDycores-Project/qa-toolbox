@@ -1,11 +1,16 @@
 from sys import *
 from math import *
 from numpy import *
+
+import matplotlib as mpl
+if os.environ.get('DISPLAY','') == '':
+   mpl.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 
 from qa_debug import *
 from qa_common import *
+
 
 class QATestError(object):
     

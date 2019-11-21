@@ -9,9 +9,12 @@ import shutil
 
 from h5py import *
 import numpy as np
+
+import matplotlib as mpl
+if os.environ.get('DISPLAY','') == '':
+   mpl.use('Agg')
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import axes3d
-import matplotlib as mpl
 from matplotlib.ticker import FormatStrFormatter
 
 from qa_swapper import Swapper

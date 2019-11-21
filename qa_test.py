@@ -18,7 +18,6 @@ import configparser
 
 from h5py import *
 import numpy as np
-import matplotlib.pyplot as plt
 
 from qa_swapper import Swapper
 from qa_debug import *
