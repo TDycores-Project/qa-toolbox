@@ -150,8 +150,7 @@ if __name__ == "__main__":
     try:
         suite_status = main(cmdl_options)
         print("success")
-        sys.exit(1)
-#        sys.exit(suite_status)
+        sys.exit(suite_status)
     except Exception as error:
         print(str(error))
 #        if cmdl_options.backtrace:
