@@ -37,9 +37,8 @@ def commandline_options():
     """
     parser = argparse.ArgumentParser(description='Run a suite of QA tests.')
 
-#    parser.add_argument('--backtrace', action='store_true',
-#                        help='show exception backtraces as extra debugging '
-#                        'output')
+    parser.add_argument('--doc_dir', action='store',
+                        help='directory for documenting test results')
                         
 #    parser.add_argument('-a', '--all', action='store_true',
 #                         help='run all tests.')
@@ -109,7 +108,7 @@ def main(options):
     # read the appropriate config file and run the various tests.
     start = time.time()
     report = {}
-    doc = QATestDoc()
+    doc = QATestDoc(options.doc_dir)
     for config_file in config_files:
         print(config_file)
         #try:

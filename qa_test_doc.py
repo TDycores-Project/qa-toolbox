@@ -9,13 +9,12 @@ from qa_debug import *
 
 successful_tests='successful_tests.log'
     
-root_dir = os.getcwd()
-
 class QATestDoc(object):
     
-    def __init__(self):
+    def __init__(self,doc_dir):
         debug_push('QATestDoc init')
         
+        self.doc_dir = doc_dir
         self.output_dicts = []
         self.cfg_dicts = []
         self.swap_dicts = []
@@ -29,13 +28,13 @@ class QATestDoc(object):
         
 
     def create_doc_file(self,test_path):
-        test = test_path.replace('{}/'.format(root_dir),'')
+        test = test_path.replace('{}/'.format(self.doc_dir),'')
         self._process_test_cfg_files_doc(test)
         
  
             
     def create_index_file(self):
-        os.chdir(root_dir)
+        os.chdir(self.doc_dir)
         test_cfgs = []
 
         self.test_names = []
@@ -56,7 +55,7 @@ class QATestDoc(object):
         
         
 
-        os.chdir(root_dir + '/docs')
+        os.chdir(self.doc_dir)
         filename='index.rst'
         
         intro = """
@@ -109,7 +108,7 @@ QA Test Suite Documentation
 
             _path, cfg_name = os.path.split(test_cfg)
 
-            os.chdir(root_dir + '/' + _path)
+            os.chdir(self.doc_dir + '/' + _path)
 
 
             config = configparser.ConfigParser()
@@ -143,7 +142,7 @@ QA Test Suite Documentation
 
             self.folder, cfg_name = os.path.split(test_cfg)
 
-            os.chdir(root_dir + '/' + self.folder)
+            os.chdir(self.folder)
 
             config = configparser.ConfigParser()
             config.read(cfg_name.strip())
@@ -548,7 +547,7 @@ Comparison of {} vs {} at {} m, {} m, {} m with scenario {}
                 
         
     def _create_intro_test_file(self):
-        os.chdir(root_dir + '/docs/qa_tests') ###requires them to be there already
+        os.chdir(self.doc_dir + '/qa_tests') ###requires them to be there already
         
 
         for key, value in self.folder_dict.items():

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 python3 directory_setup.py
-python3 qa_test_suite.py
+make all
 
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ]; then
