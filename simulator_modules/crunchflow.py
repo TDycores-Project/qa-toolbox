@@ -28,6 +28,7 @@ class QASimulatorCrunchFlow(QASimulator):
         command.append(filename) #+'.in')
         debug_push('Running CrunchFlow')
         status=self._submit_process(command,filename,annotation)
+        debug_pop()
         if status != 0:
             print_err_msg('Crunchflow simulator failed. Check {}'.format(filename))
         solution_filename = self.convert_solution_to_common_h5(filename)

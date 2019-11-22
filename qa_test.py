@@ -35,7 +35,7 @@ class QATest(object):
         print_header('*',name)
         self._txtwrap = textwrap.TextWrapper(width=78, subsequent_indent=4*" ")
         self._timeout = 300.
-        self._name = name
+        self.name = name
         self._section_dict = section_dict
         self._simulators = []
         self._mapped_simulator_names = []
@@ -53,13 +53,13 @@ class QATest(object):
         debug_pop()
 
     def __str__(self):
-        string = '    QA Test : '+self._name+'\n'
+        string = '    QA Test : '+self.name+'\n'
         string += dict_to_string(self._options)+'\n'
         return string
 
     def _process_opt_file(self):
         debug_push('QATest _process_opt_file')
-        filename = self._name+'.opt'
+        filename = self.name+'.opt'
         if not os.path.isfile(filename):
             print_err_msg('Options file name {} does not exist in folder {}'.format(filename,os.getcwd()))
 
@@ -133,7 +133,7 @@ class QATest(object):
                    self._swap_options.pop('max_attempts', None)
                else:
                    print_err_msg('ERROR: max_attempts not defined in %s.opt file' 
-                         % self._name)
+                         % self.name)
                for key, value in self._swap_options.items():
                    if len(value.split(',')) != 2:
                        print_err_msg('ERROR: %s should have first value and '
@@ -147,7 +147,7 @@ class QATest(object):
                        number_dict[key].append(first_value*(multiplier**(i)))
            else: 
                print_err_msg('Error: swap method unknown or undefined in %s.opt file'
-                   % self._name)
+                   % self.name)
 
         for i in range(self._max_attempts):
             dict_to_append = {}
@@ -156,12 +156,13 @@ class QATest(object):
                 dict_to_append[key] = value[i]
  
             list_of_swap_dict.append(dict_to_append)
-        return list_of_swap_dict
         debug_pop()
+        return list_of_swap_dict
 
     def _check_simulators(self,available_simulators):
         debug_push('QATest check simulators')
-        print (self._section_dict)
+        if debug_verbose():
+            print (self._section_dict)
         simulator_list = self._section_dict['simulators'].split(',')
         num_simulators = 0
 
@@ -177,7 +178,7 @@ class QATest(object):
                 mapped_simulator_name = s[0]
             if simulator_name not in available_simulators:
                 print_err_msg('Simulator {} requested in .cfg file, section [{}] not found \
-                              among available simulators.'.format(simulator_name,self._name))
+                              among available simulators.'.format(simulator_name,self.name))
 
             else:
                 num_simulators += 1
@@ -187,7 +188,7 @@ class QATest(object):
                 debug_simulator_list.append(mapped_simulator_name)
         if num_simulators < 2:
             print_err_msg('Insufficient number of available simulators in '
-                            '.cfg file, section [{}].'.format(self._name))
+                            '.cfg file, section [{}].'.format(self.name))
         print('simulators: '+list_to_string(debug_simulator_list))
         debug_pop()
 
@@ -231,7 +232,10 @@ class QATest(object):
             #self._compare_solutions(solutions)
             template = self._get_template()
             ##pass in template and run number
-            compare_solutions=QASolutionComparison(solutions,self._output_options,self._mapped_simulator_names,template,run_number)
+            compare_solutions = \
+                QASolutionComparison(solutions,self._output_options,
+                                     self._mapped_simulator_names,template,
+                                     run_number)
             compare_solutions.process_opt_file()
         debug_pop()
 
@@ -247,18 +251,20 @@ class QATest(object):
         out_filename = template+'_'+simulator_mapped_name+ \
                        run_number_string+simulator_suffix
         if os.path.isfile(in_filename):
-            print(in_filename+' found')
+            if debug_verbose():
+                print(in_filename+' found')
             swapper = Swapper()
-            if swap_dict:
-                print(dict_to_string(swap_dict))
-            else:
-                print('swap_dict empty')
+            if debug_verbose():
+                if swap_dict:
+                    print(dict_to_string(swap_dict))
+                else:
+                    print('swap_dict empty')
             swapper.swap_new(in_filename,out_filename,
                              swap_dict)
 #        elif os.path.isfile(in_filename):
 #            shutil.copy(in_filename, out_filename)
         else:
-            print_err_msg('{} defined in .cfg file, section [{}] not found in {}'.format(in_filename, self._name, os.getcwd()))
+            print_err_msg('{} defined in .cfg file, section [{}] not found in {}'.format(in_filename, self.name, os.getcwd()))
 
         debug_pop()
         return out_filename

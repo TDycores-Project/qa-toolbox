@@ -25,7 +25,7 @@ class QARegressionTest(object):
         debug_pop()
         
     
-    def run_test(self): 
+    def run_test(self,testlog): 
         root_dir = os.getcwd()
         simulators_dict = self._create_regression_simulator()
 
@@ -34,7 +34,7 @@ class QARegressionTest(object):
   
         test_manager = QATestManager(simulators_dict)
         test_manager.process_config_file(config_file)
-        test_manager.run_tests() 
+        test_manager.run_tests(testlog) 
         
         self._compare_values()
 

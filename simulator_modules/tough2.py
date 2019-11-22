@@ -22,6 +22,7 @@ class QASimulatorTOUGH2(QASimulator):
         debug_push('Running TOUGH2')
         self._submit_process(command,filename,annotation)
         debug_pop()        
+        debug_pop()        
 
     def read_solution(self,filename,dataset_strings):
         debug_push('QASimulatorTOUGH2 read_solution')
@@ -30,7 +31,6 @@ class QASimulatorTOUGH2(QASimulator):
         # we may have to implement such that TOUGH3 outputs TECPLOT data
         # and process TECPLOT format instead of csv format.
         # - Heeho Park
-        debug_push('QATest read_tough_soln_csv')
         tough_dict = {}
         temp_key = []
         time = ''

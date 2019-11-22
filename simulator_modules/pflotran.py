@@ -49,7 +49,7 @@ class QASimulatorPFLOTRAN(QASimulator):
         command.append('{}_pft'.format(root))
         debug_push('Running PFLOTRAN')
         status = self._submit_process(command,filename,annotation)
-        print(status)
+        debug_pop()        
         if status != 86:
             print_err_msg('Pflotran simulator failed. Check {}_pflotran.stdout'.format(root))
         solution_filename = self.convert_solution_to_common_h5(root)

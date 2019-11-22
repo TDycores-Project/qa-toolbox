@@ -241,7 +241,7 @@ class QASolutionReader(object):
         debug_pop()
     
     def get_solution(self,dimension,variable,Observation=False,Time_Slice=False):
-        debug_push('QASolutionReader get_solution_3D')
+        debug_push('QASolutionReader get_solution')
         
         if Time_Slice==True:
             array = self.get_solution_3D(dimension,variable)
@@ -271,6 +271,7 @@ class QASolutionReader(object):
             
         else:
             print_err_msg('Must specify observation or time slice in QASolutionReader get_solution')
+        debug_pop()
         return array
 
             
@@ -334,8 +335,6 @@ class QASolutionReader(object):
 
         array = np.array(group[variable_key])
 
-        print(array.shape)                        
-        
         debug_pop()
         return array
 

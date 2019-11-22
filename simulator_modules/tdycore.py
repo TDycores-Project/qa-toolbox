@@ -30,6 +30,7 @@ class QASimulatorTDycore(QASimulator):
         command.append('-pc_type lu -ksp_type preonly')
         debug_push('Running TDycore')
         self._submit_process(command,filename,annotation)
+        debug_pop()
         
         solution_filename=self.convert_solution_to_common_h5(filename)
         debug_pop()

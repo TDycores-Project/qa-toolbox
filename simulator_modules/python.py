@@ -23,9 +23,11 @@ class QASimulatorPython(QASimulator):
         command.append(filename)
         debug_push('Running Python')
         status = self._submit_process(command,filename,annotation)
+        debug_pop()
         if status != 0:
             print_err_msg('Python simulator failed. Check {}_python.stdout'.format(filename.split('.')[0]))
         solution_filename = get_h5_output_filename(filename,self._name)
+        debug_pop()
         return solution_filename
 
 def get_python_solution_filename(script_name):

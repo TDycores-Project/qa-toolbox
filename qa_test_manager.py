@@ -14,6 +14,7 @@ from collections import OrderedDict
 from qa_test import QATest
 from qa_debug import *
 from qa_common import *
+from qa_test_log import QATestLog
 
 class QATestManager(object):
     """
@@ -55,9 +56,9 @@ class QATestManager(object):
             self._tests[name] = test
         debug_pop() #QATestManager process_config_file
             
-    def run_tests(self):
+    def run_tests(self,testlog):
         debug_push('QATestManager run_tests')
-        print(len(self._tests.items()))
         for key, test_case in self._tests.items():
             test_case.run(self.available_simulators)
+            testlog.log_success(self._path,test_case.name)
         debug_pop()

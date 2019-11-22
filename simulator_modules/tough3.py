@@ -41,6 +41,7 @@ class QASimulatorTOUGH3(QASimulator):
 #        command.append(filename+'.out')
         debug_push('Running TOUGH3')
         status=self._submit_process(command,filename,annotation)
+        debug_pop()        
         if status != 0:
             print_err_msg('Tough3 simulator failed. Check {}_tough3.stdout'.format(filename.split('.')[0]))
         solution_filename = self.convert_solution_to_common_h5(filename)

@@ -39,7 +39,8 @@ class QASolutionComparison(object):
     def process_opt_file(self):
         debug_push('QACompareSolutions process_opt_file')
 
-        print(self.solution_dictionary)
+        if debug_verbose():
+            print(self.solution_dictionary)
         
         self.plot_dimension = qa_lookup(self.output_options, 'plot_dimension','fail_on_missing_keyword')#self.output_options['plot_dimension']
         x_string = qa_lookup(self.output_options,'plot_x_label','fail_on_missing_keyword').split(',')#self.output_options['plot_x_label'].split(',')

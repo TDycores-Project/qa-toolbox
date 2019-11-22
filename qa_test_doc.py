@@ -1,13 +1,15 @@
 import sys
 import os
 import configparser
+import re
 
 import numpy as np
 
 from qa_common import *
 from qa_debug import *
 
-successful_tests='successful_tests.log'
+successful_tests = 'successful_tests.log'
+root_directory = os.getcwd()
     
 class QATestDoc(object):
     
@@ -15,6 +17,9 @@ class QATestDoc(object):
         debug_push('QATestDoc init')
         
         self.doc_dir = doc_dir
+        self.title = ''
+        self.filename_root = ''
+
         self.output_dicts = []
         self.cfg_dicts = []
         self.swap_dicts = []
@@ -28,33 +33,39 @@ class QATestDoc(object):
         
 
     def create_doc_file(self,test_path):
+        debug_push("QATestDoc create_doc_file")
         test = test_path.replace('{}/'.format(self.doc_dir),'')
         self._process_test_cfg_files_doc(test)
-        
- 
+        debug_pop()
             
     def create_index_file(self):
-        os.chdir(self.doc_dir)
+        debug_push("QATestDoc create_index_file")
+        os.chdir(root_directory)
         test_cfgs = []
 
         self.test_names = []
         self.folders = []
+
         try:
-            for line in open(successful_tests,'r'):
-                if line.strip():   ####get rid of blank lines
-                    test_cfgs.append(line)
-                    self._process_test_cfg_files_index(line)
+            f = open('successful_tests.log','r')
         except:
             print("File {} not found".format(successful_tests))
+
+        # cannot place for loop inside try statement as any failure will
+        # cause the File {} not found exception, and this can be misleading
+        for line in f:
+            if line.strip():   ####get rid of blank lines
+                test_cfgs.append(line)
+                self._process_test_cfg_files_index(line)
+        f.close()
         
         self._create_folder_test_dict(test_cfgs)
         ###append test_cfgs that were not run but in successful test to index file
         ##group based on folder
-        test_names=self.test_names
-        print(test_names)
+        test_names = self.test_names
+        if debug_verbose():
+            print(test_names)
         
-        
-
         os.chdir(self.doc_dir)
         filename='index.rst'
         
@@ -102,97 +113,103 @@ QA Test Suite Documentation
         
         self._create_include_toc_tree_file()
         self._create_intro_test_file()
+        debug_pop()
 
                 
     def _process_test_cfg_files_index(self,test_cfg):
+        debug_push("QATestDoc _process_test_cfg_files_index")
 
-            _path, cfg_name = os.path.split(test_cfg)
+        _path, cfg_name = os.path.split(test_cfg)
 
-            os.chdir(self.doc_dir + '/' + _path)
+        os.chdir(_path)
 
-
-            config = configparser.ConfigParser()
+        config = configparser.ConfigParser()
+        if debug_verbose():
             print(cfg_name)
-            config.read(cfg_name.strip())
-            
-            sections = config.sections()
-            
-            print(test_cfg)   
-            print('  Sections {}'.format(len(sections)))
-            for section in sections:
-
-                opt_file = section+'.opt'#root_dir+'/'+section +'.opt'
-                config_opt = configparser.ConfigParser()
-                config_opt.read(opt_file)
-                print(opt_file)
-                output_options = \
-                      self._section_from_file(config_opt,'output_options') ####faster way to do this probably...
-
-                 
-                self.folders.append(_path)
-                title = output_options['plot_title'] ####space between fine?????
-                
-                print('title: {}'.format(title))
-                if title not in self.test_names:    #faster way??? ### can not have two tests with same name
-                     self.test_names.append(title)
-                
+        config.read(cfg_name.strip())
         
+        sections = config.sections()
+        
+        for section in sections:
+
+            opt_file = section+'.opt'#root_dir+'/'+section +'.opt'
+            config_opt = configparser.ConfigParser()
+            config_opt.read(opt_file)
+            if debug_verbose():
+                print(opt_file)
+            output_options = \
+                  self._section_from_file(config_opt,'output_options') ####faster way to do this probably...
+
+             
+            self.folders.append(_path)
+            title = output_options['plot_title'] ####space between fine?????
+            if debug_verbose():
+                print('title: {}'.format(title))
+            if title not in self.test_names:    #faster way??? ### can not have two tests with same name
+                 self.test_names.append(title)
+        debug_pop()
+                
+    
     def _process_test_cfg_files_doc(self,test_cfg):
+        debug_push("QATestDoc _process_test_cfg_files_doc")
 
+        self.folder, cfg_name = os.path.split(test_cfg)
 
-            self.folder, cfg_name = os.path.split(test_cfg)
+        os.chdir(self.folder)
 
-            os.chdir(self.folder)
-
-            config = configparser.ConfigParser()
-            config.read(cfg_name.strip())
+        config = configparser.ConfigParser()
+        config.read(cfg_name.strip())
             
-            sections = config.sections()
+        sections = config.sections()
             
             
-            for section in sections:
-                cfg_options = \
-                     self._section_from_file(config,section)
-                opt_file = section+'.opt'
-                config_opt = configparser.ConfigParser()
-                config_opt.read(opt_file)
-                self.output_options = \
-                      self._section_from_file(config_opt,'output_options') ####faster way to do this probably...
-                self.swap_options = \
-                      self._section_from_file(config_opt,'swap_options')
+        for section in sections:
+            cfg_options = \
+                 self._section_from_file(config,section)
+            opt_file = section+'.opt'
+            config_opt = configparser.ConfigParser()
+            config_opt.read(opt_file)
+            self.output_options = \
+                  self._section_from_file(config_opt,'output_options') ####faster way to do this probably...
+            self.swap_options = \
+                  self._section_from_file(config_opt,'swap_options')
  
                  
 
-                title = self.output_options['plot_title'] ####space between fine?????
+            title = self.output_options['plot_title'] ####space between fine?????
                 
-                if title not in self.test_names:    #faster way??? ### can not have two tests with same name
-                     self.test_names.append(title)
+            if title not in self.test_names:    #faster way??? ### can not have two tests with same name
+                 self.test_names.append(title)
 
-                self.template = cfg_options['template']
-                simulators = cfg_options['simulators'].split(',')
-                self.simulators = [x.strip(' ') for x in simulators]
+            self.template = cfg_options['template']
+            simulators = cfg_options['simulators'].split(',')
+            self.simulators = [x.strip(' ') for x in simulators]
 
-                self._get_input_parameters(self.output_options,self.swap_options)
-        
-                self._format_intro()
-                self._format_results_summary()
-                self._format_description() 
-                self._format_detailed_results() ####see if observation file exsists if not....
-                self._format_simulator_files()
-        
-                self._write_doc_file() 
+            self._get_input_parameters(self.output_options,self.swap_options)
     
+            self._format_intro()
+            self._format_results_summary()
+            self._format_description() 
+            self._format_detailed_results() ####see if observation file exsists if not....
+            self._format_simulator_files()
+    
+            self._write_doc_file() 
+        debug_pop()
     
     def _get_input_parameters(self,output_options,swap_options):
 
+        debug_push('QATestDoc _get_input_parameters')
         self._get_input_from_options(output_options)
         self._get_input_from_swap_options(swap_options)
-                        
+        debug_pop()
 
     def _get_input_from_options(self,output_options):
+        debug_push('QATestDoc _get_input_from_options')
         self.variable = output_options['variables']   ###need to take into account more than 1 variable
         self.time_units = output_options['plot_time_units']
         self.title = output_options['plot_title']   ##better way to do this
+        self.title.strip()
+        self.filename_root = self.title.lower().replace(" ","_")
         self.times = time_strings_to_float_list_for_documentation(
                     output_options['times'].split(',')) ###need to make this handle if no time slice
         loc=qa_lookup(output_options,'locations',[])
@@ -201,46 +218,48 @@ QA Test Suite Documentation
             self.locations = location_strings_to_float_list(qa_lookup(output_options,'locations',[]))
         else:
             self.locations=loc
+        debug_pop()
         
         
     def _get_input_from_swap_options(self,swap_options):
+        debug_push('QATestDoc _get_input_from_swap_options')
         ###see if it's empty.... count how many scenarios
         self.num_scenarios = self._process_swap_options(swap_options)
-       
+        debug_pop()
     
     def _format_intro(self):
+        debug_push('QATestDoc _format_intro')
         
-        title = self.title
         simulators = self.simulators
         intro = """
-.. _{}:
+.. _{0}:
     
-{}
-{}
-{}
-:ref:`{}-results summary`
+{1}
+{2}
+{1}
+:ref:`{0}-results summary`
 
-:ref:`{}-description`
+:ref:`{0}-description`
 
-:ref:`{}-detailed results`
-""".format(title.lower(),'*'*len(title),title,'*'*len(title),title.lower(),title.lower(),title.lower())
+:ref:`{0}-detailed results`
+""".format(self.filename_root,'*'*len(self.title),self.title)
 
         simulator_intro = [None] * len(simulators)
         for i in range(len(simulators)):
             simulator_intro[i] = """
 :ref:`{}-{} Input File`
 
-""".format(title.lower(),simulators[i])
+""".format(self.filename_root,simulators[i])
 
         self.intro = intro
         self.simulator_intro = simulator_intro
-
+        debug_pop()
     
     
     def _format_results_summary(self):
+        debug_push('QATestDoc _format_results_summary')
         
         times = self.times
-        title = self.title
         num_scenarios = self.num_scenarios
         variable = self.variable
         template = self.template
@@ -252,7 +271,7 @@ QA Test Suite Documentation
 Results Summary
 ===============
 
-""".format(title.lower())         
+""".format(self.filename_root)         
         
         results_summary=[' ']*num_scenarios
         
@@ -298,12 +317,13 @@ Scenario {}
         
         self.results_summary_intro = results_summary_intro
         self.results_summary = results_summary
+        debug_pop()
 
 
     def _format_description(self):
-        title = self.title
-        
-        description_file = 'description_{}.txt'.format(title.lower()) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
+        debug_push('QATestDoc _format_description')
+
+        description_file = 'description_{}.txt'.format(self.filename_root) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
 
         try:
             with open(description_file,'r') as file:
@@ -321,14 +341,15 @@ The Problem Description
 {}
 
 
-""".format(title.lower(),description_text)
+""".format(self.filename_root,description_text)
 
         self.description=description
+        debug_pop()
 
     def _format_detailed_results(self):      
+        debug_push('QATestDoc _format_detailed_results')
         #######assuming only two simulators..... change to accomadate variable amounts
         folder = self.folder
-        title = self.title
         num_scenarios = self.num_scenarios
         times = self.times
         locations = self.locations
@@ -344,7 +365,7 @@ The Problem Description
 Detailed Results
 ================
 
-""".format(title.lower())
+""".format(self.filename_root)
 
         k = 1
 
@@ -433,11 +454,10 @@ Comparison of {} vs {} at {} m, {} m, {} m with scenario {}
             self.detailed_results = detailed_results
             self.observation_results = observation_results
 
-
-
+        debug_pop()
 
     def _format_simulator_files(self):
-        title = self.title
+        debug_push('QATestDoc _format_simulator_files')
         simulators = self.simulators
         folder = self.folder
         template = self.template
@@ -455,60 +475,61 @@ Comparison of {} vs {} at {} m, {} m, {} m with scenario {}
 .. literalinclude:: ../{}/{}.{}
 
 
-""".format(title.lower(),simulators[i],simulators[i].upper(),'='*(len(simulators[i])+11),folder,template,simulators[i].lower())
+""".format(self.filename_root,simulators[i],simulators[i].upper(),'='*(len(simulators[i])+11),folder,template,simulators[i].lower())
 
         self.simulator_files = simulator_files
-
+        debug_pop()
 
 
     def _get_error_and_index_list(self,variable,template,i,times):
+        debug_push('QATestDoc _get_error_and_index_list')
 
-        
-            file = '{}_{}_run{}_error_documentation.stat'.format(variable,template,i+1)
+
+        file = '{}_{}_run{}_error_documentation.stat'.format(variable,template,i+1)
+        try:
+            fin = open(file,'r')
+            error_times = []
+            error_values = []
+            error_locations = []
             
-            try:
-                fin = open(file,'r')
-                error_times = []
-                error_values = []
-                error_locations = []
+            for line in fin:
+                words = line.strip().split('=')
+            
                 
-                for line in fin:
-                    words = line.strip().split('=')
-                
+                if ('Time ' in words):
+                    error_times.append(words[-1])
+                elif ('Location ' in words):
+                    error_locations.append(words[-1])
+                else:
+                    error_values.append(words[1])
                     
-                    if ('Time ' in words):
-                        error_times.append(words[-1])
-                    elif ('Location ' in words):
-                        error_locations.append(words[-1])
-                    else:
-                        error_values.append(words[1])
-                        
-                index_list = []        
-                for j in range(len(error_times)):
-                    raw_time = error_times[j].strip().split()
-                    raw_time = float(raw_time[0])
+            index_list = []        
+            for j in range(len(error_times)):
+                raw_time = error_times[j].strip().split()
+                raw_time = float(raw_time[0])
+            
+                index = times.index(raw_time)
                 
-                    index = times.index(raw_time)
-                    
-                    index = index+1+(i*len(times))
-                    index_list.append(index)
-            except:
-                error_values = None
-                error_times = None
-                error_locations = None
-                index_list = None
-                
-            return error_values,error_times,error_locations,index_list
+                index = index+1+(i*len(times))
+                index_list.append(index)
+        except:
+            error_values = None
+            error_times = None
+            error_locations = None
+            index_list = None
+            
+        debug_pop()
+        return error_values,error_times,error_locations,index_list
 
     def _write_doc_file(self):
-        title = self.title
+        debug_push('QATestDoc _write_doc_file')
         num_scenarios = self.num_scenarios
         simulators = self.simulators
         times = self.times
         locations = self.locations
 
         
-        filename = 'documentation_{}.rst'.format(title)
+        filename = 'documentation_{}.rst'.format(self.filename_root)
         
         f = open(filename, 'w')
         
@@ -528,9 +549,11 @@ Comparison of {} vs {} at {} m, {} m, {} m with scenario {}
         for i in range(len(simulators)):
             f.write(self.simulator_files[i])
         f.close()
+        debug_pop()
         
     
     def _create_include_toc_tree_file(self):
+        debug_push('QATestDoc _create_include_toc_tree_file')
 
         for i in range(len(self.test_names)):
 
@@ -544,9 +567,11 @@ Comparison of {} vs {} at {} m, {} m, {} m with scenario {}
             f = open(filename, 'w')
 
             f.write(toctree)
+        debug_pop()
                 
         
     def _create_intro_test_file(self):
+        debug_push('QATestDoc _create_intro_test_file')
         os.chdir(self.doc_dir + '/qa_tests') ###requires them to be there already
         
 
@@ -578,9 +603,11 @@ Comparison of {} vs {} at {} m, {} m, {} m with scenario {}
             f.write(intro)
             for i in range(len(value)):
                 f.write(intro_links[i])
+        debug_pop()
                 
             
     def _create_folder_test_dict(self,test_cfgs):
+        debug_push('QATestDoc _create_folder_test_dict')
 
         folders = self.folders
         
@@ -591,20 +618,21 @@ Comparison of {} vs {} at {} m, {} m, {} m with scenario {}
                 self.folder_dict[folders[i]].append(self.test_names[i])
             else:
                 self.folder_dict[folders[i]] = [self.test_names[i]]
+        debug_pop()
        
-
-    
-    
     def _section_from_file(self,config,key):
+        debug_push('QATestDoc _section_from_file')
         xx_options = {}
         try:
             xx_options = list_to_dict(config.items(key))
         except Exception as error:
             pass
+        debug_pop()
         return xx_options
 
     
     def _process_swap_options(self,swap_options):   
+        debug_push('QATestDoc _process_swap_options')
         
         max_attempts = 1
         if swap_options:
@@ -625,6 +653,7 @@ Comparison of {} vs {} at {} m, {} m, {} m with scenario {}
                 swap_options.pop('max_attempts', None)
 
 
+        debug_pop()
         return max_attempts
     
 #    def _append_rst_list_to_file(self): #self.rst_file_list

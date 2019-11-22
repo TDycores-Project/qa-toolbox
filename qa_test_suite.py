@@ -99,46 +99,30 @@ def main(options):
 
     simulators_dict = locate_simulators() 
 
+    doc = QATestDoc(options.doc_dir)
+    testlog = QATestLog(root_dir)
+
     ##before run tests, run regression tests
     regression_test = QARegressionTest()
-    regression_test.run_test()
+    regression_test.run_test(testlog)
     
 
     # loop through config files, cd into the appropriate directory,
     # read the appropriate config file and run the various tests.
     start = time.time()
     report = {}
-    doc = QATestDoc(options.doc_dir)
     for config_file in config_files:
+        os.chdir(root_dir)
         print(config_file)
-        #try:
- #         print(80 * '=', file=testlog)
-        ###initate doc
-#        doc = QATestDoc()
-        testlog=QATestLog(config_file)
-        
         
         test_manager = QATestManager(simulators_dict)
         test_manager.process_config_file(config_file)
-        test_manager.run_tests()
+        test_manager.run_tests(testlog)
 
-        testlog.add_test_to_pass_list()
         doc.create_doc_file(config_file)
-#        doc.create_doc_file(config_file)
-        #create documentation
-        
-                # get the absolute path of the directory
-#                test_dir = os.path.dirname(config_file)
-                # cd into the test directory so that the relative paths in
-                # test files are correct
-#                os.chdir(test_dir)
 
-#                os.chdir(root_dir)
-        #except Exception as error:
-        #    message = txtwrap.fill("ERROR: a problem occured.")
-        #    print(''.join(['\n', message, '\n'])) 
-#    doc = QATestDoc()
     doc.create_index_file()
+    debug_finalize()
     stop = time.time()
     status = 0
 
