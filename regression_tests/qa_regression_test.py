@@ -55,42 +55,23 @@ class QARegressionTest(object):
         gold_dict = self._process_gold_files()
         test_dict = self._get_test_values()
         
-        ##check to make sure same length
-#        if len(all_test_values) != len(all_gold_values):
-#            print('Size of test values (%d) does not match size of gold values (%d) in regression test' %
-#                  (len(all_test_values),len(all_gold_values)))
-#            exit(0)
-#            
-#        for i in range(len(all_gold_values)):
-#            if len(all_test_values[i]) != len(all_gold_values[i]):
-#                print('Size of test values (%d) does not match size of gold values (%d) in regression test' %
-#                     (len(all_test_values[i]),len(all_gold_values[i])))
-#                exit(0)
-#                
-#            for k in range(len(all_gold_values[i])):
-#                gold_values = all_gold_values[i][k]
-#                test_values = all_test_values[i][k]        
-#
-#                delta = abs(test_values-gold_values)
-#                if delta>self._tolerance:
-#                    self._fail = True
 
 
         fail_dict = {}            
         if test_dict.keys() != gold_dict.keys():
-           raise Exception('test_values to not match gold values')            
+           print_err_msg('Keys in test dictionary do not match keys in gold dictionary')            
         for key1,value1 in test_dict.items(): 
             gold_value = gold_dict[key1]
             test_value = value1
-        
+
             delta = abs(test_value-gold_value) #####DEBUG
 
-            if hasattr(delta, "__len__"):
-                if max(delta)>self._tolerance:
-                    self._fail = True
-                    fail_dict[key1]=delta
-            else:
-                if delta>self._tolerance:
+#            if hasattr(delta, "__len__"):
+#                if max(delta)>self._tolerance:
+#                    self._fail = True
+#                    fail_dict[key1]=delta
+#            else:
+            if delta>self._tolerance:
                     self._fail = True
                     fail_dict[key1]=delta
         
@@ -99,7 +80,7 @@ class QARegressionTest(object):
             with open('regression_test_output.txt','w') as f:
                 for key,value in fail_dict.items():
                     f.write('{} difference = {} \n'.format(key,value))
-            raise Exception('Regression test failed. Check regression_test_output.txt') #what did it fail on ##print out fail doc??
+            print_err_msg('Regression test failed. Check regression_test_output.txt') 
         else:
             print('Regression test passed, continuing with qa_tests')
             
@@ -107,103 +88,59 @@ class QARegressionTest(object):
             
             
     def _get_test_values(self):
-        filename_cos = 'cos_dataset.h5'
-        filename_sin = 'sin_dataset.h5'
+        time_slice_filename = '0.0_Pressure_regression_run1_error.stat'
+        observation_filename = '0.0_0.0_0.0_Pressure_regression_run1_error.stat'
+        total_error_filename = 'Pressure_regression_run1_error_documentation.stat'
         
-        [times1,solution_cos] = self._get_values_from_h5file(filename_cos) ##time slice &obs point? 
-        [times2,solution_sin] = self._get_values_from_h5file(filename_sin) ##time slice &obs point? 
+        time_slice_keys, time_slice_values = self._process_stat_file(time_slice_filename)
+        observation_keys, observation_values = self._process_stat_file(observation_filename)
+        total_error_keys, total_error_values = self._process_stat_file(total_error_filename)
         
-        test_values = self._calc_error(times1,solution_cos,times2,solution_sin)
-        
-        return test_values
+        test_dict=self._create_dict(time_slice_keys,time_slice_values,observation_keys,observation_values,total_error_keys,total_error_values)
 
-    
-    def _get_values_from_h5file(self,filename):
-        f = File(filename,'r')   ###best way to do this???
-        group = '/Time Slice/Time: 0.000e+00 y'
         
-        times = np.array(f['/Time Slice/Coordinates/X'])
-        values = np.array(f[group+'/Pressure'])
-        
-        return times,values
-        
-        
-    def _calc_error(self,times1,solution1,times2,solution2):
-        
-        ###better way   ---> store in stats file and read in from stats file??
-        error = QATestError()
+        return test_dict
 
-        error.calc_error_stats_1D(times1,solution1,times2,solution2)
+    def _process_stat_file(self,filename):
+        fin = open(filename,'r')
         
-#        error_metrics = []
-#        error_metrics.append(error.average_absolute_error)
-#        error_metrics.append(error.maximum_absolute_error)
-#        error_metrics.append(error.maximum_relative_error)
-#        error_metrics.append(error.average_relative_error)
-#        error_metrics.append(error.absolute_relative_area)
-        
-        error_metrics = {}
-        
-        error_metrics['average absolute error'] = error.average_absolute_error
-        error_metrics['maximum absolute error'] = error.maximum_absolute_error
-        error_metrics['maximum relative error'] = error.maximum_relative_error
-        error_metrics['average relative error'] = error.average_relative_error
-        error_metrics['absolute relative area'] = error.absolute_relative_error   ###change area to error
+        keys=[]
+        values=[]
+        for line in fin:
+            words = line.strip().split('=')
+            keys.append(words[0])
+            values.append(float(words[1].split()[0]))
+
+        return keys, values
     
+    def _create_dict(self,time_slice_keys,time_slice_values,observation_keys,observation_values,total_error_keys,total_error_values):
+        error_dict = {}
         
-        error_metrics['absolute error'] = error.absolute_error
-        error_metrics['relative error'] = error.relative_error
+        for i in range(len(time_slice_keys)):
+            error_dict['time_slice_{}'.format(time_slice_keys[i])]=time_slice_values[i]
+            error_dict['observation_{}'.format(observation_keys[i])] = observation_values[i]
         
-#        test_values = []
-#        test_values.append(error_metrics)
-        
-#        test_values.append(error.absolute_error)
-#        test_values.append(error.relative_error)
-        
-        return error_metrics
+        for i in range(len(total_error_keys)):
+            error_dict['{}'.format(total_error_keys[i])]=total_error_values[i]
+            
+        return error_dict
+            
     
     def _process_gold_files(self):
-        all_gold_values = []
+        time_slice_filename = '0.0_Pressure_regression_run1_error.stat.gold'
+        observation_filename = '0.0_0.0_0.0_Pressure_regression_run1_error.stat.gold'
+        total_error_filename = 'Pressure_regression_run1_error_documentation.stat.gold'
         
-        gold_error_metrics = self._read_gold_error_metrics()
-#        all_gold_values.append(gold_error_metrics)
-        gold_dict= self._create_gold_dic(gold_error_metrics)
-        
-        gold_absolute_error = self._read_gold_error_array(self._gold_filename_absolute_error)
-#        all_gold_values.append(gold_absolute_error)
-        gold_dict['absolute error'] = gold_absolute_error
-        
-        gold_relative_error = self._read_gold_error_array(self._gold_filename_relative_error)
-#        all_gold_values.append(gold_relative_error)
-        gold_dict['relative error'] = gold_relative_error
-        
+        time_slice_keys, time_slice_values = self._process_stat_file(time_slice_filename)
+        observation_keys, observation_values = self._process_stat_file(observation_filename)
+        total_error_keys, total_error_values = self._process_stat_file(total_error_filename)
+
+        gold_dict=self._create_dict(time_slice_keys,time_slice_values,observation_keys,observation_values,total_error_keys,total_error_values)
+
         
         return gold_dict
     
     
-    def _read_gold_error_metrics(self):
-        values = []
-        filename = self._gold_filename_error_metrics
-        with open(filename,'r') as f:
-            for line in f:
-                row = (line.strip().split('='))
-                values.append(float(row[-1]))
-
-        return values
     
-    def _read_gold_error_array(self,filename):
-        values = np.loadtxt(filename)
-        
-        return values
     
-    def _create_gold_dic(self,values):
-        gold_dict={}
-
-        
-        gold_dict['average absolute error'] = values[0]
-        gold_dict['maximum absolute error'] = values[1]
-        gold_dict['maximum relative error'] = values[2]
-        gold_dict['average relative error'] = values[3]
-        gold_dict['absolute relative area'] = values[4]
-        
-        return gold_dict
+    
