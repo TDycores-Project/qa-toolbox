@@ -196,6 +196,58 @@ QA Test Suite Documentation
             self._write_doc_file() 
         debug_pop()
     
+    def document_test(self,test_path):
+        debug_push("QATestDoc document_test")
+
+        path, filename = os.path.split(test_path)
+        opt_file = filename + '.opt'
+        log_file = filename + '.testlog'
+
+        os.chdir(path)
+
+        config_opt = configparser.ConfigParser()
+        config_opt.read(opt_file)
+        self.output_options = \
+            self._section_from_file(config_opt,'output_options') 
+        self.swap_options = \
+              self._section_from_file(config_opt,'swap_options')
+ 
+        testlog = open(log_file,'r')
+        self.title = self._process_testlog_line(testlog.readline())
+        self.filename_root = self.title.lower().replace(" ","_")
+        self.template = self._process_testlog_line(testlog.readline())
+
+        while True:
+            simulation_list = []
+            mylist = []
+            simulator = self._process_testlog_line(testlog.readline())
+            if not simulator:
+                break
+            mylist.append(simulator)
+            # filename
+            mylist.append(self._process_testlog_line(testlog.readline()))
+
+            simulation_list.append(mylist)
+
+        self.test_names.append(self.title)
+
+        simulators = cfg_options['simulators'].split(',')
+        self.simulators = [x.strip(' ') for x in simulators]
+
+        self._get_input_parameters(self.output_options,self.swap_options)
+
+        self._format_intro()
+        self._format_results_summary()
+        self._format_description() 
+        self._format_detailed_results()
+        self._format_simulator_files()
+
+        self._write_doc_file() 
+        debug_pop()
+
+    def _process_testlog_line(self,line):
+        return line.split(':')[1].strip().strip("'")
+    
     def _get_input_parameters(self,output_options,swap_options):
 
         debug_push('QATestDoc _get_input_parameters')
@@ -207,9 +259,9 @@ QA Test Suite Documentation
         debug_push('QATestDoc _get_input_from_options')
         self.variable = output_options['variables']   ###need to take into account more than 1 variable
         self.time_units = output_options['plot_time_units']
-        self.title = output_options['plot_title']   ##better way to do this
-        self.title.strip()
-        self.filename_root = self.title.lower().replace(" ","_")
+#        self.title = output_options['plot_title']   ##better way to do this
+#        self.title.strip()
+#        self.filename_root = self.title.lower().replace(" ","_")
         self.times = time_strings_to_float_list_for_documentation(
                     output_options['times'].split(',')) ###need to make this handle if no time slice
         loc=qa_lookup(output_options,'locations',[])

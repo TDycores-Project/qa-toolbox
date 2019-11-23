@@ -35,8 +35,12 @@ class QATest(object):
         print_header('*',name)
         self._txtwrap = textwrap.TextWrapper(width=78, subsequent_indent=4*" ")
         self._timeout = 300.
-        self.name = name
         self._section_dict = section_dict
+        self.name = name
+        try:
+            self.title = self._section_dict['title']
+        except:
+            self.title = self.name
         self._simulators = []
         self._mapped_simulator_names = []
         self._max_attempts = 1  # 1 is default
@@ -48,7 +52,7 @@ class QATest(object):
         self.tough_options={}
         self._process_opt_file()
         self.swap_dict = {}
-        
+        self._template = self._section_dict['template']
 
         debug_pop()
 
@@ -96,9 +100,6 @@ class QATest(object):
         except Exception as error:
             pass
         return xx_options
-
-    def _get_template(self):
-        return self._section_dict['template']
 
     def _process_swap_options(self):   
         debug_push('QATest _process_swap_options')
@@ -199,6 +200,10 @@ class QATest(object):
 
         i_attempt = 0
         passed = False
+
+        testlog = open('{}.testlog'.format(self.name),'w')
+        print('TITLE : {}'.format(self.title),file=testlog)
+        print('TEMPLATE : {}'.format(self._template),file=testlog)
 #        list_of_swap_dict = self._list_of_swap_dict 
 
         for i in range(len(list_of_swap_dict)):
@@ -218,9 +223,11 @@ class QATest(object):
             
             for simulator in self._simulators:
                 mapped_name = self._mapped_simulator_names[isimulator]
+                print('SIMULATOR : {}'.format(mapped_name),file=testlog)
                 print_header('-',mapped_name)
                 filename = self._swap(mapped_name,simulator.get_suffix(),
                                       run_number,swap_dict)
+                print('FILENAME : {}'.format(filename),file=testlog)
 
                 if len(self.map_options) > 0:
                     simulator.update_dict(self.map_options)
@@ -230,25 +237,24 @@ class QATest(object):
                     simulator.run(filename,annotation)
                 isimulator += 1
             #self._compare_solutions(solutions)
-            template = self._get_template()
             ##pass in template and run number
             compare_solutions = \
                 QASolutionComparison(solutions,self._output_options,
-                                     self._mapped_simulator_names,template,
-                                     run_number)
+                                     self._mapped_simulator_names,
+                                     self._template,run_number)
             compare_solutions.process_opt_file()
+        testlog.close()
         debug_pop()
 
 
     def _swap(self,simulator_mapped_name,simulator_suffix,run_number,
               swap_dict=None):
         debug_push('QATest _swap')
-        template = self._get_template()
-        in_filename = template+'.'+simulator_mapped_name
+        in_filename = self._template+'.'+simulator_mapped_name
         #run_number_string = ''
         #if run_number > 0:
         run_number_string = '_run{}'.format(run_number)
-        out_filename = template+'_'+simulator_mapped_name+ \
+        out_filename = self._template+'_'+simulator_mapped_name+ \
                        run_number_string+simulator_suffix
         if os.path.isfile(in_filename):
             if debug_verbose():
