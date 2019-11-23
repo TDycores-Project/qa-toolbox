@@ -40,18 +40,18 @@ class QARegressionTest(object):
 
 
         
-    def _create_regression_simulator(self):
+    def create_regression_simulator(self,simulator_dict):
         path=' '
         simulator_sin = QASimulatorDatasetSin(path)
         simulator_cos = QASimulatorDatasetCos(path)         
-        simulator_dict = {}
+        #simulator_dict = {}
         simulator_dict['dataset_cos'] = simulator_cos
         simulator_dict['dataset_sin'] = simulator_sin
         
         return simulator_dict
 
 
-    def _compare_values(self):
+    def compare_values(self):
         gold_dict = self._process_gold_files()
         test_dict = self._get_test_values()
         

@@ -86,23 +86,28 @@ def main(options):
     print("Running QA tests :") 
     
     config_files = []
+
     if os.path.exists('config_files.txt'):
       filename = 'config_files.txt'
     else:
       filename='default_config_files.txt'
-      
+    
+    config_files.append('regression_tests/test.cfg')
     for line in open(filename,'r'):
       line=line.strip()
         # rstrip to remove EOL. otherwise, errors when opening file
       if len(line) > 0 and not line.startswith('#'):
         full_path = root_dir+'/'+line.rstrip()
-        config_files.append(full_path) 
+        config_files.append(full_path)
+        
 
     simulators_dict = locate_simulators() 
+    regression_test = QARegressionTest()
+    simulators_dict = regression_test.create_regression_simulator(simulators_dict)
 
     ##before run tests, run regression tests
-    regression_test = QARegressionTest()
-    regression_test.run_test()
+#    regression_test = QARegressionTest()
+#    regression_test.run_test()
     
 
     # loop through config files, cd into the appropriate directory,
@@ -110,22 +115,29 @@ def main(options):
     start = time.time()
     report = {}
     doc = QATestDoc()
+    
+    regression_test_pass = False
     for config_file in config_files:
         print(config_file)
         #try:
  #         print(80 * '=', file=testlog)
         ###initate doc
-#        doc = QATestDoc()
-        testlog=QATestLog(config_file)
+        if regression_test_pass == True:
+            testlog = QATestLog(config_file)
         
         
         test_manager = QATestManager(simulators_dict)
         test_manager.process_config_file(config_file)
         test_manager.run_tests()
+        
+        if regression_test_pass == False:
+            #works for one test
+            regression_test.compare_values()
+            regression_test_pass = True
+        else:
+            testlog.add_test_to_pass_list()
+            doc.create_doc_file(config_file)
 
-        testlog.add_test_to_pass_list()
-        doc.create_doc_file(config_file)
-#        doc.create_doc_file(config_file)
         #create documentation
         
                 # get the absolute path of the directory
@@ -138,7 +150,6 @@ def main(options):
         #except Exception as error:
         #    message = txtwrap.fill("ERROR: a problem occured.")
         #    print(''.join(['\n', message, '\n'])) 
-#    doc = QATestDoc()
     doc.create_index_file()
     stop = time.time()
     status = 0
