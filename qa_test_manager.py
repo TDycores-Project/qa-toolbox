@@ -34,7 +34,7 @@ class QATestManager(object):
             string += str(value)
         return string
         
-    def process_config_file(self,config_file):
+    def process_config_file(self,root_dir,config_file):
         debug_push('QATestManager process_config_file')
         if config_file is None:
             raise RuntimeError("Error, must provide a config filename")
@@ -52,7 +52,7 @@ class QATestManager(object):
         sections = config.sections()
         for section in sections:
             name = section
-            test = QATest(name,list_to_dict(config.items(section)))
+            test = QATest(name,root_dir,list_to_dict(config.items(section)))
             self._tests[name] = test
         debug_pop() #QATestManager process_config_file
             

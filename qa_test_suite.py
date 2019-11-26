@@ -25,7 +25,7 @@ import datetime
 import textwrap
 
 from qa_test_log import QATestLog
-from qa_test_doc import QATestDoc
+#from qa_test_doc import QATestDoc
 from qa_test_manager import QATestManager
 from qa_common import *
 from simulator_modules.simulator_factory import locate_simulators
@@ -99,7 +99,7 @@ def main(options):
 
     simulators_dict = locate_simulators() 
 
-    doc = QATestDoc(options.doc_dir)
+#    doc = QATestDoc(options.doc_dir)
     testlog = QATestLog(root_dir)
 
     ##before run tests, run regression tests
@@ -116,12 +116,12 @@ def main(options):
         print(config_file)
         
         test_manager = QATestManager(simulators_dict)
-        test_manager.process_config_file(config_file)
+        test_manager.process_config_file(root_dir,config_file)
         test_manager.run_tests(testlog)
 
-        doc.create_doc_file(config_file)
+#        doc.create_doc_file(config_file)
 
-    doc.create_index_file()
+#    doc.create_index_file()
     debug_finalize()
     stop = time.time()
     status = 0

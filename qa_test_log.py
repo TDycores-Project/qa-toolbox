@@ -11,9 +11,9 @@ class QATestLog(object):
         self.unrun_tests = root_dir+'/unrun_tests.log'
  
         # initialize each file
-        Path(self.successful_tests).touch()
-        Path(self.failed_tests).touch()
-        Path(self.unrun_tests).touch()
+        open(self.successful_tests,'w').close()
+        open(self.failed_tests,'w').close()
+        open(self.unrun_tests,'w').close()
         
     def log_success(self,path,test):
         with open(self.successful_tests,"a+") as f:
