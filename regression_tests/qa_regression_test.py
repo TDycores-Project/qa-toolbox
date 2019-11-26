@@ -33,7 +33,7 @@ class QARegressionTest(object):
 
   
         test_manager = QATestManager(simulators_dict)
-        test_manager.process_config_file(config_file)
+        test_manager.process_config_file(root_dir,config_file)
         test_manager.run_tests(testlog) 
         
         self._compare_values()

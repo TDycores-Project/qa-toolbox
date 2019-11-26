@@ -22,10 +22,12 @@ from qa_debug import *
 from qa_common import *
 from qa_test_error import *
 from qa_solution import QASolutionReader
+from qa_test_doc import *
 
 class QASolutionComparison(object):
     
-    def __init__(self,solution_dictionary,output_options,mapped_simulator_names,template,run_number):
+    def __init__(self,solution_dictionary,output_options,
+                 mapped_simulator_names,template,run_number,doc_run):
         debug_push('QACompareSolutions init')
         
         self.solution_dictionary = solution_dictionary
@@ -33,12 +35,12 @@ class QASolutionComparison(object):
         self.mapped_simulator_names = mapped_simulator_names
         self.template = template
         self.run_number = run_number
+        self.doc_run = doc_run
         
         debug_pop()
         
     def process_opt_file(self):
         debug_push('QACompareSolutions process_opt_file')
-
         if debug_verbose():
             print(self.solution_dictionary)
         
@@ -105,13 +107,21 @@ class QASolutionComparison(object):
         
         all_stat_files=[]
         for time in times:
+            plot_time_units = ''
+            converted_time = -999.
             if time < 0.: 
                 # time < 0 indicates steady state
                 if len(times) > 1:
                     print_err_msg('QACompareSolutions: Negative time in times '
                                 'array indicates steady state. Yet, there '
                                 'is more than one time.')
+            else:
+                plot_time_units = self.output_options['plot_time_units']
+                sec_over_tunits = unit_conversion(plot_time_units)
+                converted_time = time/sec_over_tunits
+            doc_slice = QATestDocTimeSlice(converted_time,plot_time_units) 
             for variable in self.variables:
+                doc_var = QATestDocVariable(variable) 
                 x_min = 1e20
                 x_max = -1.e20
                 y_min = 1e20
@@ -267,10 +277,6 @@ class QASolutionComparison(object):
                 plot_time_units = ''
                 temp_title = self.title
                 if not time < 0.:
-                    plot_time_units = self.output_options['plot_time_units']
-                    sec_over_tunits = unit_conversion(plot_time_units)
-#TODO(rcl): move to function in qa_common for use elsewhere, too.
-                    converted_time = time/sec_over_tunits
                     if converted_time == 0:
                         temp_title += ' @ {} {}'.format(converted_time,
                                                         plot_time_units)
@@ -297,8 +303,9 @@ class QASolutionComparison(object):
                 prefix = 'ss'
                 if not time < 0.:
                     prefix = '{}'.format(converted_time)
-                filename = './{}_{}_{}_run{}.png'.format(prefix,variable,
+                filename = '{}_{}_{}_run{}.png'.format(prefix,variable,
                                self.template,self.run_number) 
+                doc_var.add_solution_png(filename)
                 plt.title(variable,fontsize=18)
                 plt.savefig(filename)
                 if self.plot_to_screen==True:
@@ -309,18 +316,28 @@ class QASolutionComparison(object):
 
                 error = QATestError(prefix,variable,self.template,self.run_number,self.plot_to_screen,self.error_units,False,self.plot_dimension)
                 if plot_error == True:                                     
-                    error.plot_error(x_loc[0],y_loc[0],z_loc[0],solutions[0],x_loc[1],y_loc[1],z_loc[1],solutions[1],self.x_string_time_slice,self.y_string_time_slice)
+                    filename = error.plot_error(x_loc[0],y_loc[0],z_loc[0],solutions[0],x_loc[1],y_loc[1],z_loc[1],solutions[1],self.x_string_time_slice,self.y_string_time_slice)
+                    doc_var.add_error_png(filename)
                 if print_error == True:   
-                    filename=error.print_error(x_loc[0],y_loc[0],z_loc[0],solutions[0],x_loc[1],y_loc[1],z_loc[1],solutions[1]) 
+                    filename = error.print_error(x_loc[0],y_loc[0],z_loc[0],solutions[0],x_loc[1],y_loc[1],z_loc[1],solutions[1]) 
                     all_stat_files.append(filename)
+                    doc_var.set_error_stat(filename)
+                doc_slice.add_variable(doc_var)
+            self.doc_run.add_time_slice(doc_slice)
         if print_error == True:
-            error.calc_error_metrics_over_all_times(all_stat_files,plot_time_units)
+            filename = error.calc_error_metrics_over_all_times(all_stat_files,plot_time_units)
+#            self.doc_run.add_time_slice_variable(doc_var)
+        
         debug_pop()        
         
     def plot_observation_file(self,locations,plot_error,print_error):
-        debug_push('QACompareSolutions plot_observatoin_file')
+        debug_push('QACompareSolutions plot_observation_file')
         for location in locations:
+            location_string = '{}, {}, {}'.format(location[0],location[1],
+                                                  location[2])
+            doc_obs = QATestDocObservation(location_string)
             for variable in self.variables:
+                doc_var = QATestDocVariable(variable) 
                 t_min = 1e20
                 t_max = -1e20
                 s_min = 1e20
@@ -389,15 +406,17 @@ class QASolutionComparison(object):
                 plt.ylabel(self.y_string_observation, fontsize=16)
                 
                 ax.tick_params(labelsize=14)
-                temp_title=  self.title+' {}, {}, {}'.format(location[0],location[1],location[2])
+                temp_title=  self.title+' '+location_string
                 
                 plt.annotate(temp_title, 
                              xy=(.03, .990),
                              xycoords='figure fraction',
                              horizontalalignment='left',
                              verticalalignment='top',fontsize=14)
-                filename = './{}_{}_{}_{}_{}_run{}.png'.format(
-                                               location[0],location[1],location[2],variable,self.template,self.run_number)
+                filename = '{}_{}_{}_{}_{}_run{}.png'.format(
+                          location[0],location[1],location[2],variable,
+                          self.template,self.run_number)
+                doc_var.add_solution_png(filename)
                 plt.savefig(filename)
                 if self.plot_to_screen == True:
                     plt.show()
@@ -406,9 +425,13 @@ class QASolutionComparison(object):
                 #######CHANGE
                 error = QATestError(location,variable,self.template,self.run_number,self.plot_to_screen,self.error_units,observation=True)  
                 if plot_error == True:                                     
-                    error.plot_error_1D(times[0],solutions[0],times[1],solutions[1],self.x_string_observation)
+                    filename = error.plot_error_1D(times[0],solutions[0],times[1],solutions[1],self.x_string_observation)
+                    doc_var.add_error_png(filename)
                 if print_error == True: 
                     filename = error.print_error_1D(times[0],solutions[0],times[1],solutions[1],time_unit)
+                    doc_var.set_error_stat(filename)
+                doc_obs.add_variable(doc_var)
+            self.doc_run.add_observation(doc_obs)
         
         debug_pop()
 

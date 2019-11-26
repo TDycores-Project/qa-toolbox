@@ -6,3 +6,5 @@ plot_dimension = 1D
 plot_title = Tracer Concentation
 plot_x_label = Distance [m]
 plot_y_label = Concentration [M]
+plot_error = True
+print_error = True

@@ -45,14 +45,15 @@ class QATestError(object):
             ##print error
             dimension2 = find_axis_1D(x2,y2,z2)
                 
-            self.plot_error_1D(dimension1,values1,dimension2,values2,x_label,difference_string)
+            filename = self.plot_error_1D(dimension1,values1,dimension2,values2,x_label,difference_string)
             
         elif self.dimension == '2D':
             dimension1,dimension2 = find_axis_2D(x1,y1,z1)
                 
-            self._plot_error_2D(dimension1,dimension2,values1,values2,x_label,y_label)
+            filename = self._plot_error_2D(dimension1,dimension2,values1,values2,x_label,y_label)
         
         debug_pop()
+        return filename
         
         
     def plot_error_1D(self,times1,values1,times2,values2,x_label,difference_string='all'):
@@ -134,7 +135,7 @@ class QATestError(object):
         if self.plot_to_screen == True:
             plt.show()
         plt.close()
-      
+        return filename 
 
       
     def print_error(self,x1,y1,z1,values1,x2,y2,z2,values2):
@@ -611,6 +612,7 @@ class QATestError(object):
         if self.plot_to_screen == True:
             plt.show()
         plt.close()
+        return filename
         
         
     def _calc_error_2D(self,x,y,solution1,solution2):
@@ -660,10 +662,11 @@ class QATestError(object):
     def calc_error_metrics_over_all_times(self,stat_file,tunit):
         
         if self.dimension == '1D':
-            self._calc_error_metrics_over_all_times_1D(stat_file,tunit)
+            filename = self._calc_error_metrics_over_all_times_1D(stat_file,tunit)
             
         elif self.dimension == '2D':
-            self._calc_error_metrics_over_all_times_2D(stat_file,tunit)
+            filename = self._calc_error_metrics_over_all_times_2D(stat_file,tunit)
+        return filename
 
             
     def _calc_error_metrics_over_all_times_1D(self,stat_file,tunit):
@@ -756,8 +759,7 @@ class QATestError(object):
             f.write('Maximum Average Relative Error = {} % \n'.format(maximum_average_relative_error))
             if len(tunit) > 0:
                 f.write('Time = {} {} \n'.format(maximum_average_relative_error_time,tunit))
-
-
+        return filename
             
     def _calc_error_metrics_over_all_times_2D(self,stat_file,tunit):
            
@@ -857,6 +859,7 @@ class QATestError(object):
             f.write('Maximum Average Relative Error = {} % \n'.format(maximum_average_relative_error))
             if len(tunit) > 0:
                 f.write('Time = {} {} \n'.format(maximum_average_relative_error_time,tunit))
+        return filename
         
         
 class Line:

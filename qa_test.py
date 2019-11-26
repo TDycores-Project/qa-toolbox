@@ -23,6 +23,7 @@ from qa_swapper import Swapper
 from qa_debug import *
 from qa_common import *
 from qa_solution_comparison import *
+from qa_test_doc import *
 
 class QATest(object):
     """
@@ -30,13 +31,14 @@ class QATest(object):
     """
     _wall_time_re = re.compile(r"Time \(seconds\)")
 
-    def __init__(self,name,section_dict=None):
+    def __init__(self,name,root_dir,section_dict=None):
         debug_push('QATest init')
         print_header('*',name)
         self._txtwrap = textwrap.TextWrapper(width=78, subsequent_indent=4*" ")
         self._timeout = 300.
         self._section_dict = section_dict
         self.name = name
+        self.root_dir = root_dir
         try:
             self.title = self._section_dict['title']
         except:
@@ -201,13 +203,16 @@ class QATest(object):
         i_attempt = 0
         passed = False
 
-        testlog = open('{}.testlog'.format(self.name),'w')
-        print('TITLE : {}'.format(self.title),file=testlog)
-        print('TEMPLATE : {}'.format(self._template),file=testlog)
-#        list_of_swap_dict = self._list_of_swap_dict 
-
+        cwd = os.getcwd()
+        print(cwd)
+        print(self.root_dir)
+        print(cwd.replace(self.root_dir,''))
+        doc = QATestDoc(cwd,cwd.replace(self.root_dir,''))
+        doc.set_title(self.title)
+        doc.set_template(self._template)
         for i in range(len(list_of_swap_dict)):
             run_number = i+1
+            doc_run = QATestDocRun(run_number)
   
             swap_dict = None
             if len(list_of_swap_dict) > 0:
@@ -222,18 +227,18 @@ class QATest(object):
             isimulator = 0
             
             for simulator in self._simulators:
-                mapped_name = self._mapped_simulator_names[isimulator]
-                print('SIMULATOR : {}'.format(mapped_name),file=testlog)
-                print_header('-',mapped_name)
-                filename = self._swap(mapped_name,simulator.get_suffix(),
+                mapped_simulator_name = self._mapped_simulator_names[isimulator]
+                if run_number == 1:
+                     doc.add_simulator(mapped_simulator_name)
+                print_header('-',mapped_simulator_name)
+                filename = self._swap(mapped_simulator_name,simulator.get_suffix(),
                                       run_number,swap_dict)
-                print('FILENAME : {}'.format(filename),file=testlog)
-
+                doc_run.set_input_filename(mapped_simulator_name,filename)
                 if len(self.map_options) > 0:
                     simulator.update_dict(self.map_options)
-                if len(self.tough_options) > 0 and mapped_name == 'tough3':
+                if len(self.tough_options) > 0 and mapped_simulator_name == 'tough3':
                     simulator.process_tough_options(self.tough_options,self._output_options)
-                solutions[mapped_name] = \
+                solutions[mapped_simulator_name] = \
                     simulator.run(filename,annotation)
                 isimulator += 1
             #self._compare_solutions(solutions)
@@ -241,9 +246,11 @@ class QATest(object):
             compare_solutions = \
                 QASolutionComparison(solutions,self._output_options,
                                      self._mapped_simulator_names,
-                                     self._template,run_number)
+                                     self._template,run_number,
+                                     doc_run)
             compare_solutions.process_opt_file()
-        testlog.close()
+            doc.add_run(doc_run)
+        doc.write()
         debug_pop()
 
 
