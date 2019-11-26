@@ -118,7 +118,9 @@ class QATestDoc(object):
 :ref:`{0}-detailed results`
 """.format(self._filename_root,'*'*len(self._title),self._title))
 
-        # results summary here
+        # -------------------------------
+        # results summary need to go here
+        # -------------------------------
 
         description_file = 'description_{}.txt'.format(self._filename_root) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
 
