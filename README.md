@@ -10,5 +10,5 @@ A framework for executing and documenting verification and validation tests.
    1. Create the documentation directory structure:
       * SPHINX_DIR - Top level directory where *index.rst* resides
       * SPHINX_DIR/source - Directory for supporting .rst files. Additional underlying directories may be created.
-1. Launch the test suite with **make all DOC_DIR=/path/to/documentation/directory**.
+1. Launch the test suite with **make all DOC_DIR=$SPHINX_DIR**.
    
