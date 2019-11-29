@@ -59,6 +59,6 @@ class QATestManager(object):
     def run_tests(self,testlog):
         debug_push('QATestManager run_tests')
         for key, test_case in self._tests.items():
-            test_case.run(self.available_simulators)
-            testlog.log_success(self._path,test_case.name)
+            test_title = test_case.run(self.available_simulators)
+            testlog.log_success(self._path,test_title)
         debug_pop()

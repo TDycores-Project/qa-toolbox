@@ -95,7 +95,7 @@ class QATestDoc(object):
         self._runs.append(run)
         debug_pop()
 
-    def write(self):
+    def write(self):   #write_document
 
 #           self._format_intro()
 #            self._format_results_summary()
@@ -151,6 +151,8 @@ Detailed Results
 """.format(self._filename_root))
 
         width_percent = 60
+        n = 1
+
 
         for run in self._runs:
             scenario_string = 'Scenario {}'.format(run._run_number)
@@ -167,16 +169,120 @@ Detailed Results
                                    variable_string,time_string,scenario_string,
                                   simulators[0]))
                     for i in range(1,len(simulators)):
-                        f.write(" vs {}".format(simulators[i]))
+                        f.write(" vs {}\n".format(simulators[i]))
                     f.write("\n")
                     # absolute here make it relative to the top source dir
                     # in the sphinx repo (usually: sphinx/doc/source/.)
-                    f.write(".. literalinclude:: /qa_tests/{}/{}\n\n".format(
+                    f.write(".. literalinclude:: ..{}/{}\n\n".format(
                                                          self._local_path,
                                               variable._error_stat))
-                    f.write(".. figure:: {}\n   :width: {} %\n\n".format(
-                                   variable._solution_png[0],width_percent))
-                    f.write(".. figure:: {}\n   :width: {} %\n\n".format(
-                                   variable._error_png[0],width_percent))
+                    f.write(".. _figure{}:\n".format(n))
+                    f.write("\n")
+                    f.write(".. figure:: ..{}/{}\n   :width: {} %\n\n".format(
+                                   self._local_path,variable._solution_png[0],width_percent))
+                    f.write(".. figure:: ..{}/{}\n   :width: {} %\n\n".format(
+                                   self._local_path,variable._error_png[0],width_percent))
+                    n = n+1
           
         f.close()
+
+
+class QATestDocIndex(object):
+    
+    def __init__(self,testlog):
+        self.testlog = testlog
+        
+    def write_index(self):#,testlog_file):
+        file_dict = self.testlog.read_contents()
+        print(file_dict)
+        self.write_toctree(file_dict)
+        self.write_introfiles(file_dict)
+        
+        f = open('../docs/index.rst','w')
+        
+        intro = """
+***************************
+QA Test Suite Documentation        
+***************************
+
+.. toctree::
+   :maxdepth: 2
+""" 
+        
+        f.write(intro)
+        
+        for folder in file_dict.keys():
+            f.write("""
+   intro_{}.rst
+            """.format(folder))
+
+            
+            
+        toctree_intro = """
+.. toctree::
+   :hidden:
+"""
+        f.write(toctree_intro)
+        for folder,tests in file_dict.items():          
+            for i in range(len(tests)):
+                toctree="""
+   include_toctree_{}_{}.rst""".format(folder,tests[i])
+                f.write(toctree)                
+        f.close()
+
+
+
+        
+    def write_toctree(self,file_dict):
+
+
+        
+        for folder,tests in file_dict.items():
+
+            ###RELATIVE PATHS.... MAY NEED TO CHANGE THIS LATER.....
+            
+            for i in range(len(tests)):
+                filename = '../docs/include_toctree_{}_{}.rst'.format(folder,tests[i])
+                f = open(filename, 'w')
+                toctree = """
+.. include:: ../{}/{}.rst                
+                """.format(folder,tests[i])
+                f.write(toctree)
+
+                f.close()
+        
+        
+        
+        
+    def write_introfiles(self, file_dict):        
+        for folder, test in file_dict.items():
+#            pretty_name = test.replace('_',' ').title()
+            filename = '../docs/intro_{}.rst'.format(folder)
+            intro = """
+.. {}-qa-tests:
+
+{} QA Tests
+{}
+
+            """.format(folder,folder,'='*(len(folder)+9))
+            
+            intro_links = [None]*len(test)
+            if len(test) == 1:
+                intro_links[0] = """
+* :ref:`{}`
+                """.format(test[0])
+            else:
+                for i in range(len(test)):
+                    intro_links[i] = """
+{}
+{}
+* :ref:`{}`
+                """.format(test[i],'-'*len(test[i]),test[i])
+                
+            f = open(filename, 'w')
+            f.write(intro)
+            for i in range(len(test)):
+                f.write(intro_links[i])
+            f.close()
+        
+      
