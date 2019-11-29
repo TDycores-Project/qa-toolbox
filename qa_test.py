@@ -173,7 +173,7 @@ class QATest(object):
         self._mapped_simulator_names = []
         debug_simulator_list = []
         for simulator in simulator_list:
-            s = re.split(r's*:s*',simulator.strip())
+            s = re.split(r'\s*:\s*',simulator.strip())
             simulator_name = s[0]
             if len(s) > 1:
                 mapped_simulator_name = s[1]

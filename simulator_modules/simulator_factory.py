@@ -13,6 +13,8 @@ from simulator_modules.tough2 import QASimulatorTOUGH2
 from simulator_modules.tough3 import QASimulatorTOUGH3
 from simulator_modules.tdycore import QASimulatorTDycore
 
+
+
 def locate_simulators():
     debug_push('simulator_factory.locate_simulators')
     if os.path.exists('simulators.sim'):
@@ -62,9 +64,10 @@ def create_simulator(simulator_name,path):
          simulator = QASimulatorTOUGH3(path)
     elif simulator_name == 'tdycore':
          simulator = QASimulatorTDycore(path)
+
     else:
-        print('Simulator {} not recognized in simulator_factor.py.'
+        print_err_msg('Simulator {} not recognized in simulator_factor.py.'
               .format(simulator_name))
-        raise
+        
     debug_pop()
     return simulator

@@ -29,7 +29,6 @@ from qa_test_log import QATestLog
 from qa_test_manager import QATestManager
 from qa_common import *
 from simulator_modules.simulator_factory import locate_simulators
-from regression_tests.qa_regression_test import QARegressionTest
 
 def commandline_options():
     """
@@ -89,7 +88,8 @@ def main(options):
       filename = 'config_files.txt'
     else:
       filename='default_config_files.txt'
-      
+     
+    config_files.append('regression_tests/test.cfg') ###best way??
     for line in open(filename,'r'):
       line=line.strip()
         # rstrip to remove EOL. otherwise, errors when opening file
@@ -102,9 +102,6 @@ def main(options):
 #    doc = QATestDoc(options.doc_dir)
     testlog = QATestLog(root_dir)
 
-    ##before run tests, run regression tests
-    regression_test = QARegressionTest()
-    regression_test.run_test(testlog)
     
 
     # loop through config files, cd into the appropriate directory,
