@@ -251,7 +251,6 @@ class QATest(object):
             compare_solutions.process_opt_file()
             doc.add_run(doc_run)
         doc.write()
-        return self.title ####could just read qa_test_manager
         debug_pop()
 
 

@@ -25,6 +25,7 @@ class QATestManager(object):
         self._config_filename = None
         self._tests = OrderedDict()
         self.available_simulators = simulators_dict
+        self._test_titles = OrderedDict()
         
     def __str__(self):
         string = 'QA Test Manager :\n'
@@ -52,13 +53,15 @@ class QATestManager(object):
         sections = config.sections()
         for section in sections:
             name = section
-            test = QATest(name,root_dir,list_to_dict(config.items(section)))
+            section_dict = list_to_dict(config.items(section))
+            test = QATest(name,root_dir,section_dict)
             self._tests[name] = test
+            self._test_titles[name] = qa_lookup(section_dict, 'title',name)
         debug_pop() #QATestManager process_config_file
             
     def run_tests(self,testlog):
         debug_push('QATestManager run_tests')
         for key, test_case in self._tests.items():
-            test_title = test_case.run(self.available_simulators)
-            testlog.log_success(self._path,test_title)
+            test_case.run(self.available_simulators)
+            testlog.log_success(self._path,self._test_titles[key])
         debug_pop()
