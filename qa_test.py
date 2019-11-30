@@ -51,7 +51,6 @@ class QATest(object):
         self._swap_options = {}
         self._output_options = {}
         self.map_options={}
-        self.tough_options={}
         self._process_opt_file()
         self.swap_dict = {}
         self._template = self._section_dict['template']
@@ -88,8 +87,6 @@ class QATest(object):
             self._section_from_opt_file(config,'output_options')
         self.map_options = \
             self._section_from_opt_file(config_mapping,'mapping_options')
-        self.tough_options = \
-            self._section_from_opt_file(config,'tough_options')
         if len(self._output_options) == 0:
             print_err_msg('No output_options defined in options file {} in \
                            folder'.format(filename,os.getcwd()))            
@@ -236,8 +233,6 @@ class QATest(object):
                 doc_run.set_input_filename(mapped_simulator_name,filename)
                 if len(self.map_options) > 0:
                     simulator.update_dict(self.map_options)
-                if len(self.tough_options) > 0 and mapped_simulator_name == 'tough3':
-                    simulator.process_tough_options(self.tough_options,self._output_options)
                 solutions[mapped_simulator_name] = \
                     simulator.run(filename,annotation)
                 isimulator += 1
