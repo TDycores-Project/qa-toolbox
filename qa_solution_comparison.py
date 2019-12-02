@@ -277,6 +277,7 @@ class QASolutionComparison(object):
                 plot_time_units = ''
                 temp_title = self.title
                 if not time < 0.:
+                    plot_time_units = self.output_options['plot_time_units']
                     if converted_time == 0:
                         temp_title += ' @ {} {}'.format(converted_time,
                                                         plot_time_units)
@@ -336,6 +337,8 @@ class QASolutionComparison(object):
             location_string = '{}, {}, {}'.format(location[0],location[1],
                                                   location[2])
             doc_obs = QATestDocObservation(location_string)
+            
+            all_stat_files = []
             for variable in self.variables:
                 doc_var = QATestDocVariable(variable) 
                 t_min = 1e20
@@ -430,9 +433,11 @@ class QASolutionComparison(object):
                 if print_error == True: 
                     filename = error.print_error_1D(times[0],solutions[0],times[1],solutions[1],time_unit)
                     doc_var.set_error_stat(filename)
+                    all_stat_files.append(filename)
                 doc_obs.add_variable(doc_var)
             self.doc_run.add_observation(doc_obs)
-        
+        if print_error == True:
+            filename = error.calc_error_metrics_over_all_locations(all_stat_files,time_unit) ##time_unit correct??
         debug_pop()
 
 
