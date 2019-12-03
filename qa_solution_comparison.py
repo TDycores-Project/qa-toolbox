@@ -1,7 +1,7 @@
 import sys
 import re
 import os
-import time
+
 import subprocess
 import textwrap
 import csv
@@ -105,23 +105,28 @@ class QASolutionComparison(object):
     def plot_time_slice(self,times,plot_error,print_error):
         debug_push('QACompareSolutions plot_time_slice')
         
-        all_stat_files=[]
-        for time in times:
-            plot_time_units = ''
-            converted_time = -999.
-            if time < 0.: 
+        
+        plot_time_units = ''
+        converted_time = -999.
+        if times[0] < 0.: 
                 # time < 0 indicates steady state
-                if len(times) > 1:
-                    print_err_msg('QACompareSolutions: Negative time in times '
+            if len(times) > 1:
+                print_err_msg('QACompareSolutions: Negative time in times '
                                 'array indicates steady state. Yet, there '
                                 'is more than one time.')
-            else:
-                plot_time_units = self.output_options['plot_time_units']
-                sec_over_tunits = unit_conversion(plot_time_units)
+        else:
+            plot_time_units = self.output_options['plot_time_units']
+            sec_over_tunits = unit_conversion(plot_time_units)
+            
+        for variable in self.variables:
+            doc_var = QATestDocVariable(variable) 
+            all_stat_files=[]
+            
+            for time in times:
+
                 converted_time = time/sec_over_tunits
-            doc_slice = QATestDocTimeSlice(converted_time,plot_time_units) 
-            for variable in self.variables:
-                doc_var = QATestDocVariable(variable) 
+                doc_slice = QATestDocTimeSlice(converted_time,plot_time_units) 
+            
                 x_min = 1e20
                 x_max = -1.e20
                 y_min = 1e20
@@ -274,7 +279,7 @@ class QASolutionComparison(object):
                 plt.ylabel(self.y_string_time_slice,fontsize=16)
                 
                 ax.tick_params(labelsize=14)
-                plot_time_units = ''
+#                plot_time_units = ''
                 temp_title = self.title
                 if not time < 0.:
                     if converted_time == 0:
@@ -324,8 +329,22 @@ class QASolutionComparison(object):
                     doc_var.set_error_stat(filename)
                 doc_slice.add_variable(doc_var)
             self.doc_run.add_time_slice(doc_slice)
-        if print_error == True:
-            filename = error.calc_error_metrics_over_all_times(all_stat_files,plot_time_units)
+            if print_error == True:
+                filename = error.calc_error_metrics_over_all_times(all_stat_files,plot_time_units)
+                doc_slice.add_max_absolute_error(error.maximum_absolute_error_all_times,
+                                                 error.maximum_absolute_error_time,
+                                                 error.maximum_absolute_error_location_all_times,
+                                                 error.maximum_absolute_error_index)
+                doc_slice.add_max_relative_error(error.maximum_relative_error_all_times,
+                                                 error.maximum_relative_error_time,
+                                                 error.maximum_relative_error_location_all_times,
+                                                 error.maximum_relative_error_index)
+                doc_slice.add_max_average_absolute_error(error.maximum_average_absolute_error,
+                                                         error.maximum_average_absolute_error_time,
+                                                         error.maximum_average_absolute_error_index)
+                doc_slice.add_max_average_relative_error(error.maximum_average_relative_error,
+                                                         error.maximum_average_relative_error_time,
+                                                         error.maximum_average_relative_error_index)
 #            self.doc_run.add_time_slice_variable(doc_var)
         
         debug_pop()        

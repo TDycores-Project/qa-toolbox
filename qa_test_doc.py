@@ -30,8 +30,7 @@ class QATestDocTimeSlice():
         self._time_unit = time_unit
         self._variables = []
 
-    def add_variable(self,variable):
-       self._variables.append(variable)
+
 
 class QATestDocObservation():
     def __init__(self,location):
@@ -40,6 +39,7 @@ class QATestDocObservation():
 
     def add_variable(self,variable):
        self._variables.append(variable)
+       
 
 class QATestDocRun():
     def __init__(self,run_number):
@@ -49,6 +49,23 @@ class QATestDocRun():
         self._overall = []
         self._filenames = {}
         self._rst_filename = ''
+        
+        self._maximum_absolute_errors = []
+        self._maximum_absolute_error_times = []
+        self._maximum_absolute_error_locations = []
+        self._maximum_absolute_error_index = []        
+        self._maximum_relative_errors = []
+        self._maximum_relative_error_times = []
+        self._maximum_relative_error_locations = []
+        self._maximum_relative_error_index = []
+        
+        self._maximum_average_absolute_errors = []
+        self._maximum_average_absolute_error_times = []
+        self._maximum_average_absolute_error_index = []
+        
+        self._maximum_average_relative_errors = []
+        self._maximum_average_relative_error_times = []
+        self._maximum_average_relative_error_index = []
 
     def set_input_filename(self,simulator,filename):
         self._filenames[simulator] = filename
@@ -58,6 +75,29 @@ class QATestDocRun():
     
     def add_observation(self,doc_observation):
         self._observations.append(doc_observation)
+        
+       
+    def add_max_absolute_error(self,variable,error,time,location,index):
+        self._maximum_absolute_errors.append(error)
+        self._maximum_absolute_error_times.append(time)
+        self._maximum_absolute_error_locations.append(location)
+        self._maximum_absolute_error_index.append(index)
+    
+    def add_max_relative_error(self,variable,error,time,location,index):
+        self._maximum_relative_errors.append(error)
+        self._maximum_relative_error_times.append(time)
+        self._maximum_relative_error_locations.append(location)
+        self._maximum_relative_error_index.append(index)
+        
+    def add_max_average_absolute_error(self,variable,error,time,index):
+        self._maximum_average_absolute_errors.append(error)
+        self._maximum_average_absolute_error_times.append(time)
+        self._maximum_average_absolute_error_index.append(index)
+        
+    def add_max_average_relative_error(self,variable,error,time,index):
+        self._maximum_average_relative_errors.append(error)
+        self._maximum_average_relative_error_times.append(time)
+        self._maximum_average_relative_error_index.append(index)
     
 class QATestDoc(object):
     
@@ -117,10 +157,49 @@ class QATestDoc(object):
 
 :ref:`{0}-detailed results`
 """.format(self._filename_root,'*'*len(self._title),self._title))
-
-        # -------------------------------
-        # results summary need to go here
-        # -------------------------------
+     
+    f.write("""
+.. _{}-results summary:            
+    
+Results Summary
+===============
+""").format(self._filename_root)
+        
+    for run in self._runs:
+        f.write("""
+Scenario {}
+{}
+""").format()
+        
+        for variable in run._time_slice._variables:
+            
+            
+            f.write("""
+.. list-table::
+   :widths: 40 35 10 20
+   :header-rows: 1
+   
+   * - 
+     - Value
+     - Time
+     - Location
+   * - :ref:`Maximum Absolute Error <{0}_figure{}>`
+     - {}
+     - {}
+     - {}
+   * - :ref:`Maximum Relative Error <{0}_figure{}>`
+     - {}
+     - {}
+     - {}
+   * - :ref:`Maximum Average Absolute Error <{0}_figure{}>`
+     - {}
+     - {}
+     - 
+   * - :ref:`Maximum Average Relative Error <{0}_figure{}>`
+     - {}
+     - {}
+     -
+     """).format(run._maximum_absolute_error_index,run._maximum_absolute_error,run.)
 
         description_file = 'description_{}.txt'.format(self._filename_root) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
 
