@@ -274,7 +274,6 @@ class QASolutionComparison(object):
                 plt.ylabel(self.y_string_time_slice,fontsize=16)
                 
                 ax.tick_params(labelsize=14)
-                plot_time_units = ''
                 temp_title = self.title
                 if not time < 0.:
                     plot_converted_time = format_floating_number(converted_time)
