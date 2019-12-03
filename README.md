@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/TDycores-Project/qa-toolbox.svg?branch=master)](https://travis-ci.org/TDycores-Project/qa-toolbox)
+
 # qa-toolbox
 A framework for executing and documenting verification and validation tests.
 
