@@ -95,14 +95,7 @@ class QATestDoc(object):
         self._runs.append(run)
         debug_pop()
 
-    def write(self):   #write_document
-
-#           self._format_intro()
-#            self._format_results_summary()
-#            self._format_description() 
-#            self._format_detailed_results() ####see if observation file exsists if not....
-#            self._format_simulator_files()
-
+    def write(self):   
 
         f = open(self._filename_root+'.rst','w')
         f.write("""
@@ -153,7 +146,6 @@ Detailed Results
         width_percent = 60
         n = 1
 
-
         for run in self._runs:
             scenario_string = 'Scenario {}'.format(run._run_number)
             f.write("{}\n".format(scenario_string))
@@ -185,7 +177,6 @@ Detailed Results
                     n = n+1
           
         f.close()
-
 
 class QATestDocIndex(object):
     
@@ -229,18 +220,11 @@ QA Test Suite Documentation
    include_toctree_{}_{}.rst""".format(folder,tests[i])
                 f.write(toctree)                
         f.close()
-
-
-
         
     def write_toctree(self,file_dict):
-
-
         
         for folder,tests in file_dict.items():
-
-            ###RELATIVE PATHS.... MAY NEED TO CHANGE THIS LATER.....
-            
+            ###RELATIVE PATHS.... MAY NEED TO CHANGE THIS LATER.....            
             for i in range(len(tests)):
                 filename = '../docs/include_toctree_{}_{}.rst'.format(folder,tests[i])
                 f = open(filename, 'w')
@@ -248,11 +232,7 @@ QA Test Suite Documentation
 .. include:: ../{}/{}.rst                
                 """.format(folder,tests[i])
                 f.write(toctree)
-
                 f.close()
-        
-        
-        
         
     def write_introfiles(self, file_dict):        
         for folder, test in file_dict.items():
