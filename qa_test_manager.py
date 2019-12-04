@@ -48,20 +48,18 @@ class QATestManager(object):
         config = configparser.ConfigParser()
         debug_push('QATestManager process_config_file parse')
         config.read(self._config_filename)
-        debug_pop() #QATestManager process_config_file parse
+        debug_pop() 
         
         sections = config.sections()
         for section in sections:
-            name = section
-            section_dict = list_to_dict(config.items(section))
-            test = QATest(name,root_dir,section_dict)
+            name = section            
+            test = QATest(name,root_dir,list_to_dict(config.items(section)))
             self._tests[name] = test
-            self._test_titles[name] = qa_lookup(section_dict, 'title',name)
-        debug_pop() #QATestManager process_config_file
+        debug_pop()
             
     def run_tests(self,testlog):
         debug_push('QATestManager run_tests')
         for key, test_case in self._tests.items():
             test_case.run(self.available_simulators)
-            testlog.log_success(self._path,self._test_titles[key])
+            testlog.log_success(self._path,test_case.title)
         debug_pop()

@@ -194,7 +194,7 @@ class QATestDocIndex(object):
         
     def write_index(self):#,testlog_file):
         file_dict = self.testlog.read_contents()
-        print(file_dict)
+        
         self.write_toctree(file_dict)
         self.write_introfiles(file_dict)
         
