@@ -178,7 +178,7 @@ Detailed Results
                                    variable._solution_png[0],width_percent))
                     f.write(".. figure:: {}\n   :width: {} %\n\n".format(
                                    variable._error_png[0],width_percent))
-            if len(run._observations)>0:
+            if len(run._observations) > 0:
               f.write("""
 Observation Point
 ^^^^^^^^^^^^^^^^^
