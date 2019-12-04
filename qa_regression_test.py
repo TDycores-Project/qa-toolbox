@@ -20,7 +20,6 @@ class QARegressionTest(object):
         self._tolerance = 1e-12
         debug_pop()
 
-
     def compare_values(self):
         gold_dict = self._process_gold_files()
         test_dict = self._get_test_values()
@@ -33,13 +32,11 @@ class QARegressionTest(object):
             test_value = value1
         
             delta = abs(test_value-gold_value) #####DEBUG
-
         
-            if delta>self._tolerance:
+            if delta > self._tolerance:
                 self._fail = True
-                fail_dict[key1]=delta
-        
-        
+                fail_dict[key1] = delta
+                
         if self._fail == True:
             with open('regression_test/regression_test_output.txt','w') as f:
                 for key,value in fail_dict.items():
@@ -47,9 +44,6 @@ class QARegressionTest(object):
             print_err_msg('Regression test failed. Check regression_test_output.txt') 
         else:
             print('Regression test passed, continuing with qa_tests')
-            
-            
-            
             
     def _get_test_values(self):
         time_slice_filename = '0.0_Pressure_regression_run1_error.stat'
@@ -60,16 +54,17 @@ class QARegressionTest(object):
         observation_keys, observation_values = self._process_stat_file(observation_filename)
         total_error_keys, total_error_values = self._process_stat_file(total_error_filename)
         
-        test_dict=self._create_dict(time_slice_keys,time_slice_values,observation_keys,observation_values,total_error_keys,total_error_values)
+        test_dict=self._create_dict(time_slice_keys,time_slice_values,
+                                    observation_keys,observation_values,
+                                    total_error_keys,total_error_values)
         
         return test_dict
-
     
     def _process_stat_file(self,filename):
         fin = open(filename,'r')
         
-        keys=[]
-        values=[]
+        keys = []
+        values = []
         for line in fin:
             words = line.strip().split('=')
             keys.append(words[0])
@@ -77,15 +72,16 @@ class QARegressionTest(object):
 
         return keys, values
     
-    def _create_dict(self,time_slice_keys,time_slice_values,observation_keys,observation_values,total_error_keys,total_error_values):
+    def _create_dict(self,time_slice_keys,time_slice_values,observation_keys,
+                     observation_values,total_error_keys,total_error_values):
         error_dict = {}
         
         for i in range(len(time_slice_keys)):
-            error_dict['time_slice_{}'.format(time_slice_keys[i])]=time_slice_values[i]
+            error_dict['time_slice_{}'.format(time_slice_keys[i])] = time_slice_values[i]
             error_dict['observation_{}'.format(observation_keys[i])] = observation_values[i]
         
         for i in range(len(total_error_keys)):
-            error_dict['{}'.format(total_error_keys[i])]=total_error_values[i]
+            error_dict['{}'.format(total_error_keys[i])] = total_error_values[i]
             
         return error_dict
             
@@ -99,7 +95,9 @@ class QARegressionTest(object):
         observation_keys, observation_values = self._process_stat_file(observation_filename)
         total_error_keys, total_error_values = self._process_stat_file(total_error_filename)
 
-        gold_dict=self._create_dict(time_slice_keys,time_slice_values,observation_keys,observation_values,total_error_keys,total_error_values)
+        gold_dict=self._create_dict(time_slice_keys,time_slice_values,
+                                    observation_keys,observation_values,
+                                    total_error_keys,total_error_values)
 
         
         return gold_dict

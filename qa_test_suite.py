@@ -83,13 +83,15 @@ def main(options):
 
     print("Running QA tests :") 
     
-    config_files = []
+    
     if os.path.exists('config_files.txt'):
       filename = 'config_files.txt'
     else:
       filename='default_config_files.txt'
-     
-    config_files.append('regression_tests/test.cfg') ###best way??
+    
+    # regression tests must come first in list of config files
+    config_files = []
+    config_files.append('regression_tests/test.cfg') 
     for line in open(filename,'r'):
       line=line.strip()
         # rstrip to remove EOL. otherwise, errors when opening file
