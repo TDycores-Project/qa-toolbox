@@ -253,20 +253,6 @@ def format_floating_number(value):
     elif value >= 1000:
         value = ("%.2e" % value)
         
-        
-#    if value == 0:
-#        value = value
-#    elif value < 1e-3:
-#        value = float("%.4f" % value)
-#    elif value < 1.e-2:
-#        value = float("%.3f" % value)
-#    elif value < 1.e-1:
-#        value = float("%.2f" % value)
-#    elif value < 1.:
-#        value = float("%.1f" % value)
-#    else:
-#        value = value
-        
     return value
 
     
