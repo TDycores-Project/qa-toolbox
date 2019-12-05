@@ -16,6 +16,7 @@ class QATestLog(object):
         open(self.unrun_tests,'w').close()
         
     def log_success(self,path,test):
+        test = test.lower().replace(" ","_")
         with open(self.successful_tests,"a+") as f:
             f.write('{}/{} \n'.format(path,test))
 
@@ -26,12 +27,21 @@ class QATestLog(object):
     def log_unrun(self,path,test):
         with open(unrun_tests,"a+") as f:
             f.write('{}/{} \n'.format(path,test))
-        
-        
+                
     def _copy_contents_to_file(self,file_to_read,file_to_write):
         with open(file_to_read, "r") as f1:
             with open(file_to_write, "a+") as f2:
                 for line in f1:
                     f2.write(line)
                     
-                    
+    def read_contents(self):
+        log_dict = {}
+        with open(self.successful_tests,'r') as f:
+            for line in f:
+                tests = line.strip().split('/')
+                if tests[-2] in log_dict.keys():
+                    log_dict[tests[-2]].append(tests[-1])
+                else:
+                    log_dict[tests[-2]] = [tests[-1]]
+        return log_dict
+            
