@@ -27,8 +27,7 @@ class QATestLog(object):
     def log_unrun(self,path,test):
         with open(unrun_tests,"a+") as f:
             f.write('{}/{} \n'.format(path,test))
-        
-        
+                
     def _copy_contents_to_file(self,file_to_read,file_to_write):
         with open(file_to_read, "r") as f1:
             with open(file_to_write, "a+") as f2:
@@ -44,10 +43,5 @@ class QATestLog(object):
                     log_dict[tests[-2]].append(tests[-1])
                 else:
                     log_dict[tests[-2]] = [tests[-1]]
-                
-                
         return log_dict
             
-            
-                    
-                    
