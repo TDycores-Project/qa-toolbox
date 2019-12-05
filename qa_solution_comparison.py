@@ -117,15 +117,19 @@ class QASolutionComparison(object):
         else:
             plot_time_units = self.output_options['plot_time_units']
             sec_over_tunits = unit_conversion(plot_time_units)
-            
+        
+        all_stat_files=[]
         for variable in self.variables:
-            doc_var = QATestDocVariable(variable) 
-            all_stat_files=[]
-            
+            doc_var = QATestDocVariable(variable)
             for time in times:
-
                 converted_time = time/sec_over_tunits
-                doc_slice = QATestDocTimeSlice(converted_time,plot_time_units) 
+                doc_slice = QATestDocTimeSlice(converted_time,plot_time_units)
+ 
+            
+            
+            
+
+ 
             
                 x_min = 1e20
                 x_max = -1.e20
@@ -327,25 +331,27 @@ class QASolutionComparison(object):
                     filename = error.print_error(x_loc[0],y_loc[0],z_loc[0],solutions[0],x_loc[1],y_loc[1],z_loc[1],solutions[1]) 
                     all_stat_files.append(filename)
                     doc_var.set_error_stat(filename)
+                    
                 doc_slice.add_variable(doc_var)
-            self.doc_run.add_time_slice(doc_slice)
+                self.doc_run.add_time_slice(doc_slice)
+            
             if print_error == True:
-                filename = error.calc_error_metrics_over_all_times(all_stat_files,plot_time_units)
-                doc_slice.add_max_absolute_error(error.maximum_absolute_error_all_times,
+                error.calc_error_metrics_over_all_times(all_stat_files,plot_time_units)
+                self.doc_run.add_max_absolute_error(variable, error.maximum_absolute_error_all_times,
                                                  error.maximum_absolute_error_time,
                                                  error.maximum_absolute_error_location_all_times,
                                                  error.maximum_absolute_error_index)
-                doc_slice.add_max_relative_error(error.maximum_relative_error_all_times,
+                self.doc_run.add_max_relative_error(variable,error.maximum_relative_error_all_times,
                                                  error.maximum_relative_error_time,
                                                  error.maximum_relative_error_location_all_times,
                                                  error.maximum_relative_error_index)
-                doc_slice.add_max_average_absolute_error(error.maximum_average_absolute_error,
+                self.doc_run.add_max_average_absolute_error(variable,error.maximum_average_absolute_error,
                                                          error.maximum_average_absolute_error_time,
                                                          error.maximum_average_absolute_error_index)
-                doc_slice.add_max_average_relative_error(error.maximum_average_relative_error,
+                self.doc_run.add_max_average_relative_error(variable,error.maximum_average_relative_error,
                                                          error.maximum_average_relative_error_time,
                                                          error.maximum_average_relative_error_index)
-#            self.doc_run.add_time_slice_variable(doc_var)
+##            self.doc_run.add_time_slice_variable(doc_var)
         
         debug_pop()        
         

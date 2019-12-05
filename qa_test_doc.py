@@ -30,7 +30,8 @@ class QATestDocTimeSlice():
         self._time_unit = time_unit
         self._variables = []
 
-
+    def add_variable(self,variable):
+       self._variables.append(variable)
 
 class QATestDocObservation():
     def __init__(self,location):
@@ -50,22 +51,22 @@ class QATestDocRun():
         self._filenames = {}
         self._rst_filename = ''
         
-        self._maximum_absolute_errors = []
-        self._maximum_absolute_error_times = []
-        self._maximum_absolute_error_locations = []
-        self._maximum_absolute_error_index = []        
-        self._maximum_relative_errors = []
-        self._maximum_relative_error_times = []
-        self._maximum_relative_error_locations = []
-        self._maximum_relative_error_index = []
+        self._maximum_absolute_errors = {}
+        self._maximum_absolute_error_times = {}
+        self._maximum_absolute_error_locations = {}
+        self._maximum_absolute_error_index = {}        
+        self._maximum_relative_errors = {}
+        self._maximum_relative_error_times = {}
+        self._maximum_relative_error_locations = {}
+        self._maximum_relative_error_index = {}
         
-        self._maximum_average_absolute_errors = []
-        self._maximum_average_absolute_error_times = []
-        self._maximum_average_absolute_error_index = []
+        self._maximum_average_absolute_errors = {}
+        self._maximum_average_absolute_error_times = {}
+        self._maximum_average_absolute_error_index = {}
         
-        self._maximum_average_relative_errors = []
-        self._maximum_average_relative_error_times = []
-        self._maximum_average_relative_error_index = []
+        self._maximum_average_relative_errors = {}
+        self._maximum_average_relative_error_times = {}
+        self._maximum_average_relative_error_index = {}
 
     def set_input_filename(self,simulator,filename):
         self._filenames[simulator] = filename
@@ -78,26 +79,28 @@ class QATestDocRun():
         
        
     def add_max_absolute_error(self,variable,error,time,location,index):
-        self._maximum_absolute_errors.append(error)
-        self._maximum_absolute_error_times.append(time)
-        self._maximum_absolute_error_locations.append(location)
-        self._maximum_absolute_error_index.append(index)
+        self._maximum_absolute_errors[variable]= error
+        self._maximum_absolute_error_times[variable] = time
+        self._maximum_absolute_error_locations[variable] = location
+        self._maximum_absolute_error_index[variable] = index
+#        print('max')
+#        print(self._maximum_absolute_errors[variable])
     
     def add_max_relative_error(self,variable,error,time,location,index):
-        self._maximum_relative_errors.append(error)
-        self._maximum_relative_error_times.append(time)
-        self._maximum_relative_error_locations.append(location)
-        self._maximum_relative_error_index.append(index)
+        self._maximum_relative_errors[variable] = error
+        self._maximum_relative_error_times[variable] = time
+        self._maximum_relative_error_locations[variable] = location
+        self._maximum_relative_error_index[variable] = index
         
     def add_max_average_absolute_error(self,variable,error,time,index):
-        self._maximum_average_absolute_errors.append(error)
-        self._maximum_average_absolute_error_times.append(time)
-        self._maximum_average_absolute_error_index.append(index)
+        self._maximum_average_absolute_errors[variable] = error
+        self._maximum_average_absolute_error_times[variable] = time
+        self._maximum_average_absolute_error_index[variable] = index
         
     def add_max_average_relative_error(self,variable,error,time,index):
-        self._maximum_average_relative_errors.append(error)
-        self._maximum_average_relative_error_times.append(time)
-        self._maximum_average_relative_error_index.append(index)
+        self._maximum_average_relative_errors[variable] = error
+        self._maximum_average_relative_error_times[variable] = time
+        self._maximum_average_relative_error_index[variable] = index
     
 class QATestDoc(object):
     
@@ -158,23 +161,23 @@ class QATestDoc(object):
 :ref:`{0}-detailed results`
 """.format(self._filename_root,'*'*len(self._title),self._title))
      
-    f.write("""
+        f.write("""
 .. _{}-results summary:            
     
 Results Summary
 ===============
-""").format(self._filename_root)
+
+""".format(self._filename_root))
         
-    for run in self._runs:
-        f.write("""
-Scenario {}
-{}
-""").format()
-        
-        for variable in run._time_slice._variables:
+        for run in self._runs:
+            scenario_string = 'Scenario {}'.format(run._run_number)
+            f.write("{}\n".format(scenario_string))
+            f.write("{}\n".format('-'*len(scenario_string)))
             
-            
-            f.write("""
+            for varia in run._time_slices[0]._variables:
+                variable = varia._name            
+                f.write("""
+                        
 .. list-table::
    :widths: 40 35 10 20
    :header-rows: 1
@@ -183,23 +186,32 @@ Scenario {}
      - Value
      - Time
      - Location
-   * - :ref:`Maximum Absolute Error <{0}_figure{}>`
+   * - :ref:`Maximum Absolute Error <{}_figure{}>`
      - {}
      - {}
      - {}
-   * - :ref:`Maximum Relative Error <{0}_figure{}>`
+   * - :ref:`Maximum Relative Error <{}_figure{}>`
      - {}
      - {}
      - {}
-   * - :ref:`Maximum Average Absolute Error <{0}_figure{}>`
+   * - :ref:`Maximum Average Absolute Error <{}_figure{}>`
      - {}
      - {}
      - 
-   * - :ref:`Maximum Average Relative Error <{0}_figure{}>`
+   * - :ref:`Maximum Average Relative Error <{}_figure{}>`
      - {}
      - {}
      -
-     """).format(run._maximum_absolute_error_index,run._maximum_absolute_error,run.)
+     
+     
+         """.format(self._filename_root,run._maximum_absolute_error_index[variable],
+                     run._maximum_absolute_errors[variable],run._maximum_absolute_error_times[variable],
+                     run._maximum_absolute_error_locations[variable],self._filename_root,run._maximum_relative_error_index[variable],
+                     run._maximum_relative_errors[variable],run._maximum_relative_error_times[variable],
+                     run._maximum_relative_error_locations[variable],self._filename_root,run._maximum_average_absolute_error_index[variable],
+                     run._maximum_average_absolute_errors[variable],run._maximum_average_absolute_error_times[variable],
+                     self._filename_root,run._maximum_average_relative_error_index[variable],run._maximum_average_relative_errors[variable],
+                     run._maximum_average_relative_error_times[variable]))
 
         description_file = 'description_{}.txt'.format(self._filename_root) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
 
