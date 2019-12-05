@@ -184,8 +184,7 @@ Observation Point
 ^^^^^^^^^^^^^^^^^
 
 """)
-            for observation in run._observations:
-              
+            for observation in run._observations:              
                 observation_string = '{}'.format(observation._location)
                 for variable in observation._variables:
                     variable_string = variable._name
