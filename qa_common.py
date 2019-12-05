@@ -221,7 +221,6 @@ def check_array_equal(x):
     return all(first == rest for rest in x)
 
 def check_coordinates_2D(x,x2,y,y2):
-#        debug_push('SolutionReader diff_coordinates')
     coord_eps = 1.e-6
 
     if x.size == x2.size:
@@ -245,5 +244,15 @@ def check_coordinates_2D(x,x2,y,y2):
 
     if debug_verbose():
         print('Coordinates match')
-#        debug_pop()
+        
+def format_floating_number(value):
+    if value < 1:
+        value = ("%.2e" % value)
+    elif value >= 1 and value < 1000:
+        value = ("%.2f" % value)
+    elif value >= 1000:
+        value = ("%.2e" % value)
+        
+    return value
+
     
