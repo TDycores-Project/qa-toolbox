@@ -175,7 +175,32 @@ Detailed Results
                     f.write(".. figure:: ..{}/{}\n   :width: {} %\n\n".format(
                                    self._local_path,variable._error_png[0],width_percent))
                     n = n+1
-          
+                    
+            if len(run._observations) > 0:
+                f.write("""
+Observation Point
+^^^^^^^^^^^^^^^^^
+
+""")
+            for observation in run._observations:              
+                observation_string = '{}'.format(observation._location)
+                for variable in observation._variables:
+                    variable_string = variable._name
+                    f.write("Comparison of {} at {} for {}: {}".format(
+                                 variable_string,observation_string,scenario_string,
+                                 simulators[0]))
+                    for i in range(1,len(simulators)):
+                        f.write(" vs {}\n".format(simulators[i]))
+                    f.write("\n")
+                    f.write(".. literalinclude:: ..{}/{}\n\n".format(
+                                 self._local_path,variable._error_stat))
+                    f.write(".. figure:: ..{}/{}\n   :width: {} %\n\n".format(
+                                 self._local_path,
+                                 variable._solution_png[0],width_percent))
+                    f.write(".. figure:: ..{}/{}\n   :width: {} %\n\n".format(
+                                 self._local_path,
+                                 variable._error_png[0],width_percent))
+
         f.close()
 
 class QATestDocIndex(object):
