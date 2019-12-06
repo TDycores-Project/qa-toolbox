@@ -228,7 +228,8 @@ QA Test Suite Documentation
         
         f.write(intro)
         
-        for folder in file_dict.keys():
+        for folder_path in file_dict.keys():
+            folder = folder_path.strip().split('/')[-1]
             f.write("""
    intro_{}.rst
             """.format(folder))
@@ -240,7 +241,8 @@ QA Test Suite Documentation
    :hidden:
 """
         f.write(toctree_intro)
-        for folder,tests in file_dict.items():          
+        for folder_path,tests in file_dict.items(): 
+            folder = folder_path.strip().split('/')[-1]
             for i in range(len(tests)):
                 toctree="""
    include_toctree_{}_{}.rst""".format(folder,tests[i])
@@ -249,20 +251,20 @@ QA Test Suite Documentation
         
     def write_toctree(self,file_dict):
         
-        for folder,tests in file_dict.items():
-            ###RELATIVE PATHS.... MAY NEED TO CHANGE THIS LATER.....            
+        for folder_path,tests in file_dict.items():
+            folder = folder_path.strip().split('/')[-1]            
             for i in range(len(tests)):
                 filename = '../docs/include_toctree_{}_{}.rst'.format(folder,tests[i])
                 f = open(filename, 'w')
                 toctree = """
-.. include:: ../{}/{}.rst                
-                """.format(folder,tests[i])
+.. include:: //{}/{}.rst                
+                """.format(folder_path,tests[i])
                 f.write(toctree)
                 f.close()
         
     def write_introfiles(self, file_dict):        
-        for folder, test in file_dict.items():
-#            pretty_name = test.replace('_',' ').title()
+        for folder_path, test in file_dict.items():
+            folder = folder_path.strip().split('/')[-1]
             filename = '../docs/intro_{}.rst'.format(folder)
             intro = """
 .. {}-qa-tests:
