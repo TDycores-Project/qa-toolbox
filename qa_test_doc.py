@@ -71,7 +71,8 @@ class QATestDoc(object):
         self._filename_root = ''
         self._simulators = []
         self._runs = []
-
+        print(doc_dir)
+        print('PATH')
         debug_pop()
 
     def set_title(self,title):
@@ -115,7 +116,7 @@ class QATestDoc(object):
         # results summary need to go here
         # -------------------------------
 
-        description_file = 'description_{}.txt'.format(self._filename_root) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
+        description_file = '/{}_description_{}.txt'.format(self._doc_dir,self._filename_root) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
 
         try:
             with open(description_file,'r') as file:
@@ -165,15 +166,15 @@ Detailed Results
                     f.write("\n")
                     # absolute here make it relative to the top source dir
                     # in the sphinx repo (usually: sphinx/doc/source/.)
-                    f.write(".. literalinclude:: ..{}/{}\n\n".format(
-                                                         self._local_path,
+                    f.write(".. literalinclude:: /{}/{}\n\n".format(
+                                                         self._doc_dir,
                                               variable._error_stat))
                     f.write(".. _figure{}:\n".format(n))
                     f.write("\n")
-                    f.write(".. figure:: ..{}/{}\n   :width: {} %\n\n".format(
-                                   self._local_path,variable._solution_png[0],width_percent))
-                    f.write(".. figure:: ..{}/{}\n   :width: {} %\n\n".format(
-                                   self._local_path,variable._error_png[0],width_percent))
+                    f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
+                                   self._doc_dir,variable._solution_png[0],width_percent))
+                    f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
+                                   self._doc_dir,variable._error_png[0],width_percent))
                     n = n+1
                     
             if len(run._observations) > 0:
@@ -192,13 +193,13 @@ Observation Point
                     for i in range(1,len(simulators)):
                         f.write(" vs {}\n".format(simulators[i]))
                     f.write("\n")
-                    f.write(".. literalinclude:: ..{}/{}\n\n".format(
-                                 self._local_path,variable._error_stat))
-                    f.write(".. figure:: ..{}/{}\n   :width: {} %\n\n".format(
-                                 self._local_path,
+                    f.write(".. literalinclude:: /{}/{}\n\n".format(
+                                 self._doc_dir,variable._error_stat))
+                    f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
+                                 self._doc_dir,
                                  variable._solution_png[0],width_percent))
-                    f.write(".. figure:: ..{}/{}\n   :width: {} %\n\n".format(
-                                 self._local_path,
+                    f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
+                                 self._doc_dir,
                                  variable._error_png[0],width_percent))
 
         f.close()
