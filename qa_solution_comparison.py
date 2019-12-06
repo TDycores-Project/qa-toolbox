@@ -276,24 +276,9 @@ class QASolutionComparison(object):
                 ax.tick_params(labelsize=14)
                 temp_title = self.title
                 if not time < 0.:
-                    if converted_time == 0:
-                        temp_title += ' @ {} {}'.format(converted_time,
-                                                        plot_time_units)
-                    if converted_time < 1e-3:
-                        temp_title += ' @ {:.4f} {}'.format(converted_time,
-                                                            plot_time_units)
-                    elif converted_time < 1.e-2:
-                        temp_title += ' @ {:.3f} {}'.format(converted_time,
-                                                            plot_time_units)
-                    elif converted_time < 1.e-1:
-                        temp_title += ' @ {:.2f} {}'.format(converted_time,
-                                                            plot_time_units)
-                    elif converted_time < 1.:
-                        temp_title += ' @ {:.1f} {}'.format(converted_time,
-                                                            plot_time_units)
-                    else: 
-                        temp_title += ' @ {} {}'.format(converted_time,
-                                                            plot_time_units)
+                    plot_converted_time = format_floating_number(converted_time)
+                    temp_title += ' @ {} {}'.format(plot_converted_time,plot_time_units)
+
                 plt.annotate(temp_title, 
                                  xy=(.03, .990),
                                  xycoords='figure fraction',
