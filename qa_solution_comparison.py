@@ -104,32 +104,24 @@ class QASolutionComparison(object):
               
     def plot_time_slice(self,times,plot_error,print_error):
         debug_push('QACompareSolutions plot_time_slice')
-        
-        
-        plot_time_units = ''
-        converted_time = -999.
-        if times[0] < 0.: 
+               
+        all_stat_files = {}
+        for time in times:
+            plot_time_units = ''
+            converted_time = -999.     
+            if times[0] < 0.: 
                 # time < 0 indicates steady state
-            if len(times) > 1:
-                print_err_msg('QACompareSolutions: Negative time in times '
-                                'array indicates steady state. Yet, there '
-                                'is more than one time.')
-        else:
-            plot_time_units = self.output_options['plot_time_units']
-            sec_over_tunits = unit_conversion(plot_time_units)
-        
-        all_stat_files=[]
-        for variable in self.variables:
-            doc_var = QATestDocVariable(variable)
-            for time in times:
+                if len(times) > 1:
+                    print_err_msg('QACompareSolutions: Negative time in times '
+                                  'array indicates steady state. Yet, there '
+                                  'is more than one time.')
+            else:
+                plot_time_units = self.output_options['plot_time_units']
+                sec_over_tunits = unit_conversion(plot_time_units)
                 converted_time = time/sec_over_tunits
-                doc_slice = QATestDocTimeSlice(converted_time,plot_time_units)
- 
-            
-            
-            
-
- 
+            doc_slice = QATestDocTimeSlice(converted_time,plot_time_units)
+            for variable in self.variables:
+                doc_var = QATestDocVariable(variable)
             
                 x_min = 1e20
                 x_max = -1.e20
@@ -313,14 +305,18 @@ class QASolutionComparison(object):
                     doc_var.add_error_png(filename)
                 if print_error == True:   
                     filename = error.print_error(x_loc[0],y_loc[0],z_loc[0],solutions[0],x_loc[1],y_loc[1],z_loc[1],solutions[1]) 
-                    all_stat_files.append(filename)
+                    if variable in all_stat_files.keys():
+                        all_stat_files[variable].append(filename)
+                    else:
+                        all_stat_files[variable] = [filename]
                     doc_var.set_error_stat(filename)
                     
                 doc_slice.add_variable(doc_var)
-                self.doc_run.add_time_slice(doc_slice)
+            self.doc_run.add_time_slice(doc_slice)
             
-            if print_error == True:
-                error.calc_error_metrics_over_all_times(all_stat_files,plot_time_units)
+        if print_error == True:
+            for variable in all_stat_files.keys():
+                error.calc_error_metrics_over_all_times(all_stat_files[variable],plot_time_units)
                 self.doc_run.add_max_absolute_error(variable, error.maximum_absolute_error_all_times,
                                                  error.maximum_absolute_error_time,
                                                  error.maximum_absolute_error_location_all_times,

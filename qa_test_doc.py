@@ -83,8 +83,7 @@ class QATestDocRun():
         self._maximum_absolute_error_times[variable] = time
         self._maximum_absolute_error_locations[variable] = location
         self._maximum_absolute_error_index[variable] = index
-#        print('max')
-#        print(self._maximum_absolute_errors[variable])
+
     
     def add_max_relative_error(self,variable,error,time,location,index):
         self._maximum_relative_errors[variable] = error
@@ -162,14 +161,28 @@ Results Summary
 
 """.format(self._filename_root))
         
+        previous_runs = 0
+            
         for run in self._runs:
             f.write('\n')
             scenario_string = 'Scenario {}'.format(run._run_number)
             f.write("{}\n".format(scenario_string))
             f.write("{}\n".format('-'*len(scenario_string)))
             
-            for varia in run._time_slices[0]._variables:
-                variable = varia._name            
+             
+            variable_num = 0
+            for variable in run._time_slices[0]._variables:
+                variable_string = variable._name 
+                variable_len = len(run._time_slices[0]._variables)
+                
+                max_abs_error_index = (run._maximum_absolute_error_index[variable_string]
+                                       *variable_len)+variable_num+previous_runs
+                max_rel_error_index = (run._maximum_relative_error_index[variable_string]
+                                       *variable_len)+variable_num+previous_runs
+                max_avg_abs_error_index = (run._maximum_average_absolute_error_index[variable_string]
+                                           *variable_len)+variable_num+previous_runs
+                max_avg_rel_error_index = (run._maximum_average_relative_error_index[variable_string]
+                                           *variable_len)+variable_num+previous_runs
                 f.write("""
                         
 .. list-table::
@@ -198,14 +211,18 @@ Results Summary
      -
      
      
-         """.format(self._filename_root,run._maximum_absolute_error_index[variable],
-                     run._maximum_absolute_errors[variable],run._maximum_absolute_error_times[variable],
-                     run._maximum_absolute_error_locations[variable],self._filename_root,run._maximum_relative_error_index[variable],
-                     run._maximum_relative_errors[variable],run._maximum_relative_error_times[variable],
-                     run._maximum_relative_error_locations[variable],self._filename_root,run._maximum_average_absolute_error_index[variable],
-                     run._maximum_average_absolute_errors[variable],run._maximum_average_absolute_error_times[variable],
-                     self._filename_root,run._maximum_average_relative_error_index[variable],run._maximum_average_relative_errors[variable],
-                     run._maximum_average_relative_error_times[variable]))
+         """.format(self._filename_root,max_abs_error_index,
+                     run._maximum_absolute_errors[variable_string],run._maximum_absolute_error_times[variable_string],
+                     run._maximum_absolute_error_locations[variable_string],self._filename_root,max_rel_error_index,
+                     run._maximum_relative_errors[variable_string],run._maximum_relative_error_times[variable_string],
+                     run._maximum_relative_error_locations[variable_string],self._filename_root,max_avg_abs_error_index,
+                     run._maximum_average_absolute_errors[variable_string],run._maximum_average_absolute_error_times[variable_string],
+                     self._filename_root,max_avg_rel_error_index,run._maximum_average_relative_errors[variable_string],
+                     run._maximum_average_relative_error_times[variable_string]))
+                    
+                variable_num = variable_num + 1    
+                    
+            previous_runs = len(run._time_slices) * len(run._time_slices[0]._variables)
 
         description_file = 'description_{}.txt'.format(self._filename_root) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
 
@@ -244,10 +261,12 @@ Detailed Results
             f.write("{}\n".format('-'*len(scenario_string)))
             f.write("\n")
             simulators = self._simulators
+            k=0
             for time_slice in run._time_slices:
                 time_string = '{} {}'.format(time_slice._time,
                                              time_slice._time_unit)
                 for variable in time_slice._variables:
+                    
                     variable_string = variable._name
                     f.write("Comparison of {} at {} for {}: {}".format(
                                    variable_string,time_string,scenario_string,
@@ -267,6 +286,7 @@ Detailed Results
                     f.write(".. figure:: ..{}/{}\n   :width: {} %\n\n".format(
                                    self._local_path,variable._error_png[0],width_percent))
                     n = n+1
+                k=k+1
                     
             if len(run._observations) > 0:
                 f.write("""
