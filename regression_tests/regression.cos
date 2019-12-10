@@ -2,23 +2,30 @@ import numpy as np
 import sys
 import os
 import math
+import traceback
+
+sys.path.insert(0,'..')
+sys.path.insert(0,'../simulator_module')
 
 from qa_solution import QASolutionWriter
+from simulator_modules.python import *
+
+filename = __file__
 
 def main(options):
     x = np.arange(0,17*math.pi/8,math.pi/8)
     y = np.array([0.5])
     z = np.array([0.5])
 
-    solution_sin = np.sin(x)
-    filename='sin_dataset.h5'
-    solution = QASolutionWriter(filename)
+    solution_cos = np.cos(x)
+    solution_filename = get_python_solution_filename(filename)
+    solution = QASolutionWriter(solution_filename)
     solution.write_coordinates(x,y,z)
 
-    solution.write_dataset(0,values,'variable','Time Slice')
+    solution.write_dataset(0,solution_cos,'Pressure','Time Slice')
         
     solution.write_time(x)
-    solution.write_dataset((0,0,0),values,'variable','Observation')
+    solution.write_dataset((0,0,0),solution_cos,'Pressure','Observation')
         
     solution.destroy()
     

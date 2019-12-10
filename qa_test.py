@@ -24,6 +24,7 @@ from qa_debug import *
 from qa_common import *
 from qa_solution_comparison import *
 from qa_test_doc import *
+from qa_regression_test import QARegressionTest
 
 class QATest(object):
     """
@@ -54,7 +55,7 @@ class QATest(object):
         self._process_opt_file()
         self.swap_dict = {}
         self._template = self._section_dict['template']
-
+        self.regression=qa_lookup(self._section_dict,'regression_test',False)
         debug_pop()
 
     def __str__(self):
@@ -170,7 +171,7 @@ class QATest(object):
         self._mapped_simulator_names = []
         debug_simulator_list = []
         for simulator in simulator_list:
-            s = re.split(r's*:s*',simulator.strip())
+            s = re.split(r'\s*:\s*',simulator.strip())
             simulator_name = s[0]
             if len(s) > 1:
                 mapped_simulator_name = s[1]
@@ -245,6 +246,10 @@ class QATest(object):
                                      doc_run)
             compare_solutions.process_opt_file()
             doc.add_run(doc_run)
+        #compare gold file results for regression tests
+        if self.regression == True:
+            regression_test=QARegressionTest()
+            regression_test.compare_values()
         doc.write()
         debug_pop()
 
