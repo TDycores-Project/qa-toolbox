@@ -162,28 +162,30 @@ Results Summary
 """.format(self._filename_root))
         
         previous_runs = 0
+        
+        if self._runs[0]._maximum_absolute_errors:
             
-        for run in self._runs:
-            f.write('\n')
-            scenario_string = 'Scenario {}'.format(run._run_number)
-            f.write("{}\n".format(scenario_string))
-            f.write("{}\n".format('-'*len(scenario_string)))
-            
-             
-            variable_num = 0
-            for variable in run._time_slices[0]._variables:
-                variable_string = variable._name 
-                variable_len = len(run._time_slices[0]._variables)
+            for run in self._runs:
+                f.write('\n')
+                scenario_string = 'Scenario {}'.format(run._run_number)
+                f.write("{}\n".format(scenario_string))
+                f.write("{}\n".format('-'*len(scenario_string)))
                 
-                max_abs_error_index = (run._maximum_absolute_error_index[variable_string]
-                                       *variable_len)+variable_num+previous_runs
-                max_rel_error_index = (run._maximum_relative_error_index[variable_string]
-                                       *variable_len)+variable_num+previous_runs
-                max_avg_abs_error_index = (run._maximum_average_absolute_error_index[variable_string]
+                 
+                variable_num = 0
+                for variable in run._time_slices[0]._variables:
+                    variable_string = variable._name 
+                    variable_len = len(run._time_slices[0]._variables)
+                    
+                    max_abs_error_index = (run._maximum_absolute_error_index[variable_string]
                                            *variable_len)+variable_num+previous_runs
-                max_avg_rel_error_index = (run._maximum_average_relative_error_index[variable_string]
+                    max_rel_error_index = (run._maximum_relative_error_index[variable_string]
                                            *variable_len)+variable_num+previous_runs
-                f.write("""
+                    max_avg_abs_error_index = (run._maximum_average_absolute_error_index[variable_string]
+                                               *variable_len)+variable_num+previous_runs
+                    max_avg_rel_error_index = (run._maximum_average_relative_error_index[variable_string]
+                                               *variable_len)+variable_num+previous_runs
+                    f.write("""
                         
 .. list-table::
    :widths: 40 35 10 20
@@ -220,9 +222,9 @@ Results Summary
                      self._filename_root,max_avg_rel_error_index,run._maximum_average_relative_errors[variable_string],
                      run._maximum_average_relative_error_times[variable_string]))
                     
-                variable_num = variable_num + 1    
+                    variable_num = variable_num + 1    
                     
-            previous_runs = len(run._time_slices) * len(run._time_slices[0]._variables)
+                previous_runs = len(run._time_slices) * len(run._time_slices[0]._variables)
 
         description_file = 'description_{}.txt'.format(self._filename_root) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
 
