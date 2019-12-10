@@ -109,7 +109,7 @@ class QASolutionComparison(object):
         for time in times:
             plot_time_units = ''
             converted_time = -999.     
-            if times[0] < 0.: 
+            if time < 0.: 
                 # time < 0 indicates steady state
                 if len(times) > 1:
                     print_err_msg('QACompareSolutions: Negative time in times '
@@ -140,8 +140,7 @@ class QASolutionComparison(object):
                 x_loc = []
                 y_loc = []
                 z_loc = []
-                
-              
+                              
                 for simulator in self.mapped_simulator_names:
 
                     filename = self.solution_dictionary[simulator]
@@ -164,12 +163,9 @@ class QASolutionComparison(object):
                             print('WARNING: More than two '
                                           'simulators run yet error set to True. '
                                           'Can only compare two solutions at a time.')
-                            
-                    
+                                                
                     s_min = min(s_min,(np.amin(solution)))
                     s_max = max(s_max,(np.amax(solution)))
-
-
                 
                     if self.plot_dimension == '1D':
 
@@ -186,11 +182,9 @@ class QASolutionComparison(object):
                         x_max = max(x_max,math.ceil(np.amax(x_axis)))
                         line, = plt.plot(x_axis,solution,
                                     label=simulator) 
-
                  
                         solution_handles.append(line)
-                        
-                    
+                                            
                     elif self.plot_dimension == '2D':
                         x_axis, y_axis = find_axis_2D(x,y,z)
                         
@@ -214,8 +208,7 @@ class QASolutionComparison(object):
                                                 linewidth=0.5)
                             plt.clabel(surface,inline=True,fontsize=10)
                         solution_handles.append(surface)
-                            
-                        
+                                                    
                     elif self.plot_dimension == '3D':
 
                         y_min = min(y_min,math.floor(np.amin(y)))
@@ -297,8 +290,6 @@ class QASolutionComparison(object):
                     plt.show()
                 plt.close()
               
-              
-
                 error = QATestError(prefix,variable,self.template,self.run_number,self.plot_to_screen,self.error_units,False,self.plot_dimension)
                 if plot_error == True:                                     
                     filename = error.plot_error(x_loc[0],y_loc[0],z_loc[0],solutions[0],x_loc[1],y_loc[1],z_loc[1],solutions[1],self.x_string_time_slice,self.y_string_time_slice)

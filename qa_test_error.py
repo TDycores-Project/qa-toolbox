@@ -146,9 +146,7 @@ class QATestError(object):
             ##print error
 
             filename = self.print_error_1D(dimension1,values1,dimension2,values2)
-            
-
-            
+                        
         elif self.dimension=='2D':
             ###assume uniform same grid
             
@@ -657,8 +655,7 @@ class QATestError(object):
         
         
         return absolute_error,relative_error,total_absolute_error,total_area
-    
-    
+        
     def calc_error_metrics_over_all_times(self,stat_file,tunit):
         
         if self.dimension == '1D':
@@ -666,9 +663,7 @@ class QATestError(object):
             
         elif self.dimension == '2D':
             self._calc_error_metrics_over_all_times_2D(stat_file,tunit)
-        
-
-            
+                    
     def _calc_error_metrics_over_all_times_1D(self,stat_file,tunit):
            
         maximum_absolute_error = []
@@ -787,10 +782,6 @@ class QATestError(object):
             if len(tunit) > 0:
                 f.write('Time = {} \n'.format(self.maximum_average_relative_error_time))
         
-
-        
-        
-            
     def _calc_error_metrics_over_all_times_2D(self,stat_file,tunit):
            
         maximum_absolute_error = []

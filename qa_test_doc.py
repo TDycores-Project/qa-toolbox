@@ -39,8 +39,7 @@ class QATestDocObservation():
         self._variables = []
 
     def add_variable(self,variable):
-       self._variables.append(variable)
-       
+       self._variables.append(variable)       
 
 class QATestDocRun():
     def __init__(self,run_number):
@@ -77,13 +76,11 @@ class QATestDocRun():
     def add_observation(self,doc_observation):
         self._observations.append(doc_observation)
         
-       
     def add_max_absolute_error(self,variable,error,time,location,index):
         self._maximum_absolute_errors[variable]= error
         self._maximum_absolute_error_times[variable] = time
         self._maximum_absolute_error_locations[variable] = location
         self._maximum_absolute_error_index[variable] = index
-
     
     def add_max_relative_error(self,variable,error,time,location,index):
         self._maximum_relative_errors[variable] = error
@@ -267,8 +264,7 @@ Detailed Results
             for time_slice in run._time_slices:
                 time_string = '{} {}'.format(time_slice._time,
                                              time_slice._time_unit)
-                for variable in time_slice._variables:
-                    
+                for variable in time_slice._variables:                    
                     variable_string = variable._name
                     f.write("Comparison of {} at {} for {}: {}".format(
                                    variable_string,time_string,scenario_string,
