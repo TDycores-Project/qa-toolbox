@@ -1,7 +1,7 @@
 import sys
 import re
 import os
-import time
+
 import subprocess
 import textwrap
 import csv
@@ -103,24 +103,25 @@ class QASolutionComparison(object):
               
     def plot_time_slice(self,times,plot_error,print_error):
         debug_push('QACompareSolutions plot_time_slice')
-        
-        all_stat_files=[]
+               
+        all_stat_files = {}
         for time in times:
             plot_time_units = ''
-            converted_time = -999.
+            converted_time = -999.     
             if time < 0.: 
                 # time < 0 indicates steady state
                 if len(times) > 1:
                     print_err_msg('QACompareSolutions: Negative time in times '
-                                'array indicates steady state. Yet, there '
-                                'is more than one time.')
+                                  'array indicates steady state. Yet, there '
+                                  'is more than one time.')
             else:
                 plot_time_units = self.output_options['plot_time_units']
                 sec_over_tunits = unit_conversion(plot_time_units)
                 converted_time = time/sec_over_tunits
-            doc_slice = QATestDocTimeSlice(converted_time,plot_time_units) 
+            doc_slice = QATestDocTimeSlice(converted_time,plot_time_units)
             for variable in self.variables:
-                doc_var = QATestDocVariable(variable) 
+                doc_var = QATestDocVariable(variable)
+            
                 x_min = 1e20
                 x_max = -1.e20
                 y_min = 1e20
@@ -138,8 +139,7 @@ class QASolutionComparison(object):
                 x_loc = []
                 y_loc = []
                 z_loc = []
-                
-              
+                              
                 for simulator in self.mapped_simulator_names:
 
                     filename = self.solution_dictionary[simulator]
@@ -162,12 +162,9 @@ class QASolutionComparison(object):
                             print('WARNING: More than two '
                                           'simulators run yet error set to True. '
                                           'Can only compare two solutions at a time.')
-                            
-                    
+                                                
                     s_min = min(s_min,(np.amin(solution)))
                     s_max = max(s_max,(np.amax(solution)))
-
-
                 
                     if self.plot_dimension == '1D':
 
@@ -184,11 +181,9 @@ class QASolutionComparison(object):
                         x_max = max(x_max,math.ceil(np.amax(x_axis)))
                         line, = plt.plot(x_axis,solution,
                                     label=simulator) 
-
                  
                         solution_handles.append(line)
-                        
-                    
+                                            
                     elif self.plot_dimension == '2D':
                         x_axis, y_axis = find_axis_2D(x,y,z)
                         
@@ -212,8 +207,7 @@ class QASolutionComparison(object):
                                                 linewidth=0.5)
                             plt.clabel(surface,inline=True,fontsize=10)
                         solution_handles.append(surface)
-                            
-                        
+                                                    
                     elif self.plot_dimension == '3D':
 
                         y_min = min(y_min,math.floor(np.amin(y)))
@@ -295,21 +289,39 @@ class QASolutionComparison(object):
                     plt.show()
                 plt.close()
               
-              
-
                 error = QATestError(prefix,variable,self.template,self.run_number,self.plot_to_screen,self.error_units,False,self.plot_dimension)
                 if plot_error == True:                                     
                     filename = error.plot_error(x_loc[0],y_loc[0],z_loc[0],solutions[0],x_loc[1],y_loc[1],z_loc[1],solutions[1],self.x_string_time_slice,self.y_string_time_slice)
                     doc_var.add_error_png(filename)
                 if print_error == True:   
                     filename = error.print_error(x_loc[0],y_loc[0],z_loc[0],solutions[0],x_loc[1],y_loc[1],z_loc[1],solutions[1]) 
-                    all_stat_files.append(filename)
+                    if variable in all_stat_files.keys():
+                        all_stat_files[variable].append(filename)
+                    else:
+                        all_stat_files[variable] = [filename]
                     doc_var.set_error_stat(filename)
+                    
                 doc_slice.add_variable(doc_var)
             self.doc_run.add_time_slice(doc_slice)
+            
         if print_error == True:
-            filename = error.calc_error_metrics_over_all_times(all_stat_files,plot_time_units)
-#            self.doc_run.add_time_slice_variable(doc_var)
+            for variable in all_stat_files.keys():
+                error.calc_error_metrics_over_all_times(all_stat_files[variable],plot_time_units)
+                self.doc_run.add_max_absolute_error(variable, error.maximum_absolute_error_all_times,
+                                                 error.maximum_absolute_error_time,
+                                                 error.maximum_absolute_error_location_all_times,
+                                                 error.maximum_absolute_error_index)
+                self.doc_run.add_max_relative_error(variable,error.maximum_relative_error_all_times,
+                                                 error.maximum_relative_error_time,
+                                                 error.maximum_relative_error_location_all_times,
+                                                 error.maximum_relative_error_index)
+                self.doc_run.add_max_average_absolute_error(variable,error.maximum_average_absolute_error,
+                                                         error.maximum_average_absolute_error_time,
+                                                         error.maximum_average_absolute_error_index)
+                self.doc_run.add_max_average_relative_error(variable,error.maximum_average_relative_error,
+                                                         error.maximum_average_relative_error_time,
+                                                         error.maximum_average_relative_error_index)
+##            self.doc_run.add_time_slice_variable(doc_var)
         
         debug_pop()        
         
