@@ -42,14 +42,12 @@ class QATestError(object):
 
         if self.dimension == '1D':
             dimension1 = find_axis_1D(x1,y1,z1)
-            ##print error
             dimension2 = find_axis_1D(x2,y2,z2)
                 
             filename = self.plot_error_1D(dimension1,values1,dimension2,values2,x_label,difference_string)
             
         elif self.dimension == '2D':
-            dimension1,dimension2 = find_axis_2D(x1,y1,z1)
-                
+            dimension1,dimension2 = find_axis_2D(x1,y1,z1)                
             filename = self._plot_error_2D(dimension1,dimension2,values1,values2,x_label,y_label)
         
         debug_pop()
@@ -78,13 +76,10 @@ class QATestError(object):
         ax[1].set_ylabel('Relative Error (%)')
       
         if abs(average_absolute_error) < 1:
-#        ax[0].ticklabel_format(axis='y',style='scientific',scilimits=(0,0))
             ax[0].yaxis.set_major_formatter(FormatStrFormatter('%.2e'))
         
         if abs(average_relative_error) < 1:
-#        ax[1].ticklabel_format(axis='y',style='scientific',scilimits=(0,0))
             ax[1].yaxis.set_major_formatter(FormatStrFormatter('%.2e'))
-
         
         if (abs(average_absolute_error)) >= 1 and abs(average_absolute_error) < 1000: 
             ax[0].yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
@@ -93,27 +88,18 @@ class QATestError(object):
             ax[1].yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
           
         if abs(average_absolute_error) > 1000:
-#        ax[0].ticklabel_format(axis='y',style='scientific',scilimits=(0,0))
             ax[0].yaxis.set_major_formatter(FormatStrFormatter('%.2e'))
-
           
         if abs(average_relative_error) >= 1000:
-#        ax[1].ticklabel_format(axis='y',style='scientific',scilimits=(0,0))
             ax[1].yaxis.set_major_formatter(FormatStrFormatter('%.2e'))
-
-
-
-      ###Make annotations better
       
-
-        ax[0].annotate('Maximum Absolute Error = {:.2g} \n'    #update precision
+        ax[0].annotate('Maximum Absolute Error = {:.2g} \n'    
                        'Average Absolute Error = {:.2g} \n'.format \
                        (maximum_absolute_error, average_absolute_error), 
                      xy=(.03, .940),
                      xycoords='figure fraction',
                      horizontalalignment='left',
                      verticalalignment='top',fontsize=10)
-
                       
         ax[1].annotate('Maximum Relative Error = {:.2g}% \n' 
                        'Average Relative Error = {:.2g}%'.format \
@@ -122,9 +108,6 @@ class QATestError(object):
                      xycoords='figure fraction',
                      horizontalalignment='left',
                      verticalalignment='top',fontsize=10)
-
-      
-
         
         f.suptitle(self.variable,fontsize=14)
         if self.observation == True:
@@ -136,22 +119,15 @@ class QATestError(object):
             plt.show()
         plt.close()
         return filename 
-
       
     def print_error(self,x1,y1,z1,values1,x2,y2,z2,values2):
         if self.dimension == '1D':
             dimension1 = find_axis_1D(x1,y1,z1)
-            ##print error
             dimension2 = find_axis_1D(x2,y2,z2)
-            ##print error
 
             filename = self.print_error_1D(dimension1,values1,dimension2,values2)
-            
-
-            
-        elif self.dimension=='2D':
-            ###assume uniform same grid
-            
+                        
+        elif self.dimension=='2D':           
             dimension1, dimension2 = find_axis_2D(x1,y1,z1)
     
             filename = self.print_error_2D(dimension1,dimension2,values1,values2)
@@ -159,13 +135,6 @@ class QATestError(object):
         return filename
             
     def print_error_2D(self,dimension1,dimension2,values1,values2):
-                
-#        [absolute_error,relative_error,absolute_area,total_area]=self._calc_error_2D(dimension1,dimension2,values1,values2)
-        
-#        self.average_absolute_error = self._get_average_absolute_error_2D(absolute_area,total_area)
-            
-#        self.absolute_relative_area=self._calc_absolute_relative_error_2D(dimension1,dimension1,values1,absolute_area)
-
         self.calc_error_stats_2D(dimension1,dimension2,values1,values2)
 
         if self.observation == True:
@@ -175,7 +144,6 @@ class QATestError(object):
       
       ###save to write to text file
         with open(filename,'w') as f:
-#          f.write('Absolute Relative Error = {} \n'.format(self.absolute_relative_error))
           f.write('Average Absolute Error = {} {} \n'.format(self.average_absolute_error, self.units))
           f.write('Average Relative Error = {} % \n'.format(self.average_relative_error*100.))
           f.write('Maximum Absolute Error = {} {} \n'.format(self.maximum_absolute_error, self.units)) ####MAKE APPLICABLE FOR OBSERVATION POINTS
@@ -184,15 +152,12 @@ class QATestError(object):
           f.write('Y Location of Maximum Absolute Error = {} m \n'.format(self.maximum_absolute_error_location_y))
           f.write('X Location of Maximum Relative Error = {} m \n'.format(self.maximum_relative_error_location_x))
           f.write('Y Location of Maximum Relative Error = {} m \n'.format(self.maximum_relative_error_location_y))
-      
-        
+              
         return filename
         
     def print_error_1D(self,dimension1,values1,dimension2,values2,time_unit= ' ', difference_string='all'):
         self.calc_error_stats_1D(dimension1,values1,dimension2,values2,difference_string)
 
-        
-        
         if self.observation == True:
             filename = '{}_{}_{}_{}_{}_run{}_error.stat'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],self.variable,self.template,self.run_number)
         else:
@@ -200,24 +165,20 @@ class QATestError(object):
       
       ###save to write to text file
         with open(filename,'w') as f:
-#          f.write('Absolute Relative Error = {} \n'.format(self.absolute_relative_error))
           f.write('Average Absolute Error = {} {} \n'.format(self.average_absolute_error,self.units))
           f.write('Average Relative Error = {} % \n'.format(self.average_relative_error*100.))
-          f.write('Maximum Absolute Error = {} {} \n'.format(self.maximum_absolute_error,self.units)) ####MAKE APPLICABLE FOR OBSERVATION POINTS
+          f.write('Maximum Absolute Error = {} {} \n'.format(self.maximum_absolute_error,self.units)) 
           f.write('Maximum Relative Error = {} % \n'.format(self.maximum_relative_error*100.))
           
           if self.observation == True:
-              f.write('Time of Maximum Absolute Error = {} {} \n'.format(self.maximum_absolute_error_location,time_unit)) ##add unit --> do I want to save this in here?
+              f.write('Time of Maximum Absolute Error = {} {} \n'.format(self.maximum_absolute_error_location,time_unit)) 
               f.write('Time of Maximum Relative Error = {} {} \n'.format(self.maximum_relative_error_location,time_unit))
           else:
-              f.write('Location of Maximum Absolute Error = {} m \n'.format(self.maximum_absolute_error_location)) ##add unit --> do I want to save this in here?
+              f.write('Location of Maximum Absolute Error = {} m \n'.format(self.maximum_absolute_error_location)) 
               f.write('Location of Maximum Relative Error = {} m \n'.format(self.maximum_relative_error_location))
-        
-        
+                
         return filename
     
-         
-
     def _NonOverlappingAreaOfNonIntersectingLines(self,tstart,tend,line1,line2):
         if tend <= tstart:
             if tend < tstart:
@@ -227,9 +188,8 @@ class QATestError(object):
             return 0.
         return abs((line1.ValueYAtX(tstart)+line1.ValueYAtX(tend))-
                    (line2.ValueYAtX(tstart)+line2.ValueYAtX(tend)))/2.*(tend-tstart)
-        
-        
-    def _calc_relative_error(self,times1,values1,times2,values2,difference_string):  ##add 1D
+                
+    def _calc_relative_error(self,times1,values1,times2,values2,difference_string):  
         difference_flag = 3
         if difference_string.startswith('first') or \
            difference_string.startswith('one'):
@@ -253,8 +213,6 @@ class QATestError(object):
         min_time = max(amin(times1),amin(times2))
         size1 = times1.size
         size2 = times2.size
-       #  times3 = zeros(max(size1,size2),dtype='f8')
-       #  values3 = zeros(max(size1,size2),dtype='f8')
         times3 = zeros(3,dtype='f8')
         values3 = zeros(3,dtype='f8')
        # Evaluate over segments between 0 and maximum time
@@ -273,11 +231,9 @@ class QATestError(object):
             tstart = max(times1[i1],times2[i2])
             tend = min(times1[i1+1],times2[i2+1])
          
-
             line1 = Line(times1[i1],values1[i1],times1[i1+1],values1[i1+1])
             line2 = Line(times2[i2],values2[i2],times2[i2+1],values2[i2+1])
-         
-         
+                  
             # it is possible that three values could be appended
              # therefore, we increase size of count+3 is greater than existing size
             if count3+3 >= times3.size:
@@ -306,7 +262,6 @@ class QATestError(object):
                         values3[count3] = 1.e20
                     count3 += 1
 
-
             if difference_flag >= 3 or \
               (difference_flag == 1 and abs(tend-times1[i1+1]) < 1.e-20) or \
               (difference_flag == 2 and abs(tend-times2[i2+1]) < 1.e-20):
@@ -322,7 +277,6 @@ class QATestError(object):
         values3.resize(count3)
        
         return times3,values3
-
         
     def _calc_absolute_error(self,times1,values1,times2,values2,difference_string):
         difference_flag = 3
@@ -334,8 +288,7 @@ class QATestError(object):
             difference_flag = 2
         elif difference_string.startswith('all'):
             difference_flag = 4
-              
-        
+                      
         if times1.size != values1.size:
             print('Size of times1 (%d) does not match size of values1 (%d)' %
                  (times1.size,values1.size))
@@ -349,8 +302,6 @@ class QATestError(object):
         min_time = max(amin(times1),amin(times2))
         size1 = times1.size
         size2 = times2.size
-         #  times3 = zeros(max(size1,size2),dtype='f8')
-         #  values3 = zeros(max(size1,size2),dtype='f8')
         times3 = zeros(3,dtype='f8')
         values3 = zeros(3,dtype='f8')
          # Evaluate over segments between 0 and maximum time
@@ -368,7 +319,6 @@ class QATestError(object):
                 break
             tstart = max(times1[i1],times2[i2])
             tend = min(times1[i1+1],times2[i2+1])
-
 
             segment_area = 0.
             line1 = Line(times1[i1],values1[i1],times1[i1+1],values1[i1+1])
@@ -421,10 +371,8 @@ class QATestError(object):
         values3.resize(count3)
        
         return total_area,times3,values3
-       
-      
-      
-    def _calc_absolute_relative_error(self,times1,values1,absolute_difference_area):   ##how useful is this?
+             
+    def _calc_absolute_relative_error(self,times1,values1,absolute_difference_area):   
         times2 = times1
         values2 = zeros(len(values1))
         
@@ -446,23 +394,19 @@ class QATestError(object):
         [relative_area,times3,values3] = self._calc_absolute_error(relative_times,relative_values,times2,values2,'all')
 
         average_relative_error = relative_area / (max(times3)-min(times3)) 
-
         
         return average_relative_error
-    
-    
+        
     def _get_maximum_error(self,values):
         return amax(abs(values))
     
     def _get_index_max_error(self,values):
         index = unravel_index(argmax(abs(values)),values.shape)
         return index
-    
-    
+        
     def _get_average_absolute_error(self,absolute_area,absolute_times):
         return absolute_area / (max(absolute_times)-min(absolute_times))
-    
-    
+        
     def calc_error_stats_1D(self,times1,values1,times2,values2,difference_string='all'):
         [absolute_area,absolute_times,absolute_values] = self._calc_absolute_error(times1,values1,times2,values2,difference_string)
         [relative_times,relative_values] = self._calc_relative_error(times1,values1,times2,values2,difference_string)
@@ -482,8 +426,7 @@ class QATestError(object):
         
         self.maximum_absolute_error_location = absolute_times[maximum_absolute_error_index]
         self.maximum_relative_error_location = relative_times[maximum_relative_error_index]
-        
-        
+                
     def calc_error_stats_2D(self,x,y,values1,values2,difference_string='all'):
 
         [absolute_error,relative_error,absolute_area,total_area] = self._calc_error_2D(x,y,values1,values2)
@@ -494,10 +437,8 @@ class QATestError(object):
         self.average_absolute_error = self._get_average_absolute_error_2D(absolute_area,total_area)
         self.average_relative_error = self._calc_average_relative_error_2D(x,y,relative_error)
 
-
         self.absolute_relative_error = self._calc_absolute_relative_error_2D(x,y,values1,absolute_area)
-
-        
+       
         self.absolute_error = absolute_error
         self.relative_error = relative_error
         
@@ -509,12 +450,9 @@ class QATestError(object):
         
         self.maximum_relative_error_location_x = x[maximum_relative_error_index[1]] 
         self.maximum_relative_error_location_y = y[maximum_relative_error_index[0]]
-
-
         
     def _get_average_absolute_error_2D(self,absolute_area,total_area):
         return absolute_area/total_area
-
     
     def _calc_absolute_relative_error_2D(self,x,y,solution1,absolute_area):
         #calculate average relative error given relative error
@@ -528,8 +466,7 @@ class QATestError(object):
             absolute_relative_error = 1e20
         
         return absolute_relative_error
- 
-    
+     
     def _calc_average_relative_error_2D(self,x,y,relative_error):
         #calculate average relative error given relative error
         solution2 = zeros_like(relative_error)
@@ -539,8 +476,7 @@ class QATestError(object):
         average_relative_error = relative_area / total_area
         
         return average_relative_error
-
-       
+      
     def _plot_error_2D(self,x,y,solution1,solution2,xlabel,ylabel):
 
         [absolute_error,relative_error,absolute_area,total_area] = self._calc_error_2D(x,y,solution1,solution2)
@@ -551,9 +487,8 @@ class QATestError(object):
         average_absolute_error = self._get_average_absolute_error_2D(absolute_area,total_area)
         average_relative_error = self._calc_average_relative_error_2D(x,y,relative_error)
         
-        X,Y = np.meshgrid(x,y)
-
-        
+        X,Y = meshgrid(x,y)
+       
         plt.figure(figsize=(11,10))
         plt.contourf(X,Y,absolute_error)
         plt.xlabel(xlabel)
@@ -575,13 +510,11 @@ class QATestError(object):
         if abs(average_absolute_error > 1000):
             plt.colorbar(format='%.2e')
 
-
 #        plt.colorbar(format='%.0e')
         plt.title(self.variable,fontsize=18)
         if self.plot_to_screen == True:
             plt.show()
         plt.close()
-
         
         plt.figure(figsize=(11,10))
         plt.contourf(X,Y,relative_error*100)
@@ -613,8 +546,7 @@ class QATestError(object):
             plt.show()
         plt.close()
         return filename
-        
-        
+                
     def _calc_error_2D(self,x,y,solution1,solution2):
         absolute_error = solution1-solution2
         
@@ -622,43 +554,14 @@ class QATestError(object):
         relative_error = (solution1-solution2)/solution1
 
         ####assume uniform structured grid and we are inputting cell centered coordinates
-        
-        
+                
         area_of_cell = abs(x[-1]+x[0])/len(x)*abs(y[-1]+y[0])/len(y)
-
-#        for i in range(len(x)):
-#            for j in range(len(y)):
-#                if i==0 and j==0:
-#                    area_of_cell = ((abs(x[i+1]-x[i])/2)*2)*((abs(y[j+1]-y[j])/2)*2)   
-#                elif i==(len(x)-1) and j==(len(y)-1):
-#                    area_of_cell = ((abs(x[i]-x[i-1])/2)*2)*((abs(y[j]-y[j-1])/2)*2)
-#                elif i==0 and j==(len(y)-1):
-#                    area_of_cell = ((abs(x[i+1]-x[i])/2)*2)*((abs(y[j]-y[j-1])/2)*2)
-#                elif i==(len(x)-1) and j==0:
-#                    area_of_cell = ((abs(x[i]-x[i-1])/2)*2)*((abs(y[j+1]-y[j])/2)*2)
-#                elif i==0:
-#                    area_of_cell = ((abs(x[i+1]-x[i])/2)*2)*(abs(y[j+1]-y[j])/2+abs(y[j]-y[j-1])/2)
-#                elif j==0:
-#                    area_of_cell= (abs(x[i+1]-x[i])/2+abs(x[i]-x[i-1])/2)*((abs(y[j+1]-y[j])/2)*2)
-#                elif i==(len(x)-1):
-#                    area_of_cell = ((abs(x[i]-x[i-1])/2)*2)*(abs(y[j+1]-y[j])/2+abs(y[j]-y[j-1])/2)
-#                elif j==(len(y)-1):
-#                    area_of_cell = (abs(x[i+1]-x[i])/2+abs(x[i]-x[i-1])/2)*((abs(y[j]-y[j-1])/2)*2)
-#                else:
-#                    area_of_cell = (abs(x[i+1]-x[i])/2+abs(x[i]-x[i-1])/2)*(abs(y[j+1]-y[j])/2+abs(y[j]-y[j-1])/2)
-#                    
-#                
-#                
-#                total_error = total_error+abs(solution1[i][j]-solution2[i][j])*area_of_cell
-#                total_area = total_area+area_of_cell
 
         total_absolute_error = abs(absolute_error).sum()*area_of_cell
         total_area = area_of_cell*len(x)*len(y)
-        
-        
+                
         return absolute_error,relative_error,total_absolute_error,total_area
-    
-    
+        
     def calc_error_metrics_over_all_times(self,stat_file,tunit):
         
         if self.dimension == '1D':
@@ -667,8 +570,7 @@ class QATestError(object):
         elif self.dimension == '2D':
             filename = self._calc_error_metrics_over_all_times_2D(stat_file,tunit)
         return filename
-
-            
+           
     def _calc_error_metrics_over_all_times_1D(self,stat_file,tunit):
            
         maximum_absolute_error = []
@@ -703,15 +605,13 @@ class QATestError(object):
                         if ('Location' in words):
                             maximum_relative_error_location.append(value)
                         else:
-                            maximum_relative_error.append(value)
-                
+                            maximum_relative_error.append(value)                
             
                 elif ('Average' in words):
                     if ('Absolute' in words):
                         average_absolute_error.append(value)
                     elif ('Relative' in words):
                         average_relative_error.append(value)
-    #            for line in fin:
 
         maximum_absolute_error_all_times = max(maximum_absolute_error)
         index = argmax(maximum_absolute_error)       
@@ -719,8 +619,7 @@ class QATestError(object):
         maximum_absolute_error_location_all_times = maximum_absolute_error_location[index]
         if len(tunit) > 0:
             maximum_absolute_error_time = times[index]
-        
-        
+                
         maximum_relative_error_all_times = max(maximum_relative_error)
         index = argmax(maximum_relative_error)
         
@@ -739,8 +638,7 @@ class QATestError(object):
         
         if len(tunit) > 0:
             maximum_average_relative_error_time = times[index]
-        
-        
+                
         filename = '{}_{}_run{}_error_documentation.stat'.format(self.variable,self.template,self.run_number)
       
       ###save to write to text file
@@ -802,14 +700,12 @@ class QATestError(object):
                             maximum_relative_error_location_y.append(value)
                         else:
                             maximum_relative_error.append(value)
-                
-            
+                            
                 elif ('Average' in words):
                     if ('Absolute' in words):
                         average_absolute_error.append(value)
                     elif ('Relative' in words):
                         average_relative_error.append(value)
-    #            for line in fin:
 
         maximum_absolute_error_all_times = max(maximum_absolute_error)
         index = argmax(maximum_absolute_error)       
@@ -818,8 +714,7 @@ class QATestError(object):
         maximum_absolute_error_y_location_all_times = maximum_absolute_error_location_y[index]
         if len(tunit) > 0:
             maximum_absolute_error_time = times[index]
-        
-        
+                
         maximum_relative_error_all_times = max(maximum_relative_error)
         index = argmax(maximum_relative_error)
         
@@ -839,8 +734,7 @@ class QATestError(object):
         
         if len(tunit) > 0:
             maximum_average_relative_error_time = times[index]
-        
-        
+                
         filename = '{}_{}_run{}_error_documentation.stat'.format(self.variable,self.template,self.run_number)
       
       ###save to write to text file
@@ -860,8 +754,7 @@ class QATestError(object):
             if len(tunit) > 0:
                 f.write('Time = {} {} \n'.format(maximum_average_relative_error_time,tunit))
         return filename
-        
-        
+                
 class Line:
   '''Based on the equation for a line y = mx + b where m is the slope and
      b is the y intercept at x = 0.
