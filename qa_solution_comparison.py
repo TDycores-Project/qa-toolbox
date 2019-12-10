@@ -48,8 +48,7 @@ class QASolutionComparison(object):
         x_string = qa_lookup(self.output_options,'plot_x_label','fail_on_missing_keyword').split(',')#self.output_options['plot_x_label'].split(',')
         y_string = qa_lookup(self.output_options,'plot_y_label','fail_on_missing_keyword').split(',')#self.output_options['plot_y_label'].split(',')
         self.title = qa_lookup(self.output_options,'plot_title','fail_on_missing_keyword')#self.output_options['plot_title']
-        self.variables = qa_lookup(self.output_options,'variables','fail_on_missing_keyword').split(',')#self.output_options['variables'].split(',')
-        
+        self.variables = [x.strip() for x in qa_lookup(self.output_options,'variables','fail_on_missing_keyword').split(',')]#self.output_options['variables'].split(',')
         ###checking optional parameters
 #        if 'plot_type' in self.output_options.keys():
 #            plot_type = [x.strip() for x in self.output_options['plot_type'].split(',')]
