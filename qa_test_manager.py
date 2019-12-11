@@ -16,6 +16,7 @@ from qa_debug import *
 from qa_common import *
 from qa_test_log import QATestLog
 
+
 class QATestManager(object):
     """
     Class to open and process a configuration file and run the tets within.
@@ -25,6 +26,7 @@ class QATestManager(object):
         self._config_filename = None
         self._tests = OrderedDict()
         self.available_simulators = simulators_dict
+
         
     def __str__(self):
         string = 'QA Test Manager :\n'
@@ -47,18 +49,18 @@ class QATestManager(object):
         config = configparser.ConfigParser()
         debug_push('QATestManager process_config_file parse')
         config.read(self._config_filename)
-        debug_pop() #QATestManager process_config_file parse
+        debug_pop() 
         
         sections = config.sections()
         for section in sections:
-            name = section
+            name = section            
             test = QATest(name,root_dir,list_to_dict(config.items(section)))
             self._tests[name] = test
-        debug_pop() #QATestManager process_config_file
+        debug_pop()
             
     def run_tests(self,testlog):
         debug_push('QATestManager run_tests')
         for key, test_case in self._tests.items():
             test_case.run(self.available_simulators)
-            testlog.log_success(self._path,test_case.name)
+            testlog.log_success(self._path,test_case.title)
         debug_pop()
