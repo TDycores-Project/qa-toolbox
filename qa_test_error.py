@@ -798,7 +798,7 @@ class QATestError(object):
 
            
         for i in range(len(stat_file)):
-
+            print(stat_file)
             filename = stat_file[i]
 
             if len(tunit) > 0:
@@ -961,7 +961,8 @@ class QATestError(object):
     #            for line in fin:
 
         maximum_absolute_error_all_locations = max(maximum_absolute_error)
-        index = argmax(maximum_absolute_error)       
+        index = argmax(maximum_absolute_error)  
+        self.maximum_absolute_error_observation_index = index
         
         maximum_absolute_error_time_all_locations = maximum_absolute_error_time[index]
         
@@ -972,6 +973,7 @@ class QATestError(object):
         
         maximum_relative_error_all_locations = max(maximum_relative_error)
         index = argmax(maximum_relative_error)
+        self.maximum_relative_error_observation_index = index
         
         maximum_relative_error_time_all_locations = maximum_relative_error_time[index]
         maximum_relative_error_x_location = x_locations[index]
@@ -981,6 +983,7 @@ class QATestError(object):
         
         maximum_average_absolute_error = max((average_absolute_error))
         index = argmax(average_absolute_error)
+        self.maximum_average_absolute_error_observation_index = index
         
         maximum_average_absolute_error_x_location = x_locations[index]
         maximum_average_absolute_error_y_location = y_locations[index]
@@ -988,28 +991,40 @@ class QATestError(object):
         
         maximum_average_relative_error = max((average_relative_error))
         index = argmax(average_relative_error)
+        self.maximum_average_relative_error_observation_index = index
         
         maximum_average_relative_error_x_location = x_locations[index]
         maximum_average_relative_error_y_location = y_locations[index]
         maximum_average_relative_error_z_location = z_locations[index]
         
-
+        self.maximum_absolute_error_all_locations = '{} {} \n'.format(maximum_absolute_error_all_locations,self.units)
+        self.maximum_absolute_error_time_all_locations = '{} {}'.format(maximum_absolute_error_time_all_locations, tunit)
+        self.maximum_absolute_error_locations = '{},{},{}'.format(maximum_absolute_error_x_location,maximum_absolute_error_y_location,maximum_absolute_error_z_location)
         
+        self.maximum_relative_error_all_locations = '{} %'.format(maximum_relative_error_all_locations)
+        self.maximum_relative_error_time_all_locations ='{} {}'.format(maximum_relative_error_time_all_locations,tunit)
+        self.maximum_relative_error_locations = '{},{},{}'.format(maximum_relative_error_x_location,maximum_relative_error_y_location,maximum_relative_error_z_location)
+        
+        self.maximum_average_absolute_error_observation = '{} {}'.format(maximum_average_absolute_error, self.units)
+        self.maximum_average_absolute_error_location = '{},{},{}'.format(maximum_average_absolute_error_x_location,maximum_average_absolute_error_y_location,maximum_average_absolute_error_z_location)
+        
+        self.maximum_average_relative_error_observation = '{} {}'.format(maximum_average_relative_error,self.units)
+        self.maximum_average_relative_error_location = '{},{},{}'.format(maximum_average_relative_error_x_location,maximum_average_relative_error_y_location,maximum_average_relative_error_z_location)
         
         filename = '{}_{}_run{}_observation_error_documentation.stat'.format(self.variable,self.template,self.run_number)
       
       ###save to write to text file
         with open(filename,'w') as f:
-            f.write('Maximum Absolute Error = {} {} \n'.format(maximum_absolute_error_all_locations,self.units))
-            f.write('Location = {},{},{} \n'.format(maximum_absolute_error_x_location,maximum_absolute_error_y_location,maximum_absolute_error_z_location))
-            f.write('Time = {} {} \n'.format(maximum_absolute_error_time_all_locations,tunit))
-            f.write('Maximum Relative Error = {} % \n'.format(maximum_relative_error_all_locations))
-            f.write('Location = {},{},{} \n'.format(maximum_relative_error_x_location,maximum_relative_error_y_location,maximum_relative_error_z_location))
-            f.write('Time = {} {} \n'.format(maximum_relative_error_time_all_locations,tunit))
-            f.write('Maximum Average Absolute Error = {} {} \n'.format(maximum_average_absolute_error, self.units))
-            f.write('Location = {},{},{} \n'.format(maximum_average_absolute_error_x_location,maximum_average_absolute_error_y_location,maximum_average_absolute_error_z_location))
-            f.write('Maximum Average Relative Error = {} {} \n'.format(maximum_average_relative_error,self.units))
-            f.write('Location = {},{},{} \n'.format(maximum_average_relative_error_x_location,maximum_average_relative_error_y_location,maximum_average_relative_error_z_location))    
+            f.write('Maximum Absolute Error = {} \n'.format(self.maximum_absolute_error_all_locations))
+            f.write('Location = {} \n'.format(self.maximum_absolute_error_locations))
+            f.write('Time = {} \n'.format(self.maximum_absolute_error_time_all_locations))
+            f.write('Maximum Relative Error = {} \n'.format(self.maximum_relative_error_all_locations))
+            f.write('Location = {} \n'.format(self.maximum_relative_error_locations))
+            f.write('Time = {} \n'.format(self.maximum_relative_error_time_all_locations))
+            f.write('Maximum Average Absolute Error = {} \n'.format(self.maximum_average_absolute_error_observation))
+            f.write('Location = {} \n'.format(self.maximum_average_absolute_error_location))
+            f.write('Maximum Average Relative Error = {} \n'.format(maximum_average_relative_error,self.units))
+            f.write('Location = {} \n'.format(self.maximum_average_relative_error_location))    
 
         
         
