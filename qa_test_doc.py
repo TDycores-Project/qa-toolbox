@@ -200,34 +200,19 @@ Results Summary
 ===============
 
 """.format(self._filename_root))
-        
-        previous_runs = 0
-        
-
-            
+                    
         for run in self._runs:
                 f.write('\n')
                 scenario_string = 'Scenario {}'.format(run._run_number)
                 f.write("{}\n".format(scenario_string))
                 f.write("{}\n".format('-'*len(scenario_string)))
-                
-                 
+                                
                 variable_num = 0
                 if run._maximum_absolute_error_index:
                     for variable in run._time_slices[0]._variables:
                         variable_string = variable._name 
                         variable_len = len(run._time_slices[0]._variables)
                     
-                    ##check to see if time slice
-                    
-                        max_abs_error_index = (run._maximum_absolute_error_index[variable_string]
-                                           *variable_len)+variable_num+previous_runs
-                        max_rel_error_index = (run._maximum_relative_error_index[variable_string]
-                                           *variable_len)+variable_num+previous_runs
-                        max_avg_abs_error_index = (run._maximum_average_absolute_error_index[variable_string]
-                                               *variable_len)+variable_num+previous_runs
-                        max_avg_rel_error_index = (run._maximum_average_relative_error_index[variable_string]
-                                               *variable_len)+variable_num+previous_runs
                         f.write("""
                         
 .. list-table::
@@ -238,35 +223,42 @@ Results Summary
      - Value
      - Time
      - Location
-   * - :ref:`Maximum Absolute Error <{}_figure{}>`
+   * - :ref:`Maximum Absolute Error <{}_{}_{}_figure{}>`
      - {}
      - {}
      - {}
-   * - :ref:`Maximum Relative Error <{}_figure{}>`
+   * - :ref:`Maximum Relative Error <{}_{}_{}_figure{}>`
      - {}
      - {}
      - {}
-   * - :ref:`Maximum Average Absolute Error <{}_figure{}>`
+   * - :ref:`Maximum Average Absolute Error <{}_{}_{}_figure{}>`
      - {}
      - {}
      - 
-   * - :ref:`Maximum Average Relative Error <{}_figure{}>`
+   * - :ref:`Maximum Average Relative Error <{}_{}_{}_figure{}>`
      - {}
      - {}
      -
      
      
-         """.format(self._filename_root,max_abs_error_index,
-                     run._maximum_absolute_errors[variable_string],run._maximum_absolute_error_times[variable_string],
-                     run._maximum_absolute_error_locations[variable_string],self._filename_root,max_rel_error_index,
-                     run._maximum_relative_errors[variable_string],run._maximum_relative_error_times[variable_string],
-                     run._maximum_relative_error_locations[variable_string],self._filename_root,max_avg_abs_error_index,
-                     run._maximum_average_absolute_errors[variable_string],run._maximum_average_absolute_error_times[variable_string],
-                     self._filename_root,max_avg_rel_error_index,run._maximum_average_relative_errors[variable_string],
-                     run._maximum_average_relative_error_times[variable_string]))
-                    
-                        variable_num = variable_num + 1 
-                previous_runs = len(run._time_slices) * len(run._time_slices[0]._variables)
+         """.format(self._filename_root,run._run_number,variable_string,
+                    run._maximum_absolute_error_index[variable_string],
+                    run._maximum_absolute_errors[variable_string],
+                    run._maximum_absolute_error_times[variable_string],
+                    run._maximum_absolute_error_locations[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_relative_error_index[variable_string],
+                    run._maximum_relative_errors[variable_string],
+                    run._maximum_relative_error_times[variable_string],
+                    run._maximum_relative_error_locations[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_average_absolute_error_index[variable_string],
+                    run._maximum_average_absolute_errors[variable_string],
+                    run._maximum_average_absolute_error_times[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_average_relative_error_index[variable_string],
+                    run._maximum_average_relative_errors[variable_string],
+                    run._maximum_average_relative_error_times[variable_string]))
                 
                 if run._maximum_absolute_error_index_observation:
                     f.write("""
@@ -305,18 +297,25 @@ Observation Point
      - {}
      
      
-         """.format(self._filename_root,run._run_number,variable_string,run._maximum_absolute_error_index_observation[variable_string],
-                     run._maximum_absolute_errors_observation[variable_string],run._maximum_absolute_error_times_observation[variable_string],
-                     run._maximum_absolute_error_locations_observation[variable_string],self._filename_root,run._run_number,variable_string,run._maximum_relative_error_index_observation[variable_string],
-                     run._maximum_relative_errors_observation[variable_string],run._maximum_relative_error_times_observation[variable_string],
-                     run._maximum_relative_error_locations_observation[variable_string],self._filename_root,run._run_number,variable_string,run._maximum_average_absolute_error_index_observation[variable_string],
-                     run._maximum_average_absolute_errors_observation[variable_string],run._maximum_average_absolute_error_location_observation[variable_string],
-                     self._filename_root,run._run_number,variable_string,run._maximum_average_relative_error_index_observation[variable_string],run._maximum_average_relative_errors_observation[variable_string],
-                     run._maximum_average_relative_error_location_observation[variable_string]))
+         """.format(self._filename_root,run._run_number,variable_string,
+                    run._maximum_absolute_error_index_observation[variable_string],
+                    run._maximum_absolute_errors_observation[variable_string],
+                    run._maximum_absolute_error_times_observation[variable_string],
+                    run._maximum_absolute_error_locations_observation[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_relative_error_index_observation[variable_string],
+                    run._maximum_relative_errors_observation[variable_string],
+                    run._maximum_relative_error_times_observation[variable_string],
+                    run._maximum_relative_error_locations_observation[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_average_absolute_error_index_observation[variable_string],
+                    run._maximum_average_absolute_errors_observation[variable_string],
+                    run._maximum_average_absolute_error_location_observation[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_average_relative_error_index_observation[variable_string],
+                    run._maximum_average_relative_errors_observation[variable_string],
+                    run._maximum_average_relative_error_location_observation[variable_string]))
                         
-                    
-                
-
         description_file = 'description_{}.txt'.format(self._filename_root) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
 
         try:
@@ -346,14 +345,14 @@ Detailed Results
 """.format(self._filename_root))
 
         width_percent = 60
-        n = 0
-        
+                
         for run in self._runs:
             scenario_string = 'Scenario {}'.format(run._run_number)
             f.write("{}\n".format(scenario_string))
             f.write("{}\n".format('-'*len(scenario_string)))
             f.write("\n")
             simulators = self._simulators
+            n = 0
             for time_slice in run._time_slices:
                 time_string = '{} {}'.format(time_slice._time,
                                              time_slice._time_unit)
@@ -370,13 +369,14 @@ Detailed Results
                     f.write(".. literalinclude:: ..{}/{}\n\n".format(
                                                          self._local_path,
                                               variable._error_stat))
-                    f.write(".. _{}_figure{}:\n".format(self._filename_root,n))
+                    f.write(".. _{}_{}_{}_figure{}:\n".format(self._filename_root,
+                                                run._run_number,variable_string,n))
                     f.write("\n")
                     f.write(".. figure:: ..{}/{}\n   :width: {} %\n\n".format(
                                    self._local_path,variable._solution_png[0],width_percent))
                     f.write(".. figure:: ..{}/{}\n   :width: {} %\n\n".format(
                                    self._local_path,variable._error_png[0],width_percent))
-                    n = n+1
+                n = n+1
 
                     
             if len(run._observations) > 0:
