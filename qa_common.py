@@ -175,6 +175,10 @@ def find_axis_1D(x,y,z):
     elif len(z)>1:
         if check_array_equal(x)==False:
             x_axis = z
+    print(x_axis)
+    print(x)
+    print(y)
+    print(z)
     try:   
         if x_axis == None:
             raise Exception('Invalid coordinates, check x,y, and z') ###better error message here
