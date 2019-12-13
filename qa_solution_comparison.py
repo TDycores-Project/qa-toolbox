@@ -172,6 +172,9 @@ class QASolutionComparison(object):
                             plt.figure(figsize=(12,8))
 
                         x_axis = find_axis_1D(x,y,z)
+                        print('test')
+                        print(x_min)
+                        print(x_axis)
                         ###sort x_axis
 #                        solution = [x for _, x in sorted(zip(x_axis,solution))]
 #                        x_axis = sorted(x_axis)
