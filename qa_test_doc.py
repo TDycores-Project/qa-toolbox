@@ -110,8 +110,6 @@ class QATestDoc(object):
         self._filename_root = ''
         self._simulators = []
         self._runs = []
-        print(doc_dir)
-        print('PATH')
         debug_pop()
 
     def set_title(self,title):
@@ -316,8 +314,15 @@ Observation Point
 
 class QATestDocIndex(object):
     
-    def __init__(self,testlog):
+    def __init__(self,testlog,_doc_dir):
         self.testlog = testlog
+        if _doc_dir == None:
+            self._doc_dir = '../docs'
+        else:
+            self._doc_dir = _doc_dir
+        if not os.path.isdir(self._doc_dir):
+            print_err_msg('Document Directory Path: {} does not exsist'.format(self._doc_dir))
+        
         
     def write_index(self):#,testlog_file):
         file_dict = self.testlog.read_contents()
@@ -325,7 +330,7 @@ class QATestDocIndex(object):
         self.write_toctree(file_dict)
         self.write_introfiles(file_dict)
         
-        f = open('../docs/index.rst','w')
+        f = open('{}/index.rst'.format(self._doc_dir),'w')
         
         intro = """
 ***************************
@@ -364,7 +369,7 @@ QA Test Suite Documentation
         for folder_path,tests in file_dict.items():
             folder = folder_path.strip().split('/')[-1]            
             for i in range(len(tests)):
-                filename = '../docs/include_toctree_{}_{}.rst'.format(folder,tests[i])
+                filename = '{}/include_toctree_{}_{}.rst'.format(self._doc_dir,folder,tests[i])
                 f = open(filename, 'w')
                 toctree = """
 .. include:: //{}/{}.rst                
@@ -375,7 +380,7 @@ QA Test Suite Documentation
     def write_introfiles(self, file_dict):        
         for folder_path, test in file_dict.items():
             folder = folder_path.strip().split('/')[-1]
-            filename = '../docs/intro_{}.rst'.format(folder)
+            filename = '{}/intro_{}.rst'.format(self._doc_dir,folder)
             intro = """
 .. {}-qa-tests:
 

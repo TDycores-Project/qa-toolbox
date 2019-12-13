@@ -120,7 +120,7 @@ def main(options):
 
 
 
-    doc = QATestDocIndex(testlog)
+    doc = QATestDocIndex(testlog,options.doc_dir)
     doc.write_index()
     debug_finalize()
     stop = time.time()
