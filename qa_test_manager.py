@@ -16,6 +16,7 @@ from qa_debug import *
 from qa_common import *
 from qa_test_log import QATestLog
 
+
 class QATestManager(object):
     """
     Class to open and process a configuration file and run the tets within.
@@ -25,7 +26,7 @@ class QATestManager(object):
         self._config_filename = None
         self._tests = OrderedDict()
         self.available_simulators = simulators_dict
-        self._test_titles = OrderedDict()
+
         
     def __str__(self):
         string = 'QA Test Manager :\n'

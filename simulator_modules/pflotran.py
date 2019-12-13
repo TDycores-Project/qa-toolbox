@@ -18,12 +18,12 @@ h5_mapping['liquid_saturation'] = 'Liquid_Saturation'
 h5_mapping['Total_Tracer [M]'] = 'Tracer'
 h5_mapping['Material_ID'] = 'Material_ID'
 h5_mapping['Liquid_Pressure [Pa]'] = 'Liquid_Pressure'
-h5_mapping['Liquid_Saturation'] = 'Liquid_Saturation'
+h5_mapping['Liquid Saturation'] = 'Liquid_Saturation'
 
 
 obs_mapping = {}
 obs_mapping['Liquid Pressure'] ='Liquid_Pressure'
-obs_mapping['Liquid Saturation'] = 'Liquid Saturation'
+obs_mapping['Liquid Saturation'] = 'Liquid_Saturation'
 obs_mapping['Liquid Pressure [Pa]'] = 'Liquid_Pressure'
 
 

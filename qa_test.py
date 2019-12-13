@@ -24,6 +24,7 @@ from qa_debug import *
 from qa_common import *
 from qa_solution_comparison import *
 from qa_test_doc import *
+from qa_regression_test import QARegressionTest
 
 class QATest(object):
     """
@@ -51,11 +52,10 @@ class QATest(object):
         self._swap_options = {}
         self._output_options = {}
         self.map_options={}
-        self.tough_options={}
         self._process_opt_file()
         self.swap_dict = {}
         self._template = self._section_dict['template']
-
+        self.regression=qa_lookup(self._section_dict,'regression_test',False)
         debug_pop()
 
     def __str__(self):
@@ -88,8 +88,6 @@ class QATest(object):
             self._section_from_opt_file(config,'output_options')
         self.map_options = \
             self._section_from_opt_file(config_mapping,'mapping_options')
-        self.tough_options = \
-            self._section_from_opt_file(config,'tough_options')
         if len(self._output_options) == 0:
             print_err_msg('No output_options defined in options file {} in \
                            folder'.format(filename,os.getcwd()))            
@@ -173,7 +171,7 @@ class QATest(object):
         self._mapped_simulator_names = []
         debug_simulator_list = []
         for simulator in simulator_list:
-            s = re.split(r's*:s*',simulator.strip())
+            s = re.split(r'\s*:\s*',simulator.strip())
             simulator_name = s[0]
             if len(s) > 1:
                 mapped_simulator_name = s[1]
@@ -236,8 +234,6 @@ class QATest(object):
                 doc_run.set_input_filename(mapped_simulator_name,filename)
                 if len(self.map_options) > 0:
                     simulator.update_dict(self.map_options)
-                if len(self.tough_options) > 0 and mapped_simulator_name == 'tough3':
-                    simulator.process_tough_options(self.tough_options,self._output_options)
                 solutions[mapped_simulator_name] = \
                     simulator.run(filename,annotation)
                 isimulator += 1
@@ -250,6 +246,10 @@ class QATest(object):
                                      doc_run)
             compare_solutions.process_opt_file()
             doc.add_run(doc_run)
+        #compare gold file results for regression tests
+        if self.regression == True:
+            regression_test=QARegressionTest()
+            regression_test.compare_values()
         doc.write()
         debug_pop()
 
