@@ -184,6 +184,7 @@ def find_axis_1D(x,y,z):
             raise Exception('Invalid coordinates, check x,y, and z') ###better error message here
     except:    
         return x_axis
+    return x_axis
 
 
 def find_axis_2D(x,y,z):
