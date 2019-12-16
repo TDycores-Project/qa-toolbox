@@ -104,7 +104,7 @@ class QASolutionComparison(object):
     def plot_time_slice(self,times,plot_error,print_error):
         debug_push('QACompareSolutions plot_time_slice')
                
-        all_stat_files = {}
+        stat_files_by_var_dict = {}
         for time in times:
             plot_time_units = ''
             converted_time = -999.     
@@ -295,32 +295,22 @@ class QASolutionComparison(object):
                     doc_var.add_error_png(filename)
                 if print_error == True:   
                     filename = error.print_error(x_loc[0],y_loc[0],z_loc[0],solutions[0],x_loc[1],y_loc[1],z_loc[1],solutions[1]) 
-                    if variable in all_stat_files.keys():
-                        all_stat_files[variable].append(filename)
+                    if variable in stat_files_by_var_dict.keys():
+                        stat_files_by_var_dict[variable].append(filename)
                     else:
-                        all_stat_files[variable] = [filename]
+                        stat_files_by_var_dict[variable] = [filename]
                     doc_var.set_error_stat(filename)
                     
                 doc_slice.add_variable(doc_var)
             self.doc_run.add_time_slice(doc_slice)
             
-        if print_error == True:
-            for variable in all_stat_files.keys():
-                error.calc_error_metrics_over_all_times(all_stat_files[variable],plot_time_units)
-                self.doc_run.add_max_absolute_error(variable, error.maximum_absolute_error_all_times,
-                                                 error.maximum_absolute_error_time,
-                                                 error.maximum_absolute_error_location_all_times,
-                                                 error.maximum_absolute_error_index)
-                self.doc_run.add_max_relative_error(variable,error.maximum_relative_error_all_times,
-                                                 error.maximum_relative_error_time,
-                                                 error.maximum_relative_error_location_all_times,
-                                                 error.maximum_relative_error_index)
-                self.doc_run.add_max_average_absolute_error(variable,error.maximum_average_absolute_error,
-                                                         error.maximum_average_absolute_error_time,
-                                                         error.maximum_average_absolute_error_index)
-                self.doc_run.add_max_average_relative_error(variable,error.maximum_average_relative_error,
-                                                         error.maximum_average_relative_error_time,
-                                                         error.maximum_average_relative_error_index)
+        if print_error:
+            for variable in stat_files_by_var_dict.keys():
+                error.calc_error_metrics_over_all_times(stat_files_by_var_dict[variable],plot_time_units)
+                self.doc_run.add_max_absolute_error(variable, error)
+                self.doc_run.add_max_relative_error(variable,error)
+                self.doc_run.add_max_average_absolute_error(variable,error)
+                self.doc_run.add_max_average_relative_error(variable,error)
 ##            self.doc_run.add_time_slice_variable(doc_var)
         
         debug_pop()        
@@ -328,7 +318,7 @@ class QASolutionComparison(object):
     def plot_observation_file(self,locations,plot_error,print_error):
         debug_push('QACompareSolutions plot_observation_file')
         
-        all_stat_files = {}
+        stat_files_by_var_dict = {}
         for location in locations:
             location_string = '{}, {}, {}'.format(location[0],location[1],
                                                   location[2])
@@ -428,31 +418,21 @@ class QASolutionComparison(object):
                     doc_var.add_error_png(filename)
                 if print_error == True: 
                     filename = error.print_error_1D(times[0],solutions[0],times[1],solutions[1],time_unit)
-                    if variable in all_stat_files.keys():
-                        all_stat_files[variable].append(filename)
+                    if variable in stat_files_by_var_dict.keys():
+                        stat_files_by_var_dict[variable].append(filename)
                     else:
-                        all_stat_files[variable] = [filename]
+                        stat_files_by_var_dict[variable] = [filename]
                     doc_var.set_error_stat(filename)
                     
                 doc_obs.add_variable(doc_var)
             self.doc_run.add_observation(doc_obs)
-        if print_error == True:
-            for variable in all_stat_files.keys():
-                error.calc_error_metrics_over_all_locations(all_stat_files[variable],time_unit) ##check correct time_unit
-                self.doc_run.add_max_absolute_error_observation(variable,error.maximum_absolute_error_all_locations,
-                                                                error.maximum_absolute_error_time_all_locations,
-                                                                error.maximum_absolute_error_locations,
-                                                                error.maximum_absolute_error_observation_index)#error,time,location,index
-                self.doc_run.add_max_relative_error_observation(variable,error.maximum_relative_error_all_locations,
-                                                                error.maximum_relative_error_time_all_locations,
-                                                                error.maximum_relative_error_locations,
-                                                                error.maximum_relative_error_observation_index)
-                self.doc_run.add_max_average_absolute_error_observation(variable, error.maximum_average_absolute_error_observation,
-                                                                        error.maximum_average_absolute_error_location,
-                                                                        error.maximum_average_absolute_error_observation_index) #variable,error,location, index
-                self.doc_run.add_max_average_relative_error_observation(variable, error.maximum_average_relative_error_observation,
-                                                                        error.maximum_average_relative_error_location,
-                                                                        error.maximum_average_relative_error_observation_index)
+        if print_error:
+            for variable in stat_files_by_var_dict.keys():
+                error.calc_error_metrics_over_all_locations(stat_files_by_var_dict[variable],time_unit) ##check correct time_unit
+                self.doc_run.add_max_absolute_error_observation(variable,error)
+                self.doc_run.add_max_relative_error_observation(variable,error)
+                self.doc_run.add_max_average_absolute_error_observation(variable, error) 
+                self.doc_run.add_max_average_relative_error_observation(variable, error)
         debug_pop()
 
 

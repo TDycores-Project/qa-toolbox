@@ -798,7 +798,6 @@ class QATestError(object):
 
            
         for i in range(len(stat_file)):
-            print(stat_file)
             filename = stat_file[i]
 
             if len(tunit) > 0:

@@ -97,49 +97,49 @@ class QATestDocRun():
     def add_observation(self,doc_observation):
         self._observations.append(doc_observation)
         
-    def add_max_absolute_error(self,variable,error,time,location,index):
-        self._maximum_absolute_errors[variable]= error
-        self._maximum_absolute_error_times[variable] = time
-        self._maximum_absolute_error_locations[variable] = location
-        self._maximum_absolute_error_index[variable] = index
+    def add_max_absolute_error(self,variable,error):
+        self._maximum_absolute_errors[variable]= error.maximum_absolute_error_all_times
+        self._maximum_absolute_error_times[variable] = error.maximum_absolute_error_time
+        self._maximum_absolute_error_locations[variable] = error.maximum_absolute_error_location_all_times
+        self._maximum_absolute_error_index[variable] = error.maximum_absolute_error_index
     
-    def add_max_relative_error(self,variable,error,time,location,index):
-        self._maximum_relative_errors[variable] = error
-        self._maximum_relative_error_times[variable] = time
-        self._maximum_relative_error_locations[variable] = location
-        self._maximum_relative_error_index[variable] = index
+    def add_max_relative_error(self,variable,error):
+        self._maximum_relative_errors[variable] = error.maximum_relative_error_all_times
+        self._maximum_relative_error_times[variable] = error.maximum_relative_error_time
+        self._maximum_relative_error_locations[variable] = error.maximum_relative_error_location_all_times
+        self._maximum_relative_error_index[variable] = error.maximum_relative_error_index
         
-    def add_max_average_absolute_error(self,variable,error,time,index):
-        self._maximum_average_absolute_errors[variable] = error
-        self._maximum_average_absolute_error_times[variable] = time
-        self._maximum_average_absolute_error_index[variable] = index
+    def add_max_average_absolute_error(self,variable,error):
+        self._maximum_average_absolute_errors[variable] = error.maximum_average_absolute_error
+        self._maximum_average_absolute_error_times[variable] = error.maximum_average_absolute_error_time
+        self._maximum_average_absolute_error_index[variable] = error.maximum_average_absolute_error_index
         
-    def add_max_average_relative_error(self,variable,error,time,index):
-        self._maximum_average_relative_errors[variable] = error
-        self._maximum_average_relative_error_times[variable] = time
-        self._maximum_average_relative_error_index[variable] = index
+    def add_max_average_relative_error(self,variable,error):
+        self._maximum_average_relative_errors[variable] = error.maximum_average_relative_error
+        self._maximum_average_relative_error_times[variable] = error.maximum_average_relative_error_time
+        self._maximum_average_relative_error_index[variable] = error.maximum_average_relative_error_index
         
-    def add_max_absolute_error_observation(self,variable,error,time,location,index):
-        self._maximum_absolute_errors_observation[variable]= error
-        self._maximum_absolute_error_times_observation[variable] = time
-        self._maximum_absolute_error_locations_observation[variable] = location
-        self._maximum_absolute_error_index_observation[variable] = index
+    def add_max_absolute_error_observation(self,variable,error):
+        self._maximum_absolute_errors_observation[variable]= error.maximum_absolute_error_all_locations
+        self._maximum_absolute_error_times_observation[variable] = error.maximum_absolute_error_time_all_locations
+        self._maximum_absolute_error_locations_observation[variable] = error.maximum_absolute_error_locations
+        self._maximum_absolute_error_index_observation[variable] = error.maximum_absolute_error_observation_index
     
-    def add_max_relative_error_observation(self,variable,error,time,location,index):
-        self._maximum_relative_errors_observation[variable] = error
-        self._maximum_relative_error_times_observation[variable] = time
-        self._maximum_relative_error_locations_observation[variable] = location
-        self._maximum_relative_error_index_observation[variable] = index
+    def add_max_relative_error_observation(self,variable,error):
+        self._maximum_relative_errors_observation[variable] = error.maximum_relative_error_all_locations
+        self._maximum_relative_error_times_observation[variable] = error.maximum_relative_error_time_all_locations
+        self._maximum_relative_error_locations_observation[variable] = error.maximum_relative_error_locations
+        self._maximum_relative_error_index_observation[variable] = error.maximum_relative_error_observation_index
         
-    def add_max_average_absolute_error_observation(self,variable,error,location,index):
-        self._maximum_average_absolute_errors_observation[variable] = error
-        self._maximum_average_absolute_error_location_observation[variable] = location
-        self._maximum_average_absolute_error_index_observation[variable] = index
+    def add_max_average_absolute_error_observation(self,variable,error):
+        self._maximum_average_absolute_errors_observation[variable] = error.maximum_average_absolute_error_observation
+        self._maximum_average_absolute_error_location_observation[variable] = error.maximum_average_absolute_error_location
+        self._maximum_average_absolute_error_index_observation[variable] = error.maximum_average_absolute_error_observation_index
         
-    def add_max_average_relative_error_observation(self,variable,error,location,index):
-        self._maximum_average_relative_errors_observation[variable] = error
-        self._maximum_average_relative_error_location_observation[variable] = location
-        self._maximum_average_relative_error_index_observation[variable] = index
+    def add_max_average_relative_error_observation(self,variable,error):
+        self._maximum_average_relative_errors_observation[variable] = error.maximum_average_relative_error_observation
+        self._maximum_average_relative_error_location_observation[variable] = error.maximum_average_relative_error_location
+        self._maximum_average_relative_error_index_observation[variable] = error.maximum_average_relative_error_observation_index
     
 class QATestDoc(object):
     
