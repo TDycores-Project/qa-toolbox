@@ -91,7 +91,7 @@ def main(options):
     
     # regression tests must come first in list of config files
     config_files = []
-    config_files.append('regression_tests/test.cfg') 
+    config_files.append('{}/regression_tests/test.cfg'.format(root_dir)) 
     for line in open(filename,'r'):
       line=line.strip()
         # rstrip to remove EOL. otherwise, errors when opening file
