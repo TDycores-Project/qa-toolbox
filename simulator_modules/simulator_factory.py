@@ -27,6 +27,9 @@ def locate_simulators():
     simulator_dict = {}
     to_be_removed = []
     for simulator, path in simulators:
+        print(path)
+        print(simulator)
+        print('here')
         if debug_verbose():
             print('Searching for "{}" mapped to "{}".'.format(path,simulator))
         if not os.path.isfile(path):
