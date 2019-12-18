@@ -222,7 +222,7 @@ Results Summary
                     
                 previous_runs = len(run._time_slices) * len(run._time_slices[0]._variables)
 
-        description_file = '/{}_description_{}.txt'.format(self._doc_dir,self._filename_root) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
+        description_file = '{}/description_{}.txt'.format(self._doc_dir,self._template) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
 
         try:
             with open(description_file,'r') as file:
