@@ -47,6 +47,7 @@ class QASimulatorTDycore(QASimulator):
         #   The results are on a 2D unit square. Calculate the descretization
         #   accordingly.
 #        fin = open('{}.sol'.format(root), 'r')
+        print(os.listdir())
         fin = open('{}.vtk'.format(root), 'r')
         all_values = []
         found = False
