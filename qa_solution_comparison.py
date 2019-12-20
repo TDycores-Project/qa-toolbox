@@ -153,7 +153,7 @@ class QASolutionComparison(object):
                     
 
                 
-                    if plot_error == True or print_error == True:
+                    if plot_error or print_error:
                         solutions.append(solution)
                         x_loc.append(x)
                         y_loc.append(y)
@@ -290,10 +290,10 @@ class QASolutionComparison(object):
                 plt.close()
               
                 error = QATestError(prefix,variable,self.template,self.run_number,self.plot_to_screen,self.error_units,False,self.plot_dimension)
-                if plot_error == True:                                     
+                if plot_error:                                     
                     filename = error.plot_error(x_loc[0],y_loc[0],z_loc[0],solutions[0],x_loc[1],y_loc[1],z_loc[1],solutions[1],self.x_string_time_slice,self.y_string_time_slice)
                     doc_var.add_error_png(filename)
-                if print_error == True:   
+                if print_error:   
                     filename = error.print_error(x_loc[0],y_loc[0],z_loc[0],solutions[0],x_loc[1],y_loc[1],z_loc[1],solutions[1]) 
                     if variable in stat_files_by_var_dict.keys():
                         stat_files_by_var_dict[variable].append(filename)
@@ -348,7 +348,7 @@ class QASolutionComparison(object):
                     solution = solution_object.get_solution(location,variable,Observation=True)
                     solution_object.destroy()
                   
-                    if plot_error == True or print_error == True:
+                    if plot_error or print_error:
                         solutions.append(solution)
                         times.append(time)
                         if len(solutions) > 2:
@@ -407,16 +407,16 @@ class QASolutionComparison(object):
                           self.template,self.run_number)
                 doc_var.add_solution_png(filename)
                 plt.savefig(filename)
-                if self.plot_to_screen == True:
+                if self.plot_to_screen:
                     plt.show()
                 plt.close()
                 
                 #######CHANGE
                 error = QATestError(location,variable,self.template,self.run_number,self.plot_to_screen,self.error_units,observation=True)  
-                if plot_error == True:                                     
+                if plot_error:                                     
                     filename = error.plot_error_1D(times[0],solutions[0],times[1],solutions[1],self.x_string_observation)
                     doc_var.add_error_png(filename)
-                if print_error == True: 
+                if print_error: 
                     filename = error.print_error_1D(times[0],solutions[0],times[1],solutions[1],time_unit)
                     if variable in stat_files_by_var_dict.keys():
                         stat_files_by_var_dict[variable].append(filename)
