@@ -29,7 +29,6 @@ from qa_test_doc import QATestDocIndex
 from qa_test_manager import QATestManager
 from qa_common import *
 from simulator_modules.simulator_factory import locate_simulators
-from regression_tests.qa_regression_test import QARegressionTest
 
 def commandline_options():
     """
@@ -84,12 +83,15 @@ def main(options):
 
     print("Running QA tests :") 
     
-    config_files = []
+    
     if os.path.exists('config_files.txt'):
       filename = 'config_files.txt'
     else:
       filename='default_config_files.txt'
-      
+    
+    # regression tests must come first in list of config files
+    config_files = []
+    config_files.append('regression_tests/test.cfg') 
     for line in open(filename,'r'):
       line=line.strip()
         # rstrip to remove EOL. otherwise, errors when opening file
@@ -102,9 +104,6 @@ def main(options):
 
     testlog = QATestLog(root_dir)
 
-    ##before run tests, run regression tests
-    regression_test = QARegressionTest()
-    regression_test.run_test(testlog)
     
 
     # loop through config files, cd into the appropriate directory,
