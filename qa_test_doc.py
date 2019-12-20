@@ -110,7 +110,6 @@ class QATestDoc(object):
         self._filename_root = ''
         self._simulators = []
         self._runs = []
-
         debug_pop()
 
     def set_title(self,title):
@@ -223,7 +222,7 @@ Results Summary
                     
                 previous_runs = len(run._time_slices) * len(run._time_slices[0]._variables)
 
-        description_file = 'description_{}.txt'.format(self._filename_root) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
+        description_file = '{}/description_{}.txt'.format(self._doc_dir,self._template) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
 
         try:
             with open(description_file,'r') as file:
@@ -274,15 +273,15 @@ Detailed Results
                     f.write("\n")
                     # absolute here make it relative to the top source dir
                     # in the sphinx repo (usually: sphinx/doc/source/.)
-                    f.write(".. literalinclude:: ..{}/{}\n\n".format(
-                                                         self._local_path,
+                    f.write(".. literalinclude:: /{}/{}\n\n".format(
+                                                         self._doc_dir,
                                               variable._error_stat))
                     f.write(".. _{}_figure{}:\n".format(self._filename_root,n))
                     f.write("\n")
-                    f.write(".. figure:: ..{}/{}\n   :width: {} %\n\n".format(
-                                   self._local_path,variable._solution_png[0],width_percent))
-                    f.write(".. figure:: ..{}/{}\n   :width: {} %\n\n".format(
-                                   self._local_path,variable._error_png[0],width_percent))
+                    f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
+                                   self._doc_dir,variable._solution_png[0],width_percent))
+                    f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
+                                   self._doc_dir,variable._error_png[0],width_percent))
                     n = n+1
                 k=k+1
                     
@@ -302,21 +301,28 @@ Observation Point
                     for i in range(1,len(simulators)):
                         f.write(" vs {}\n".format(simulators[i]))
                     f.write("\n")
-                    f.write(".. literalinclude:: ..{}/{}\n\n".format(
-                                 self._local_path,variable._error_stat))
-                    f.write(".. figure:: ..{}/{}\n   :width: {} %\n\n".format(
-                                 self._local_path,
+                    f.write(".. literalinclude:: /{}/{}\n\n".format(
+                                 self._doc_dir,variable._error_stat))
+                    f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
+                                 self._doc_dir,
                                  variable._solution_png[0],width_percent))
-                    f.write(".. figure:: ..{}/{}\n   :width: {} %\n\n".format(
-                                 self._local_path,
+                    f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
+                                 self._doc_dir,
                                  variable._error_png[0],width_percent))
 
         f.close()
 
 class QATestDocIndex(object):
     
-    def __init__(self,testlog):
+    def __init__(self,testlog,_doc_dir):
         self.testlog = testlog
+        if _doc_dir == None:
+            self._doc_dir = '../docs'
+        else:
+            self._doc_dir = _doc_dir
+        if not os.path.isdir(self._doc_dir):
+            print_err_msg('Document Directory Path: {} does not exsist'.format(self._doc_dir))
+        
         
     def write_index(self):#,testlog_file):
         file_dict = self.testlog.read_contents()
@@ -324,7 +330,7 @@ class QATestDocIndex(object):
         self.write_toctree(file_dict)
         self.write_introfiles(file_dict)
         
-        f = open('../docs/index.rst','w')
+        f = open('{}/index.rst'.format(self._doc_dir),'w')
         
         intro = """
 ***************************
@@ -337,7 +343,8 @@ QA Test Suite Documentation
         
         f.write(intro)
         
-        for folder in file_dict.keys():
+        for folder_path in file_dict.keys():
+            folder = folder_path.strip().split('/')[-1]
             f.write("""
    intro_{}.rst
             """.format(folder))
@@ -349,7 +356,8 @@ QA Test Suite Documentation
    :hidden:
 """
         f.write(toctree_intro)
-        for folder,tests in file_dict.items():          
+        for folder_path,tests in file_dict.items(): 
+            folder = folder_path.strip().split('/')[-1]
             for i in range(len(tests)):
                 toctree="""
    include_toctree_{}_{}.rst""".format(folder,tests[i])
@@ -358,21 +366,21 @@ QA Test Suite Documentation
         
     def write_toctree(self,file_dict):
         
-        for folder,tests in file_dict.items():
-            ###RELATIVE PATHS.... MAY NEED TO CHANGE THIS LATER.....            
+        for folder_path,tests in file_dict.items():
+            folder = folder_path.strip().split('/')[-1]            
             for i in range(len(tests)):
-                filename = '../docs/include_toctree_{}_{}.rst'.format(folder,tests[i])
+                filename = '{}/include_toctree_{}_{}.rst'.format(self._doc_dir,folder,tests[i])
                 f = open(filename, 'w')
                 toctree = """
-.. include:: ../{}/{}.rst                
-                """.format(folder,tests[i])
+.. include:: //{}/{}.rst                
+                """.format(folder_path,tests[i])
                 f.write(toctree)
                 f.close()
         
     def write_introfiles(self, file_dict):        
-        for folder, test in file_dict.items():
-#            pretty_name = test.replace('_',' ').title()
-            filename = '../docs/intro_{}.rst'.format(folder)
+        for folder_path, test in file_dict.items():
+            folder = folder_path.strip().split('/')[-1]
+            filename = '{}/intro_{}.rst'.format(self._doc_dir,folder)
             intro = """
 .. {}-qa-tests:
 
