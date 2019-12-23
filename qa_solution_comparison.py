@@ -411,7 +411,6 @@ class QASolutionComparison(object):
                     plt.show()
                 plt.close()
                 
-                #######CHANGE
                 error = QATestError(location,variable,self.template,self.run_number,self.plot_to_screen,self.error_units,observation=True)  
                 if plot_error:                                     
                     filename = error.plot_error_1D(times[0],solutions[0],times[1],solutions[1],self.x_string_observation)
