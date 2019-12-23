@@ -36,12 +36,12 @@ class QARegressionTest(object):
             if delta > self._tolerance:
                 self._fail = True
                 fail_dict[key1] = delta
-                
+    
         if self._fail == True:
-            with open('regression_test/regression_test_output.txt','w') as f:
+            with open('regression_test_output.txt','w') as f:
                 for key,value in fail_dict.items():
                     f.write('{} difference = {} \n'.format(key,value))
-            print_err_msg('Regression test failed. Check regression_test_output.txt') 
+            print_err_msg('Regression test failed. Check regression_tests/regression_test_output.txt') 
         else:
             print('Regression test passed, continuing with qa_tests')
             

@@ -39,9 +39,11 @@ class QATestLog(object):
         with open(self.successful_tests,'r') as f:
             for line in f:
                 tests = line.strip().split('/')
-                if tests[-2] in log_dict.keys():
-                    log_dict[tests[-2]].append(tests[-1])
+                s = '/'
+                folder_path = s.join(tests[0:-1])
+                if folder_path in log_dict.keys():
+                    log_dict[folder_path].append(tests[-1])
                 else:
-                    log_dict[tests[-2]] = [tests[-1]]
+                    log_dict[folder_path] = [tests[-1]]
         return log_dict
             
