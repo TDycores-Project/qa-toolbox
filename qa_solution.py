@@ -65,6 +65,7 @@ class QASolutionWriter(object):
             soln = np.reshape(soln,(soln.shape[0],1,1))
         elif soln.ndim == 2:
             soln = np.reshape(soln,(soln.shape[0],soln.shape[1],1))
+        dataset_name = dataset_name.replace('/','_')
         ###Change group names to 1 Time, 1 Location, 2 Time, 2 Location?
         if group == 'Time Slice':
             group_name = '{}/Time: {:9.3e} {}'.format(group,dimension,self._tunit)
