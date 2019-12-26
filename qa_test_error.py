@@ -138,7 +138,7 @@ class QATestError(object):
         self.calc_error_stats_2D(dimension1,dimension2,values1,values2)
 
         if self.observation == True:
-            filename='{}_{}_{}_{}_{}_run{}_error.stat'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],self.variable,self.template,self.run_number)
+            filename = '{}_{}_{}_{}_{}_run{}_error.stat'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],self.variable,self.template,self.run_number)
         else:
             filename = '{}_{}_{}_run{}_error.stat'.format(self.converted_time,self.variable,self.template,self.run_number)
       
@@ -155,7 +155,7 @@ class QATestError(object):
               
         return filename
         
-    def print_error_1D(self,dimension1,values1,dimension2,values2,time_unit= ' ', difference_string='all'):
+    def print_error_1D(self,dimension1,values1,dimension2,values2,time_unit = ' ', difference_string='all'):
         self.calc_error_stats_1D(dimension1,values1,dimension2,values2,difference_string)
 
         if self.observation == True:
@@ -752,7 +752,7 @@ class QATestError(object):
             maximum_relative_error_time = times[index]
             self.maximum_relative_error_time = '{} {}'.format(maximum_relative_error_time,tunit)
         else:
-            self.maximum_relative_error_time =' '
+            self.maximum_relative_error_time = ' '
         
         maximum_average_absolute_error = max((average_absolute_error))
         index = argmax(average_absolute_error)
