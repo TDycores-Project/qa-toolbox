@@ -321,6 +321,9 @@ class QASolutionComparison(object):
                 self.doc_run.add_max_average_relative_error(variable,error.maximum_average_relative_error,
                                                          error.maximum_average_relative_error_time,
                                                          error.maximum_average_relative_error_index)
+                
+                ###save variables for solution convergence, different types of error?
+                self.error_solution_convergence = error.maximum_relative_error_all_times
 ##            self.doc_run.add_time_slice_variable(doc_var)
         
         debug_pop()        
@@ -429,6 +432,11 @@ class QASolutionComparison(object):
             self.doc_run.add_observation(doc_obs)
         
         debug_pop()
+        
+        
+    def get_max_error(self):
+        error_solution_convergence = self.error_solution_convergence.split()[0]
+        return string_to_number(error_solution_convergence)
 
 
 

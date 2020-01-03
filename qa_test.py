@@ -90,6 +90,8 @@ class QATest(object):
             self._section_from_opt_file(config,'output_options')
         self.map_options = \
             self._section_from_opt_file(config_mapping,'mapping_options')
+        self._convergence_options = \
+            self._section_from_opt_file(config,'solution_convergence')
         if len(self._output_options) == 0:
             print_err_msg('No output_options defined in options file {} in \
                            folder'.format(filename,os.getcwd()))            
@@ -210,11 +212,17 @@ class QATest(object):
         doc = QATestDoc(cwd,cwd.replace(self.root_dir,''))
         doc.set_title(self.title)
         doc.set_template(self._template)
-        ##check to see if converging 
-        #if converging enter convergence class
-        #else do below
-        if self._solution_convergence:
-            qa_solution_convergence()
+
+        if len(self._convergence_options) != 0: 
+            self._start_qa_convergence()
+            self._process_convergence_options()
+            while self.test_pass == False and self.num_tries < self._max_tries:
+                self._update_value(doc)
+                
+            if self._verbose == True:
+                doc.write()
+            elif self.test_pass == True:
+                doc.write()
         else:
             for i in range(len(list_of_swap_dict)):
                 run_number = i+1
@@ -291,54 +299,47 @@ class QATest(object):
         return out_filename
     
     
-    
-    ##qa_solution_class
-    #while not pass and not max_tries
-    #1. increase run number
-    
-    #2. Swap out new value
-    #--> list_of_swap_dict = [{'nx': 100}]
-    #--> update annotation
-    
-    #3.Loop through simulators same way
-    
-    #4. Compare solutions ---> make sure error is one (go into output_options and set??)
-    
-    #5. Check to see if passes over tolerance,
-    #a. if it does add to documentation exit while loop
-    #b. if it doesn't
-      #i. increase/decrease swap variable in swap list
-      #ii. check if verbose documentation (add if is verbose)
-      #iii. increase number of tries
-   
-class QASolutionConvergence(QATest,doc):
-     def __init__(self,convergence_dict):
-         self._convergence_dict = convergence_dict
-         self._values_dict = {}
-         self.num_tries = 0
-         self.test_pass = False
-         self.doc = doc
+    def _start_qa_convergence(self):
+#        self._convergence_dict = convergence_dict
+        self._values_dict = {}
+        self.num_tries = 0
+        self.test_pass = False
+#         self.doc = doc
          
          
-     def process_convergence_options(self):
-         self._max_tries = qa_lookup(self.convergence_dict, 'max_tries','fail_on_missing_keyword')
-         self._tolerance = qa_lookup(self.convergence_dict, 'tolerance','fail_on_missing_keyword')
-         self._increment_value = qa_lookup(self.convergence_dict, 'increment_value','fail_on_missing_keyword')
+    def _process_convergence_options(self):
+         max_tries = qa_lookup(self._convergence_options, 'max_tries','fail_on_missing_keyword')
+         tolerance = qa_lookup(self._convergence_options, 'tolerance','fail_on_missing_keyword')
+         increment_value = qa_lookup(self._convergence_options, 'increment_value','fail_on_missing_keyword')
 #         self._variable = qa_lookup(self.convergence_dict, 'variable','fail_on_missing_keyword')
-         self._verbose = qa_lookup(self.convergence_dict, 'verbose','True')
+         self._verbose = qa_lookup(self._convergence_options, 'verbose','True')
          
-         self.convergence_dict.pop('max_tries',None)
-         self.convergence_dict.pop('tolerance',None)
-         self.convergence_dict.pop('increment_value',None)
-         self.convergence_dict.pop('verbose',None)
+         self._convergence_options.pop('max_tries',None)
+         self._convergence_options.pop('tolerance',None)
+         self._convergence_options.pop('increment_value',None)
+         self._convergence_options.pop('verbose',None)
+         
+         self._max_tries = string_to_number(max_tries)
+         self._tolerance = string_to_number(tolerance)
+         self._increment_value = string_to_number(increment_value)
          
          #going to need to user error proof this
-         for key,value in self._swap_options.items():
+         for key,value in self._convergence_options.items():
              self._values_dict[key] = string_to_number(value)
              
-     def update_value(self):
-         doc = self.doc
+         self._update_options_file()
          
+    def _update_options_file(self):
+        plot_error = qa_lookup(self._output_options,'plot_error',False)
+        print_error = qa_lookup(self._output_options,'print_error',False)
+        
+        if plot_error == False:
+            self._output_options['plot_error'] = True
+        if print_error == False:
+            self._output_options['print_error'] = True
+             
+    def _update_value(self,doc):
+#         doc = self.doc
          run_number = self.num_tries + 1
          doc_run = QATestDocRun(run_number)
 
@@ -360,7 +361,7 @@ class QASolutionConvergence(QATest,doc):
              mapped_simulator_name = self._mapped_simulator_names[isimulator]
              if run_number == 1:
                  doc.add_simulator(mapped_simulator_name)
-             print_headers('-',mapped_simulator_name)
+#             print_headers('-',mapped_simulator_name)
              filename = self._swap(mapped_simulator_name,simulator.get_suffix(),
                                    run_number,self._values_dict)
              
@@ -378,17 +379,27 @@ class QASolutionConvergence(QATest,doc):
                                          self._template,run_number,
                                          doc_run)
          compare_solutions.process_opt_file()
-         
-         max_error = compare_solutions.error.maximum_relative_error_all_times
+         max_error = compare_solutions.get_max_error() ##name better?
+#         max_error = compare_solutions.error.maximum_relative_error_all_times
          if max_error > self._tolerance:
-             for key,value in self._swap_options.items():
-                 self._values_dict[key] = string_to_number(value)*self._increment_value
+             for key,value in self._values_dict.items():
+                 self._values_dict[key] = value*self._increment_value
              self.num_tries = self.num_tries + 1
-             if self.verbose == True:
+             if self._verbose == True:
                  doc.add_run(doc_run)
+             if self.num_tries >= self._max_tries:
+                 print('Maximum number of tries reached, aborting test')
+             else:
+                 print('continuing tests')
          else:
+             print('converged, aborting test')
              self.test_pass = True
              doc.add_run(doc_run) ##update this later so doesn't write...
+             
+             
+   
+
+
          
             
 
