@@ -82,6 +82,8 @@ class QATest(object):
                 print('  {}'.format(section))
         debug_pop()
         
+        ####get options dict here
+        
         self._swap_options = \
             self._section_from_opt_file(config,'swap_options')
         self._output_options = \
@@ -208,49 +210,55 @@ class QATest(object):
         doc = QATestDoc(cwd,cwd.replace(self.root_dir,''))
         doc.set_title(self.title)
         doc.set_template(self._template)
-        for i in range(len(list_of_swap_dict)):
-            run_number = i+1
-            doc_run = QATestDocRun(run_number)
-  
-            swap_dict = None
-            if len(list_of_swap_dict) > 0:
-                #if len(list_of_swap_dict) > 1:
-                #    run_number += 1
-                swap_dict = list_of_swap_dict[i]
-            annotation = None
-            if swap_dict:
-                annotation = 'Run {}\n'.format(run_number)
-                annotation += dict_to_string(swap_dict)
-            solutions = {}
-            isimulator = 0
-            
-            for simulator in self._simulators:
-                mapped_simulator_name = self._mapped_simulator_names[isimulator]
-                if run_number == 1:
-                     doc.add_simulator(mapped_simulator_name)
-                print_header('-',mapped_simulator_name)
-                filename = self._swap(mapped_simulator_name,simulator.get_suffix(),
-                                      run_number,swap_dict)
-                doc_run.set_input_filename(mapped_simulator_name,filename)
-                if len(self.map_options) > 0:
-                    simulator.update_dict(self.map_options)
-                solutions[mapped_simulator_name] = \
-                    simulator.run(filename,annotation)
-                isimulator += 1
-            #self._compare_solutions(solutions)
-            ##pass in template and run number
-            compare_solutions = \
-                QASolutionComparison(solutions,self._output_options,
-                                     self._mapped_simulator_names,
-                                     self._template,run_number,
-                                     doc_run)
-            compare_solutions.process_opt_file()
-            doc.add_run(doc_run)
-        #compare gold file results for regression tests
-        if self.regression == True:
-            regression_test=QARegressionTest()
-            regression_test.compare_values()
-        doc.write()
+        ##check to see if converging 
+        #if converging enter convergence class
+        #else do below
+        if self._solution_convergence:
+            qa_solution_convergence()
+        else:
+            for i in range(len(list_of_swap_dict)):
+                run_number = i+1
+                doc_run = QATestDocRun(run_number)
+      
+                swap_dict = None
+                if len(list_of_swap_dict) > 0:
+                    #if len(list_of_swap_dict) > 1:
+                    #    run_number += 1
+                    swap_dict = list_of_swap_dict[i]
+                annotation = None
+                if swap_dict:
+                    annotation = 'Run {}\n'.format(run_number)
+                    annotation += dict_to_string(swap_dict)
+                solutions = {}
+                isimulator = 0
+                
+                for simulator in self._simulators:
+                    mapped_simulator_name = self._mapped_simulator_names[isimulator]
+                    if run_number == 1:
+                         doc.add_simulator(mapped_simulator_name)
+                    print_header('-',mapped_simulator_name)
+                    filename = self._swap(mapped_simulator_name,simulator.get_suffix(),
+                                          run_number,swap_dict)
+                    doc_run.set_input_filename(mapped_simulator_name,filename)
+                    if len(self.map_options) > 0:
+                        simulator.update_dict(self.map_options)
+                    solutions[mapped_simulator_name] = \
+                        simulator.run(filename,annotation)
+                    isimulator += 1
+                #self._compare_solutions(solutions)
+                ##pass in template and run number
+                compare_solutions = \
+                    QASolutionComparison(solutions,self._output_options,
+                                         self._mapped_simulator_names,
+                                         self._template,run_number,
+                                         doc_run)
+                compare_solutions.process_opt_file()
+                doc.add_run(doc_run)
+            #compare gold file results for regression tests
+            if self.regression == True:
+                regression_test=QARegressionTest()
+                regression_test.compare_values()
+            doc.write()
         debug_pop()
 
 
@@ -281,5 +289,107 @@ class QATest(object):
 
         debug_pop()
         return out_filename
-
+    
+    
+    
+    ##qa_solution_class
+    #while not pass and not max_tries
+    #1. increase run number
+    
+    #2. Swap out new value
+    #--> list_of_swap_dict = [{'nx': 100}]
+    #--> update annotation
+    
+    #3.Loop through simulators same way
+    
+    #4. Compare solutions ---> make sure error is one (go into output_options and set??)
+    
+    #5. Check to see if passes over tolerance,
+    #a. if it does add to documentation exit while loop
+    #b. if it doesn't
+      #i. increase/decrease swap variable in swap list
+      #ii. check if verbose documentation (add if is verbose)
+      #iii. increase number of tries
    
+class QASolutionConvergence(QATest,doc):
+     def __init__(self,convergence_dict):
+         self._convergence_dict = convergence_dict
+         self._values_dict = {}
+         self.num_tries = 0
+         self.test_pass = False
+         self.doc = doc
+         
+         
+     def process_convergence_options(self):
+         self._max_tries = qa_lookup(self.convergence_dict, 'max_tries','fail_on_missing_keyword')
+         self._tolerance = qa_lookup(self.convergence_dict, 'tolerance','fail_on_missing_keyword')
+         self._increment_value = qa_lookup(self.convergence_dict, 'increment_value','fail_on_missing_keyword')
+#         self._variable = qa_lookup(self.convergence_dict, 'variable','fail_on_missing_keyword')
+         self._verbose = qa_lookup(self.convergence_dict, 'verbose','True')
+         
+         self.convergence_dict.pop('max_tries',None)
+         self.convergence_dict.pop('tolerance',None)
+         self.convergence_dict.pop('increment_value',None)
+         self.convergence_dict.pop('verbose',None)
+         
+         #going to need to user error proof this
+         for key,value in self._swap_options.items():
+             self._values_dict[key] = string_to_number(value)
+             
+     def update_value(self):
+         doc = self.doc
+         
+         run_number = self.num_tries + 1
+         doc_run = QATestDocRun(run_number)
+
+         annotation = 'Run {}\n'.format(run_number)
+         annotation += dict_to_string(self._values_dict)
+         
+         solutions = {}
+         isimulator = 0
+         
+         for simulator in self._simulators: 
+             ###self._simulators won't be defined! neither will..
+             #self._mapped_simulator_name
+             #self.swap
+             #self.map_optons
+             #self._template
+             #self.output_options
+             #self.regression
+             
+             mapped_simulator_name = self._mapped_simulator_names[isimulator]
+             if run_number == 1:
+                 doc.add_simulator(mapped_simulator_name)
+             print_headers('-',mapped_simulator_name)
+             filename = self._swap(mapped_simulator_name,simulator.get_suffix(),
+                                   run_number,self._values_dict)
+             
+             doc_run.set_input_filename(mapped_simulator_name,filename)
+             if len(self.map_options) > 0:
+                 simulator.update_dict(self.map_options)
+             solutions[mapped_simulator_name] = \
+                 simulator.run(filename,annotation)
+             isimulator += 1
+             
+         #update output options so includes error
+         compare_solutions =  \
+             QASolutionComparison(solutions,self._output_options,
+                                         self._mapped_simulator_names,
+                                         self._template,run_number,
+                                         doc_run)
+         compare_solutions.process_opt_file()
+         
+         max_error = compare_solutions.error.maximum_relative_error_all_times
+         if max_error > self._tolerance:
+             for key,value in self._swap_options.items():
+                 self._values_dict[key] = string_to_number(value)*self._increment_value
+             self.num_tries = self.num_tries + 1
+             if self.verbose == True:
+                 doc.add_run(doc_run)
+         else:
+             self.test_pass = True
+             doc.add_run(doc_run) ##update this later so doesn't write...
+         
+            
+
+                           
