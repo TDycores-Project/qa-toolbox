@@ -50,10 +50,12 @@ class QATestDocRun():
         self._filenames = {}
         self._rst_filename = ''
         
+        #####time slice
         self._maximum_absolute_errors = {}
         self._maximum_absolute_error_times = {}
         self._maximum_absolute_error_locations = {}
-        self._maximum_absolute_error_index = {}        
+        self._maximum_absolute_error_index = {}  
+        
         self._maximum_relative_errors = {}
         self._maximum_relative_error_times = {}
         self._maximum_relative_error_locations = {}
@@ -66,6 +68,25 @@ class QATestDocRun():
         self._maximum_average_relative_errors = {}
         self._maximum_average_relative_error_times = {}
         self._maximum_average_relative_error_index = {}
+        
+        ####observation point
+        self._maximum_absolute_errors_observation = {}
+        self._maximum_absolute_error_times_observation = {}
+        self._maximum_absolute_error_locations_observation = {}
+        self._maximum_absolute_error_index_observation = {}  
+        
+        self._maximum_relative_errors_observation = {}
+        self._maximum_relative_error_times_observation = {}
+        self._maximum_relative_error_locations_observation = {}
+        self._maximum_relative_error_index_observation = {}
+        
+        self._maximum_average_absolute_errors_observation = {}
+        self._maximum_average_absolute_error_location_observation = {}
+        self._maximum_average_absolute_error_index_observation = {}
+        
+        self._maximum_average_relative_errors_observation = {}
+        self._maximum_average_relative_error_location_observation = {}
+        self._maximum_average_relative_error_index_observation = {}
 
     def set_input_filename(self,simulator,filename):
         self._filenames[simulator] = filename
@@ -76,27 +97,49 @@ class QATestDocRun():
     def add_observation(self,doc_observation):
         self._observations.append(doc_observation)
         
-    def add_max_absolute_error(self,variable,error,time,location,index):
-        self._maximum_absolute_errors[variable]= error
-        self._maximum_absolute_error_times[variable] = time
-        self._maximum_absolute_error_locations[variable] = location
-        self._maximum_absolute_error_index[variable] = index
+    def add_max_absolute_error(self,variable,error):
+        self._maximum_absolute_errors[variable]= error.maximum_absolute_error_all_times
+        self._maximum_absolute_error_times[variable] = error.maximum_absolute_error_time
+        self._maximum_absolute_error_locations[variable] = error.maximum_absolute_error_location_all_times
+        self._maximum_absolute_error_index[variable] = error.maximum_absolute_error_index
     
-    def add_max_relative_error(self,variable,error,time,location,index):
-        self._maximum_relative_errors[variable] = error
-        self._maximum_relative_error_times[variable] = time
-        self._maximum_relative_error_locations[variable] = location
-        self._maximum_relative_error_index[variable] = index
+    def add_max_relative_error(self,variable,error):
+        self._maximum_relative_errors[variable] = error.maximum_relative_error_all_times
+        self._maximum_relative_error_times[variable] = error.maximum_relative_error_time
+        self._maximum_relative_error_locations[variable] = error.maximum_relative_error_location_all_times
+        self._maximum_relative_error_index[variable] = error.maximum_relative_error_index
         
-    def add_max_average_absolute_error(self,variable,error,time,index):
-        self._maximum_average_absolute_errors[variable] = error
-        self._maximum_average_absolute_error_times[variable] = time
-        self._maximum_average_absolute_error_index[variable] = index
+    def add_max_average_absolute_error(self,variable,error):
+        self._maximum_average_absolute_errors[variable] = error.maximum_average_absolute_error
+        self._maximum_average_absolute_error_times[variable] = error.maximum_average_absolute_error_time
+        self._maximum_average_absolute_error_index[variable] = error.maximum_average_absolute_error_index
         
-    def add_max_average_relative_error(self,variable,error,time,index):
-        self._maximum_average_relative_errors[variable] = error
-        self._maximum_average_relative_error_times[variable] = time
-        self._maximum_average_relative_error_index[variable] = index
+    def add_max_average_relative_error(self,variable,error):
+        self._maximum_average_relative_errors[variable] = error.maximum_average_relative_error
+        self._maximum_average_relative_error_times[variable] = error.maximum_average_relative_error_time
+        self._maximum_average_relative_error_index[variable] = error.maximum_average_relative_error_index
+        
+    def add_max_absolute_error_observation(self,variable,error):
+        self._maximum_absolute_errors_observation[variable]= error.maximum_absolute_error_all_locations
+        self._maximum_absolute_error_times_observation[variable] = error.maximum_absolute_error_time_all_locations
+        self._maximum_absolute_error_locations_observation[variable] = error.maximum_absolute_error_locations
+        self._maximum_absolute_error_index_observation[variable] = error.maximum_absolute_error_observation_index
+    
+    def add_max_relative_error_observation(self,variable,error):
+        self._maximum_relative_errors_observation[variable] = error.maximum_relative_error_all_locations
+        self._maximum_relative_error_times_observation[variable] = error.maximum_relative_error_time_all_locations
+        self._maximum_relative_error_locations_observation[variable] = error.maximum_relative_error_locations
+        self._maximum_relative_error_index_observation[variable] = error.maximum_relative_error_observation_index
+        
+    def add_max_average_absolute_error_observation(self,variable,error):
+        self._maximum_average_absolute_errors_observation[variable] = error.maximum_average_absolute_error_observation
+        self._maximum_average_absolute_error_location_observation[variable] = error.maximum_average_absolute_error_location
+        self._maximum_average_absolute_error_index_observation[variable] = error.maximum_average_absolute_error_observation_index
+        
+    def add_max_average_relative_error_observation(self,variable,error):
+        self._maximum_average_relative_errors_observation[variable] = error.maximum_average_relative_error_observation
+        self._maximum_average_relative_error_location_observation[variable] = error.maximum_average_relative_error_location
+        self._maximum_average_relative_error_index_observation[variable] = error.maximum_average_relative_error_observation_index
     
 class QATestDoc(object):
     
@@ -156,32 +199,20 @@ Results Summary
 ===============
 
 """.format(self._filename_root))
-        
-        previous_runs = 0
-        
-        if self._runs[0]._maximum_absolute_errors:
-            
-            for run in self._runs:
+                    
+        for run in self._runs:
                 f.write('\n')
                 scenario_string = 'Scenario {}'.format(run._run_number)
                 f.write("{}\n".format(scenario_string))
                 f.write("{}\n".format('-'*len(scenario_string)))
-                
-                 
+                                
                 variable_num = 0
-                for variable in run._time_slices[0]._variables:
-                    variable_string = variable._name 
-                    variable_len = len(run._time_slices[0]._variables)
+                if run._maximum_absolute_error_index:
+                    for variable in run._time_slices[0]._variables:
+                        variable_string = variable._name 
+                        variable_len = len(run._time_slices[0]._variables)
                     
-                    max_abs_error_index = (run._maximum_absolute_error_index[variable_string]
-                                           *variable_len)+variable_num+previous_runs
-                    max_rel_error_index = (run._maximum_relative_error_index[variable_string]
-                                           *variable_len)+variable_num+previous_runs
-                    max_avg_abs_error_index = (run._maximum_average_absolute_error_index[variable_string]
-                                               *variable_len)+variable_num+previous_runs
-                    max_avg_rel_error_index = (run._maximum_average_relative_error_index[variable_string]
-                                               *variable_len)+variable_num+previous_runs
-                    f.write("""
+                        f.write("""
                         
 .. list-table::
    :widths: 40 35 10 20
@@ -191,37 +222,99 @@ Results Summary
      - Value
      - Time
      - Location
-   * - :ref:`Maximum Absolute Error <{}_figure{}>`
+   * - :ref:`Maximum Absolute Error <{}_{}_{}_figure{}>`
      - {}
      - {}
      - {}
-   * - :ref:`Maximum Relative Error <{}_figure{}>`
+   * - :ref:`Maximum Relative Error <{}_{}_{}_figure{}>`
      - {}
      - {}
      - {}
-   * - :ref:`Maximum Average Absolute Error <{}_figure{}>`
+   * - :ref:`Maximum Average Absolute Error <{}_{}_{}_figure{}>`
      - {}
      - {}
      - 
-   * - :ref:`Maximum Average Relative Error <{}_figure{}>`
+   * - :ref:`Maximum Average Relative Error <{}_{}_{}_figure{}>`
      - {}
      - {}
      -
      
      
-         """.format(self._filename_root,max_abs_error_index,
-                     run._maximum_absolute_errors[variable_string],run._maximum_absolute_error_times[variable_string],
-                     run._maximum_absolute_error_locations[variable_string],self._filename_root,max_rel_error_index,
-                     run._maximum_relative_errors[variable_string],run._maximum_relative_error_times[variable_string],
-                     run._maximum_relative_error_locations[variable_string],self._filename_root,max_avg_abs_error_index,
-                     run._maximum_average_absolute_errors[variable_string],run._maximum_average_absolute_error_times[variable_string],
-                     self._filename_root,max_avg_rel_error_index,run._maximum_average_relative_errors[variable_string],
-                     run._maximum_average_relative_error_times[variable_string]))
-                    
-                    variable_num = variable_num + 1    
-                    
-                previous_runs = len(run._time_slices) * len(run._time_slices[0]._variables)
+         """.format(self._filename_root,run._run_number,variable_string,
+                    run._maximum_absolute_error_index[variable_string],
+                    run._maximum_absolute_errors[variable_string],
+                    run._maximum_absolute_error_times[variable_string],
+                    run._maximum_absolute_error_locations[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_relative_error_index[variable_string],
+                    run._maximum_relative_errors[variable_string],
+                    run._maximum_relative_error_times[variable_string],
+                    run._maximum_relative_error_locations[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_average_absolute_error_index[variable_string],
+                    run._maximum_average_absolute_errors[variable_string],
+                    run._maximum_average_absolute_error_times[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_average_relative_error_index[variable_string],
+                    run._maximum_average_relative_errors[variable_string],
+                    run._maximum_average_relative_error_times[variable_string]))
+                
+                if run._maximum_absolute_error_index_observation:
+                    f.write("""
+Observation Point
+^^^^^^^^^^^^^^^^^
 
+""")
+                    for variable in run._observations[0]._variables:       
+                        variable_string = variable._name 
+
+                        f.write("""
+                        
+.. list-table::
+   :widths: 40 35 10 20
+   :header-rows: 1
+   
+   * - 
+     - Value
+     - Time
+     - Location
+   * - :ref:`Maximum Absolute Error <{}_{}_{}_observation_figure{}>`
+     - {}
+     - {}
+     - {}
+   * - :ref:`Maximum Relative Error <{}_{}_{}_observation_figure{}>`
+     - {}
+     - {}
+     - {}
+   * - :ref:`Maximum Average Absolute Error <{}_{}_{}_observation_figure{}>`
+     - {}
+     - 
+     - {}
+   * - :ref:`Maximum Average Relative Error <{}_{}_{}_observation_figure{}>`
+     - {}
+     - 
+     - {}
+     
+     
+         """.format(self._filename_root,run._run_number,variable_string,
+                    run._maximum_absolute_error_index_observation[variable_string],
+                    run._maximum_absolute_errors_observation[variable_string],
+                    run._maximum_absolute_error_times_observation[variable_string],
+                    run._maximum_absolute_error_locations_observation[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_relative_error_index_observation[variable_string],
+                    run._maximum_relative_errors_observation[variable_string],
+                    run._maximum_relative_error_times_observation[variable_string],
+                    run._maximum_relative_error_locations_observation[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_average_absolute_error_index_observation[variable_string],
+                    run._maximum_average_absolute_errors_observation[variable_string],
+                    run._maximum_average_absolute_error_location_observation[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_average_relative_error_index_observation[variable_string],
+                    run._maximum_average_relative_errors_observation[variable_string],
+                    run._maximum_average_relative_error_location_observation[variable_string]))
+                        
         description_file = '{}/description_{}.txt'.format(self._doc_dir,self._template) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
 
         try:
@@ -252,14 +345,14 @@ Detailed Results
 
         width_percent = 60
         n = 0
-
+                
         for run in self._runs:
             scenario_string = 'Scenario {}'.format(run._run_number)
             f.write("{}\n".format(scenario_string))
             f.write("{}\n".format('-'*len(scenario_string)))
             f.write("\n")
             simulators = self._simulators
-            k=0
+           
             for time_slice in run._time_slices:
                 time_string = '{} {}'.format(time_slice._time,
                                              time_slice._time_unit)
@@ -276,14 +369,17 @@ Detailed Results
                     f.write(".. literalinclude:: /{}/{}\n\n".format(
                                                          self._doc_dir,
                                               variable._error_stat))
-                    f.write(".. _{}_figure{}:\n".format(self._filename_root,n))
+                    f.write(".. _{}_{}_{}_figure{}:\n".format(self._filename_root,
+                                                run._run_number,variable_string,n))
                     f.write("\n")
+
                     f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
                                    self._doc_dir,variable._solution_png[0],width_percent))
                     f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
                                    self._doc_dir,variable._error_png[0],width_percent))
-                    n = n+1
-                k=k+1
+                n = n+1
+                
+
                     
             if len(run._observations) > 0:
                 f.write("""
@@ -291,6 +387,7 @@ Observation Point
 ^^^^^^^^^^^^^^^^^
 
 """)
+            k = 0    
             for observation in run._observations:              
                 observation_string = '{}'.format(observation._location)
                 for variable in observation._variables:
@@ -301,6 +398,11 @@ Observation Point
                     for i in range(1,len(simulators)):
                         f.write(" vs {}\n".format(simulators[i]))
                     f.write("\n")
+
+                    f.write(".. _{}_{}_{}_observation_figure{}:\n".format(self._filename_root,
+                                                            run._run_number,variable_string,k))
+                    f.write("\n")
+
                     f.write(".. literalinclude:: /{}/{}\n\n".format(
                                  self._doc_dir,variable._error_stat))
                     f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
@@ -309,6 +411,7 @@ Observation Point
                     f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
                                  self._doc_dir,
                                  variable._error_png[0],width_percent))
+                k = k+1
 
         f.close()
 
