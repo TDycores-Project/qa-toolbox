@@ -157,7 +157,6 @@ class QATestDocRun():
         self._maximum_average_relative_error_location_observation[variable] = error.maximum_average_relative_error_location
         self._maximum_average_relative_error_index_observation[variable] = error.maximum_average_relative_error_observation_index
 
-
     def _format_documentation_values(self,error_string):
         split_array = error_string.split()
         error_float = float(split_array[0])
