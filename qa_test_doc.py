@@ -98,48 +98,79 @@ class QATestDocRun():
         self._observations.append(doc_observation)
         
     def add_max_absolute_error(self,variable,error):
-        self._maximum_absolute_errors[variable]= error.maximum_absolute_error_all_times
+        maximum_absolute_error_all_times = self._format_documentation_values(error.maximum_absolute_error_all_times)
+        
+        self._maximum_absolute_errors[variable]= maximum_absolute_error_all_times
         self._maximum_absolute_error_times[variable] = error.maximum_absolute_error_time
         self._maximum_absolute_error_locations[variable] = error.maximum_absolute_error_location_all_times
         self._maximum_absolute_error_index[variable] = error.maximum_absolute_error_index
     
     def add_max_relative_error(self,variable,error):
-        self._maximum_relative_errors[variable] = error.maximum_relative_error_all_times
+        maximum_relative_error_all_times = self._format_documentation_values(error.maximum_relative_error_all_times)
+
+        self._maximum_relative_errors[variable] = maximum_relative_error_all_times
         self._maximum_relative_error_times[variable] = error.maximum_relative_error_time
         self._maximum_relative_error_locations[variable] = error.maximum_relative_error_location_all_times
         self._maximum_relative_error_index[variable] = error.maximum_relative_error_index
         
     def add_max_average_absolute_error(self,variable,error):
-        self._maximum_average_absolute_errors[variable] = error.maximum_average_absolute_error
+        maximum_average_absolute_error = self._format_documentation_values(error.maximum_average_absolute_error)
+        
+        self._maximum_average_absolute_errors[variable] = maximum_average_absolute_error
         self._maximum_average_absolute_error_times[variable] = error.maximum_average_absolute_error_time
         self._maximum_average_absolute_error_index[variable] = error.maximum_average_absolute_error_index
         
     def add_max_average_relative_error(self,variable,error):
-        self._maximum_average_relative_errors[variable] = error.maximum_average_relative_error
+        maximum_average_relative_error = self._format_documentation_values(error.maximum_average_relative_error)
+        
+        self._maximum_average_relative_errors[variable] = maximum_average_relative_error
         self._maximum_average_relative_error_times[variable] = error.maximum_average_relative_error_time
         self._maximum_average_relative_error_index[variable] = error.maximum_average_relative_error_index
         
     def add_max_absolute_error_observation(self,variable,error):
-        self._maximum_absolute_errors_observation[variable]= error.maximum_absolute_error_all_locations
+        maximum_absolute_error_all_locations = self._format_documentation_values(error.maximum_absolute_error_all_locations)
+        
+        self._maximum_absolute_errors_observation[variable]= maximum_absolute_error_all_locations
         self._maximum_absolute_error_times_observation[variable] = error.maximum_absolute_error_time_all_locations
         self._maximum_absolute_error_locations_observation[variable] = error.maximum_absolute_error_locations
         self._maximum_absolute_error_index_observation[variable] = error.maximum_absolute_error_observation_index
     
     def add_max_relative_error_observation(self,variable,error):
-        self._maximum_relative_errors_observation[variable] = error.maximum_relative_error_all_locations
+        maximum_relative_error_all_locations = self._format_documentation_values(error.maximum_relative_error_all_locations)
+        
+        self._maximum_relative_errors_observation[variable] = maximum_relative_error_all_locations
         self._maximum_relative_error_times_observation[variable] = error.maximum_relative_error_time_all_locations
         self._maximum_relative_error_locations_observation[variable] = error.maximum_relative_error_locations
         self._maximum_relative_error_index_observation[variable] = error.maximum_relative_error_observation_index
         
     def add_max_average_absolute_error_observation(self,variable,error):
-        self._maximum_average_absolute_errors_observation[variable] = error.maximum_average_absolute_error_observation
+        maximum_average_absolute_error_observation = self._format_documentation_values(error.maximum_average_absolute_error_observation)
+        
+        self._maximum_average_absolute_errors_observation[variable] = maximum_average_absolute_error_observation
         self._maximum_average_absolute_error_location_observation[variable] = error.maximum_average_absolute_error_location
         self._maximum_average_absolute_error_index_observation[variable] = error.maximum_average_absolute_error_observation_index
         
     def add_max_average_relative_error_observation(self,variable,error):
-        self._maximum_average_relative_errors_observation[variable] = error.maximum_average_relative_error_observation
+        maximum_average_relative_error_observation = self._format_documentation_values(error.maximum_average_relative_error_observation)
+
+        self._maximum_average_relative_errors_observation[variable] = maximum_average_relative_error_observation
         self._maximum_average_relative_error_location_observation[variable] = error.maximum_average_relative_error_location
         self._maximum_average_relative_error_index_observation[variable] = error.maximum_average_relative_error_observation_index
+
+
+    def _format_documentation_values(self,error_string):
+        split_array = error_string.split()
+        error_float = float(split_array[0])
+        
+        truncated_error = format_floating_number(error_float)
+        
+        try:
+            new_error_string = truncated_error + ' ' + split_array[1]
+        except:
+            new_error_string = truncated_error
+        
+        return new_error_string
+
     
 class QATestDoc(object):
     
@@ -210,11 +241,13 @@ Results Summary
                 if run._maximum_absolute_error_index:
                     for variable in run._time_slices[0]._variables:
                         variable_string = variable._name 
+                        f.write("\n")
+                        f.write("Variable: {}".format(variable_string))
                     
                         f.write("""
                         
 .. list-table::
-   :widths: 40 35 10 20
+   :widths: 40 25 25 25
    :header-rows: 1
    
    * - 
@@ -266,11 +299,13 @@ Observation Point
 """)
                     for variable in run._observations[0]._variables:       
                         variable_string = variable._name 
+                        f.write("\n")
+                        f.write("Variable: {}".format(variable_string))
 
                         f.write("""
                         
 .. list-table::
-   :widths: 40 35 10 20
+   :widths: 40 25 25 25
    :header-rows: 1
    
    * - 
