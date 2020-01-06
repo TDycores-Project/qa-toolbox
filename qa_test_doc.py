@@ -210,7 +210,6 @@ Results Summary
                 if run._maximum_absolute_error_index:
                     for variable in run._time_slices[0]._variables:
                         variable_string = variable._name 
-                        variable_len = len(run._time_slices[0]._variables)
                     
                         f.write("""
                         
@@ -344,7 +343,6 @@ Detailed Results
 """.format(self._filename_root))
 
         width_percent = 60
-        n = 0
                 
         for run in self._runs:
             scenario_string = 'Scenario {}'.format(run._run_number)
@@ -353,6 +351,7 @@ Detailed Results
             f.write("\n")
             simulators = self._simulators
            
+            n = 0
             for time_slice in run._time_slices:
                 time_string = '{} {}'.format(time_slice._time,
                                              time_slice._time_unit)
