@@ -408,7 +408,8 @@ Detailed Results
 
                     f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
                                    self._doc_dir,variable._solution_png[0],width_percent))
-                    f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
+                    if variable._error_png:
+                        f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
                                    self._doc_dir,variable._error_png[0],width_percent))
                 n = n+1
                 
@@ -441,7 +442,8 @@ Observation Point
                     f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
                                  self._doc_dir,
                                  variable._solution_png[0],width_percent))
-                    f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
+                    if variable._error_png:
+                        f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
                                  self._doc_dir,
                                  variable._error_png[0],width_percent))
                 k = k+1
