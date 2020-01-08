@@ -26,6 +26,7 @@ from qa_solution_comparison import *
 from qa_test_doc import *
 from qa_regression_test import QARegressionTest
 
+
 class QATest(object):
     """
     Class to collect data about a test, run the test, and plot results
@@ -393,4 +394,6 @@ class QATest(object):
              self.test_pass = True
              doc.add_run(doc_run) 
              
+             
+    
                            

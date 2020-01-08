@@ -15,6 +15,7 @@ from qa_test import QATest
 from qa_debug import *
 from qa_common import *
 from qa_test_log import QATestLog
+from qa_solution_convergence import QASolutionConvergence
 
 
 class QATestManager(object):
@@ -53,8 +54,12 @@ class QATestManager(object):
         
         sections = config.sections()
         for section in sections:
-            name = section            
-            test = QATest(name,root_dir,list_to_dict(config.items(section)))
+            name = section 
+            if name == 'qa_solution_convergence':
+                name = 'richards'
+                test = QASolutionConvergence(name,root_dir,list_to_dict(config.items(section)))
+            else:
+                test = QATest(name,root_dir,list_to_dict(config.items(section)))
             self._tests[name] = test
         debug_pop()
             
