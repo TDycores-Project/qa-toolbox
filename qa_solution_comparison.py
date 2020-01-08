@@ -304,7 +304,6 @@ class QASolutionComparison(object):
                 doc_slice.add_variable(doc_var)
             self.doc_run.add_time_slice(doc_slice)
             
-
         if print_error:
             for variable in stat_files_by_var_dict.keys():
                 error.calc_error_metrics_over_all_times(stat_files_by_var_dict[variable],plot_time_units)
@@ -312,8 +311,8 @@ class QASolutionComparison(object):
                 self.doc_run.add_max_relative_error(variable,error)
                 self.doc_run.add_max_average_absolute_error(variable,error)
                 self.doc_run.add_max_average_relative_error(variable,error)
-
-##            self.doc_run.add_time_slice_variable(doc_var)
+                
+                self.error_solution_convergence = error.maximum_relative_error_all_times
         
         debug_pop()        
         
@@ -435,11 +434,8 @@ class QASolutionComparison(object):
                 self.doc_run.add_max_average_absolute_error_observation(variable, error) 
                 self.doc_run.add_max_average_relative_error_observation(variable, error)
         debug_pop()
-        
-        
+                
     def get_max_error(self):
         error_solution_convergence = self.error_solution_convergence.split()[0]
         return string_to_number(error_solution_convergence)
-
-
 

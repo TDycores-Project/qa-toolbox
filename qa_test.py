@@ -82,8 +82,6 @@ class QATest(object):
                 print('  {}'.format(section))
         debug_pop()
         
-        ####get options dict here
-        
         self._swap_options = \
             self._section_from_opt_file(config,'swap_options')
         self._output_options = \
@@ -300,11 +298,9 @@ class QATest(object):
     
     
     def _start_qa_convergence(self):
-#        self._convergence_dict = convergence_dict
         self._values_dict = {}
         self.num_tries = 0
         self.test_pass = False
-#         self.doc = doc
          
          
     def _process_convergence_options(self):
@@ -339,7 +335,6 @@ class QATest(object):
             self._output_options['print_error'] = True
              
     def _update_value(self,doc):
-#         doc = self.doc
          run_number = self.num_tries + 1
          doc_run = QATestDocRun(run_number)
 
@@ -350,18 +345,15 @@ class QATest(object):
          isimulator = 0
          
          for simulator in self._simulators: 
-             ###self._simulators won't be defined! neither will..
-             #self._mapped_simulator_name
-             #self.swap
-             #self.map_optons
-             #self._template
-             #self.output_options
-             #self.regression
              
              mapped_simulator_name = self._mapped_simulator_names[isimulator]
              if run_number == 1:
                  doc.add_simulator(mapped_simulator_name)
-#             print_headers('-',mapped_simulator_name)
+             
+             variable_string = ''
+             for key, value in self._values_dict.items():
+                 variable_string = variable_string + ' {} = {}'.format(key,value)
+             print_header('-',mapped_simulator_name+variable_string) ###make more informative
              filename = self._swap(mapped_simulator_name,simulator.get_suffix(),
                                    run_number,self._values_dict)
              
@@ -372,7 +364,6 @@ class QATest(object):
                  simulator.run(filename,annotation)
              isimulator += 1
              
-         #update output options so includes error
          compare_solutions =  \
              QASolutionComparison(solutions,self._output_options,
                                          self._mapped_simulator_names,
@@ -380,7 +371,8 @@ class QATest(object):
                                          doc_run)
          compare_solutions.process_opt_file()
          max_error = compare_solutions.get_max_error() ##name better?
-#         max_error = compare_solutions.error.maximum_relative_error_all_times
+         print('Max Error = {}'.format(max_error))
+         print('Attempt # = {}'.format(self.num_tries))
          if max_error > self._tolerance:
              for key,value in self._values_dict.items():
                  self._values_dict[key] = value*self._increment_value
@@ -394,13 +386,6 @@ class QATest(object):
          else:
              print('converged, aborting test')
              self.test_pass = True
-             doc.add_run(doc_run) ##update this later so doesn't write...
+             doc.add_run(doc_run) 
              
-             
-   
-
-
-         
-            
-
                            
