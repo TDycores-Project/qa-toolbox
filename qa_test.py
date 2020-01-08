@@ -309,11 +309,13 @@ class QATest(object):
          increment_value = qa_lookup(self._convergence_options, 'increment_value','fail_on_missing_keyword')
 #         self._variable = qa_lookup(self.convergence_dict, 'variable','fail_on_missing_keyword')
          self._verbose = qa_lookup(self._convergence_options, 'verbose','True')
+         self._convergence_observation = qa_lookup(self._convergence_options, 'observation','False')
          
          self._convergence_options.pop('max_tries',None)
          self._convergence_options.pop('tolerance',None)
          self._convergence_options.pop('increment_value',None)
          self._convergence_options.pop('verbose',None)
+         self._convergence_options.pop('observation',None)
          
          self._max_tries = string_to_number(max_tries)
          self._tolerance = string_to_number(tolerance)
@@ -370,7 +372,10 @@ class QATest(object):
                                          self._template,run_number,
                                          doc_run)
          compare_solutions.process_opt_file()
-         max_error = compare_solutions.get_max_error() ##name better?
+         if self._convergence_observation:
+             max_error = compare_solutions.get_observation_max_error()
+         else:
+             max_error = compare_solutions.get_time_slice_max_error() ##name better?
          print('Max Error = {}'.format(max_error))
          print('Attempt # = {}'.format(self.num_tries))
          if max_error > self._tolerance:
