@@ -74,9 +74,9 @@ class QASolutionConvergence(QATest):
         plot_error = qa_lookup(self._output_options,'plot_error',False)
         print_error = qa_lookup(self._output_options,'print_error',False)
         
-        if plot_error == False:
+        if not plot_error:
             self._output_options['plot_error'] = True
-        if print_error == False:
+        if not print_error:
             self._output_options['print_error'] = True
         
         for i in range(len(list_of_swap_dict)):
