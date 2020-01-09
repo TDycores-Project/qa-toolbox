@@ -411,7 +411,7 @@ Detailed Results
                     if variable._error_png:
                         f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
                                    self._doc_dir,variable._error_png[0],width_percent))
-                n = n+1
+                n += 1
                 
 
                     
@@ -446,7 +446,7 @@ Observation Point
                         f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
                                  self._doc_dir,
                                  variable._error_png[0],width_percent))
-                k = k+1
+                k += 1
 
         f.close()
 
