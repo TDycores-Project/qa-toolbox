@@ -76,7 +76,8 @@ class QASolutionConvergence(QATest):
             doc_run = QATestDocRun(run_number)
             
             swap_dict = list_of_swap_dict[i]
-            
+            print (swap_dict)
+            print('hereeee')
             annotation = 'Run {}\n'.format(run_number)
             annotation += dict_to_string(swap_dict)
          
@@ -90,8 +91,8 @@ class QASolutionConvergence(QATest):
                     doc.add_simulator(mapped_simulator_name)
                  
                 variable_string = ''
-#addbackinlater                for key, value in self._values_dict.items():
-#                    variable_string = variable_string + ' {} = {}'.format(key,value)
+                for key, value in swap_dict.items(): ###what if a lot in swap_dict
+                    variable_string = variable_string + ' {} = {}'.format(key,value)
                 print_header('-',mapped_simulator_name+variable_string) 
                 filename = self._swap(mapped_simulator_name,simulator.get_suffix(),
                                        run_number,swap_dict)
