@@ -212,18 +212,8 @@ class QATest(object):
         doc.set_title(self.title)
         doc.set_template(self._template)
 
-        if len(self._convergence_options) != 0: 
-            self._start_qa_convergence()
-            self._process_convergence_options()
-            while self.test_pass == False and self.num_tries < self._max_tries:
-                self._update_value(doc)
-                
-            if self._verbose == True:
-                doc.write()
-            elif self.test_pass == True:
-                doc.write()
-        else:
-            for i in range(len(list_of_swap_dict)):
+
+        for i in range(len(list_of_swap_dict)):
                 run_number = i+1
                 doc_run = QATestDocRun(run_number)
       
@@ -262,10 +252,10 @@ class QATest(object):
                 compare_solutions.process_opt_file()
                 doc.add_run(doc_run)
             #compare gold file results for regression tests
-            if self.regression == True:
+        if self.regression == True:
                 regression_test=QARegressionTest()
                 regression_test.compare_values()
-            doc.write()
+        doc.write()
         debug_pop()
 
 

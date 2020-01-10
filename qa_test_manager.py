@@ -54,9 +54,11 @@ class QATestManager(object):
         
         sections = config.sections()
         for section in sections:
-            name = section 
-            if name == 'qa_solution_convergence':
-                name = 'richards'
+            name = section
+            solution_convergence = self.check_options(name)
+
+            if solution_convergence:
+
                 test = QASolutionConvergence(name,root_dir,list_to_dict(config.items(section)))
             else:
                 test = QATest(name,root_dir,list_to_dict(config.items(section)))
@@ -69,3 +71,23 @@ class QATestManager(object):
             test_case.run(self.available_simulators)
             testlog.log_success(self._path,test_case.title)
         debug_pop()
+        
+    def check_options(self,name):
+        debug_push('QATestManager check_options')
+        filename = name +'.opt'
+        if not os.path.isfile(filename):
+            print_err_msg('Options file name {} does not exist in folder {}'.format(filename,os.getcwd()))
+        config = configparser.ConfigParser()
+        config.read(filename)
+        sections = config.sections()
+        
+        qa_solution_convergence = False
+        for section in sections:
+            if section == 'solution_convergence':
+                qa_solution_convergence = True
+                
+        debug_pop()   
+
+        return qa_solution_convergence
+        
+              

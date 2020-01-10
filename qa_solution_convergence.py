@@ -50,10 +50,8 @@ class QASolutionConvergence(QATest):
         self.num_tries = 0
         self.test_pass = False
         
-#        max_tries = qa_lookup(self._convergence_options, 'max_tries','fail_on_missing_keyword')
         tolerance = qa_lookup(self._convergence_options, 'tolerance','fail_on_missing_keyword')
-#        increment_value = qa_lookup(self._convergence_options, 'increment_value','fail_on_missing_keyword')
-#         self._variable = qa_lookup(self.convergence_dict, 'variable','fail_on_missing_keyword')
+
         self._verbose = qa_lookup(self._convergence_options, 'verbose','True')
         self._convergence_observation = qa_lookup(self._convergence_options, 'observation','False')
          
@@ -63,13 +61,7 @@ class QASolutionConvergence(QATest):
         self._convergence_options.pop('verbose',None)
         self._convergence_options.pop('observation',None)
          
-#        self._max_tries = string_to_number(max_tries)
         self._tolerance = string_to_number(tolerance)
-#        self._increment_value = string_to_number(increment_value)
-         
-         #going to need to user error proof this
-#        for key,value in self._convergence_options.items():
-#            self._values_dict[key] = string_to_number(value)
         
         plot_error = qa_lookup(self._output_options,'plot_error',False)
         print_error = qa_lookup(self._output_options,'print_error',False)
@@ -80,7 +72,6 @@ class QASolutionConvergence(QATest):
             self._output_options['print_error'] = True
         
         for i in range(len(list_of_swap_dict)):
-         # while self.test_pass == False and self.num_tries < self._max_tries:
             run_number = self.num_tries + 1
             doc_run = QATestDocRun(run_number)
             
@@ -126,15 +117,10 @@ class QASolutionConvergence(QATest):
             print('Attempt # = {}'.format(self.num_tries))
                   
             if max_error > self._tolerance:
-#                for key,value in self._values_dict.items():
-#                    self._values_dict[key] = value*self._increment_value
-#                self.num_tries = self.num_tries + 1
+
                 if self._verbose == True:
                     doc.add_run(doc_run)
                     
-#                if self.num_tries >= self._max_tries:
-#                    print('Maximum number of tries reached, aborting test')
-#                else:
                 print('continuing tests')
             else:
                 print('converged, aborting test')
