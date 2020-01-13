@@ -55,12 +55,6 @@ class QASolutionConvergence(QATest):
         self._verbose = qa_lookup(self._convergence_options, 'verbose','True')
         self._convergence_observation = qa_lookup(self._convergence_options, 'observation','False')
          
-        self._convergence_options.pop('max_tries',None)
-        self._convergence_options.pop('tolerance',None)
-        self._convergence_options.pop('increment_value',None)
-        self._convergence_options.pop('verbose',None)
-        self._convergence_options.pop('observation',None)
-         
         self._tolerance = string_to_number(tolerance)
         
         plot_error = qa_lookup(self._output_options,'plot_error',False)
@@ -129,13 +123,13 @@ class QASolutionConvergence(QATest):
                 doc.add_run(doc_run) 
                 break
                     
-        if self._verbose == True:
+        if self._verbose:
             doc.write()
-        elif self.test_pass == True:
+        elif self.test_pass:
             doc.write()
 
-#            if self.regression == True:
-#                regression_test=QARegressionTest()
-#                regression_test.compare_values()
+        if self.regression:
+            regression_test=QARegressionTest()
+            regression_test.compare_values()
             
         debug_pop()
