@@ -114,11 +114,12 @@ class QASolutionComparison(object):
                     print_err_msg('QACompareSolutions: Negative time in times '
                                   'array indicates steady state. Yet, there '
                                   'is more than one time.')
+                doc_slice = QATestDocTimeSlice('steady state',plot_time_units)
             else:
                 plot_time_units = self.output_options['plot_time_units']
                 sec_over_tunits = unit_conversion(plot_time_units)
                 converted_time = time/sec_over_tunits
-            doc_slice = QATestDocTimeSlice(converted_time,plot_time_units)
+                doc_slice = QATestDocTimeSlice(converted_time,plot_time_units)
             for variable in self.variables:
                 doc_var = QATestDocVariable(variable)
             
