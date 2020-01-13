@@ -13,18 +13,18 @@ successful_exit_code = 86
 
 #update these names??
 h5_mapping = {}
-h5_mapping['liquid_pressure'] = 'Liquid_Pressure'
-h5_mapping['liquid_saturation'] = 'Liquid_Saturation'
+h5_mapping['liquid_pressure'] = 'Liquid Pressure'
+h5_mapping['liquid_saturation'] = 'Liquid Saturation'
 h5_mapping['Total_Tracer [M]'] = 'Tracer'
 h5_mapping['Material_ID'] = 'Material_ID'
-h5_mapping['Liquid_Pressure [Pa]'] = 'Liquid_Pressure'
-h5_mapping['Liquid Saturation'] = 'Liquid_Saturation'
+h5_mapping['Liquid_Pressure [Pa]'] = 'Liquid Pressure'
+h5_mapping['Liquid_Saturation'] = 'Liquid Saturation'
 
 
 obs_mapping = {}
-obs_mapping['Liquid Pressure'] ='Liquid_Pressure'
-obs_mapping['Liquid Saturation'] = 'Liquid_Saturation'
-obs_mapping['Liquid Pressure [Pa]'] = 'Liquid_Pressure'
+obs_mapping['Liquid_Pressure'] ='Liquid Pressure'
+obs_mapping['Liquid_Saturation'] = 'Liquid Saturation'
+obs_mapping['Liquid Pressure [Pa]'] = 'Liquid Pressure'
 
 
 class QASimulatorPFLOTRAN(QASimulator):
@@ -132,7 +132,7 @@ class QASimulatorPFLOTRAN(QASimulator):
               variable = all_values[i]
           
               dkey = header[i].split(' obs_pt')[0]
-
+              
               if dkey in obs_mapping:
                   new_key = obs_mapping[dkey]
               else: 
