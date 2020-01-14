@@ -15,7 +15,7 @@ from qa_test import QATest
 from qa_debug import *
 from qa_common import *
 from qa_test_log import QATestLog
-from qa_solution_convergence import QASolutionConvergence
+from qa_test_convergence import QATestConvergence
 
 
 class QATestManager(object):
@@ -58,8 +58,7 @@ class QATestManager(object):
             solution_convergence = self.check_options(name)
 
             if solution_convergence:
-
-                test = QASolutionConvergence(name,root_dir,list_to_dict(config.items(section)))
+                test = QATestConvergence(name,root_dir,list_to_dict(config.items(section)))
             else:
                 test = QATest(name,root_dir,list_to_dict(config.items(section)))
             self._tests[name] = test

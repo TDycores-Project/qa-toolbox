@@ -26,7 +26,7 @@ from qa_test_doc import *
 from qa_regression_test import QARegressionTest
 from qa_test import QATest
 
-class QASolutionConvergence(QATest):
+class QATestConvergence(QATest):
     def __init__(self,name,root_dir,section_dict=None):
         super().__init__(name,root_dir,section_dict)
         
@@ -47,7 +47,7 @@ class QASolutionConvergence(QATest):
         doc.set_template(self._template)
 
         self._values_dict = {}
-        self.num_tries = 0
+        self.num_tries = 1
         self.test_pass = False
         
         tolerance = qa_lookup(self._convergence_options, 'tolerance','fail_on_missing_keyword')
@@ -66,12 +66,13 @@ class QASolutionConvergence(QATest):
             self._output_options['print_error'] = True
         
         for i in range(len(list_of_swap_dict)):
-            run_number = self.num_tries + 1
+            run_number = self.num_tries 
             doc_run = QATestDocRun(run_number)
             
             swap_dict = list_of_swap_dict[i]
-            print (swap_dict)
-            print('hereeee')
+            if not swap_dict:
+                print_err_msg('solution convergence specified in options file but '
+                               'no swap options were set.')
             annotation = 'Run {}\n'.format(run_number)
             annotation += dict_to_string(swap_dict)
          
@@ -85,7 +86,7 @@ class QASolutionConvergence(QATest):
                     doc.add_simulator(mapped_simulator_name)
                  
                 variable_string = ''
-                for key, value in swap_dict.items(): ###what if a lot in swap_dict
+                for key, value in swap_dict.items(): 
                     variable_string = variable_string + ' {} = {}'.format(key,value)
                 print_header('-',mapped_simulator_name+variable_string) 
                 filename = self._swap(mapped_simulator_name,simulator.get_suffix(),
@@ -105,18 +106,18 @@ class QASolutionConvergence(QATest):
                                          doc_run)
             compare_solutions.process_opt_file()
             if self._convergence_observation:
-              max_error = compare_solutions.get_observation_max_error()
+                max_error = compare_solutions.get_observation_max_error()
             else:
-              max_error = compare_solutions.get_time_slice_max_error() ##name better?
+                max_error = compare_solutions.get_time_slice_max_error() 
             print('Max Error = {}'.format(max_error))
             print('Attempt # = {}'.format(self.num_tries))
                   
             if max_error > self._tolerance:
-
-                if self._verbose == True:
-                    doc.add_run(doc_run)
-                    
-                print('continuing tests')
+                if self._verbose:
+                    doc.add_run(doc_run)                    
+                print('Max error above tolerance')
+                self.num_tries += 1
+                
             else:
                 print('converged, aborting test')
                 self.test_pass = True
