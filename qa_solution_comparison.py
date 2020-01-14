@@ -280,7 +280,8 @@ class QASolutionComparison(object):
                 prefix = 'ss'
                 if not time < 0.:
                     prefix = '{}'.format(converted_time)
-                filename = '{}_{}_{}_run{}.png'.format(prefix,variable,
+                variable_string = variable.replace(" ","_")
+                filename = '{}_{}_{}_run{}.png'.format(prefix,variable_string,
                                self.template,self.run_number) 
                 doc_var.add_solution_png(filename)
                 plt.title(variable,fontsize=18)
@@ -402,8 +403,9 @@ class QASolutionComparison(object):
                              xycoords='figure fraction',
                              horizontalalignment='left',
                              verticalalignment='top',fontsize=14)
+                variable_string = variable.replace(" ","_")
                 filename = '{}_{}_{}_{}_{}_run{}.png'.format(
-                          location[0],location[1],location[2],variable,
+                          location[0],location[1],location[2],variable_string,
                           self.template,self.run_number)
                 doc_var.add_solution_png(filename)
                 plt.savefig(filename)
