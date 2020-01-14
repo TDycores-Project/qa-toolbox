@@ -212,7 +212,6 @@ class QATest(object):
         doc.set_title(self.title)
         doc.set_template(self._template)
 
-
         for i in range(len(list_of_swap_dict)):
             run_number = i+1
             doc_run = QATestDocRun(run_number)
@@ -287,10 +286,3 @@ class QATest(object):
         debug_pop()
         return out_filename
     
-
-         
- 
-             
-             
-    
-                           
