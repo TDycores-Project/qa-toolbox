@@ -29,6 +29,7 @@ from qa_test_doc import QATestDocIndex
 from qa_test_manager import QATestManager
 from qa_common import *
 from simulator_modules.simulator_factory import locate_simulators
+from qa_doc_regression_test import QADocumentationRegressionTest
 
 def commandline_options():
     """
@@ -38,6 +39,9 @@ def commandline_options():
 
     parser.add_argument('--doc_dir', action='store',
                         help='directory for documenting test results')
+    
+    parser.add_argument('--test', action='store',
+                        help='when set to True runs documentation test')
                         
 #    parser.add_argument('-a', '--all', action='store_true',
 #                         help='run all tests.')
@@ -81,6 +85,13 @@ def main(options):
     print(options)
     
 
+    if options.test:
+        test = QADocumentationRegressionTest(root_dir)
+        test.write_index_file()
+        test.compare_files()
+        
+    os.chdir(root_dir)
+        
     print("Running QA tests :") 
     
     

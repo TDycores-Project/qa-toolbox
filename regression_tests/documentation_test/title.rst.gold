@@ -1,0 +1,80 @@
+
+.. _title:
+    
+*****
+title
+*****
+:ref:`title-results summary`
+
+:ref:`title-description`
+
+:ref:`title-detailed results`
+
+.. _title-results summary:            
+    
+Results Summary
+===============
+
+
+Scenario 1
+----------
+
+Variable: variable
+                        
+.. list-table::
+   :widths: 40 25 25 25
+   :header-rows: 1
+   
+   * - 
+     - Value
+     - Time
+     - Location
+   * - :ref:`Maximum Absolute Error <title_1_variable_figure0>`
+     - 3.00 Pa
+     - 0.0 y
+     - 5 m
+   * - :ref:`Maximum Relative Error <title_1_variable_figure0>`
+     - 4.00 %
+     - 0.0 y
+     - 6 m
+   * - :ref:`Maximum Average Absolute Error <title_1_variable_figure0>`
+     - 1.00 Pa
+     - 0.0 y
+     - 
+   * - :ref:`Maximum Average Relative Error <title_1_variable_figure0>`
+     - 2.00 %
+     - 0.0 y
+     -
+     
+     
+         
+.. _title-description:
+    
+The Problem Description
+=======================
+
+TO BE ADDED LATER
+
+
+
+
+.. _title-detailed results:
+
+Detailed Results
+================
+
+Scenario 1
+----------
+
+Comparison of variable at 0.0 y for Scenario 1: simulator1 vs simulator2
+
+.. literalinclude:: //Users/rleone/software/qa-toolbox/regression_tests/documentation_test/dummy.stat
+
+.. _title_1_variable_figure0:
+
+.. figure:: //Users/rleone/software/qa-toolbox/regression_tests/documentation_test/dummy.png
+   :width: 60 %
+
+.. figure:: //Users/rleone/software/qa-toolbox/regression_tests/documentation_test/dummy.png
+   :width: 60 %
+
