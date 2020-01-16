@@ -127,10 +127,11 @@ class QATestError(object):
 
         
         f.suptitle(self.variable,fontsize=14)
+        variable_string = self.variable.replace(" ","_")
         if self.observation == True:
-            filename = '{}_{}_{}_{}_{}_run{}_error.png'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],self.variable,self.template,self.run_number)
+            filename = '{}_{}_{}_{}_{}_run{}_error.png'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],variable_string,self.template,self.run_number)
         else:
-            filename = '{}_{}_{}_run{}_error.png'.format(self.converted_time,self.variable,self.template,self.run_number)
+            filename = '{}_{}_{}_run{}_error.png'.format(self.converted_time,variable_string,self.template,self.run_number)
         plt.savefig(filename)
         if self.plot_to_screen == True:
             plt.show()
@@ -163,13 +164,14 @@ class QATestError(object):
 #        self.average_absolute_error = self._get_average_absolute_error_2D(absolute_area,total_area)
             
 #        self.absolute_relative_area=self._calc_absolute_relative_error_2D(dimension1,dimension1,values1,absolute_area)
-
+        variable_string = self.variable.replace(" ","_")
+        
         self.calc_error_stats_2D(dimension1,dimension2,values1,values2)
 
         if self.observation == True:
-            filename='{}_{}_{}_{}_{}_run{}_error.stat'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],self.variable,self.template,self.run_number)
+            filename='{}_{}_{}_{}_{}_run{}_error.stat'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],variable_string,self.template,self.run_number)
         else:
-            filename = '{}_{}_{}_run{}_error.stat'.format(self.converted_time,self.variable,self.template,self.run_number)
+            filename = '{}_{}_{}_run{}_error.stat'.format(self.converted_time,variable_string,self.template,self.run_number)
       
       ###save to write to text file
         with open(filename,'w') as f:
@@ -189,12 +191,12 @@ class QATestError(object):
     def print_error_1D(self,dimension1,values1,dimension2,values2,time_unit= ' ', difference_string='all'):
         self.calc_error_stats_1D(dimension1,values1,dimension2,values2,difference_string)
 
-        
+        variable_string = self.variable.replace(" ","_")
         
         if self.observation == True:
-            filename = '{}_{}_{}_{}_{}_run{}_error.stat'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],self.variable,self.template,self.run_number)
+            filename = '{}_{}_{}_{}_{}_run{}_error.stat'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],variable_string,self.template,self.run_number)
         else:
-            filename = '{}_{}_{}_run{}_error.stat'.format(self.converted_time,self.variable,self.template,self.run_number)
+            filename = '{}_{}_{}_run{}_error.stat'.format(self.converted_time,variable_string,self.template,self.run_number)
       
       ###save to write to text file
         with open(filename,'w') as f:
@@ -603,9 +605,11 @@ class QATestError(object):
         if abs(average_relative_error >= 1000):
             plt.colorbar(format='%.2e')
             
+        variable_string = self.variable.replace(" ","_")
+            
 #        plt.colorbar(format='%.3e')
         plt.title(self.variable)
-        filename = '{}_{}_{}_run{}_error.png'.format(self.converted_time,self.variable,self.template,self.run_number)
+        filename = '{}_{}_{}_run{}_error.png'.format(self.converted_time,variable_string,self.template,self.run_number)
         plt.savefig(filename)
         if self.plot_to_screen == True:
             plt.show()
