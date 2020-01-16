@@ -252,7 +252,7 @@ class QATest(object):
             doc.add_run(doc_run)
             #compare gold file results for regression tests
         if self.regression == True:
-                regression_test=QARegressionTest()
+                regression_test = QARegressionTest()
                 regression_test.compare_values()
         doc.write()
         debug_pop()

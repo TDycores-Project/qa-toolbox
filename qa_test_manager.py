@@ -55,9 +55,8 @@ class QATestManager(object):
         sections = config.sections()
         for section in sections:
             name = section
-            solution_convergence = self.check_options(name)
 
-            if solution_convergence:
+            if self.check_for_solution_convergence(name):
                 test = QATestConvergence(name,root_dir,list_to_dict(config.items(section)))
             else:
                 test = QATest(name,root_dir,list_to_dict(config.items(section)))
@@ -71,7 +70,7 @@ class QATestManager(object):
             testlog.log_success(self._path,test_case.title)
         debug_pop()
         
-    def check_options(self,name):
+    def check_for_solution_convergence(self,name):
         debug_push('QATestManager check_options')
         filename = name +'.opt'
         if not os.path.isfile(filename):
