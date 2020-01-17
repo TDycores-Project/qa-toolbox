@@ -66,16 +66,19 @@ class QATestError(object):
         average_absolute_error = self._get_average_absolute_error(absolute_area,absolute_times)
         average_relative_error = self._calc_average_relative_error(relative_times,relative_values)
       
-        f,ax = plt.subplots(2,1,figsize=(9,8))
+        f,ax = plt.subplots(2,1,figsize=(11,9))  #9,8
         plt.subplots_adjust(hspace=0.5)
 
         ax[0].plot(absolute_times,absolute_values,marker='x')
         ax[1].plot(relative_times,relative_values*100,marker='x')
       
-        ax[0].set_xlabel(x_label) 
-        ax[0].set_ylabel('Absolute Error')
-        ax[1].set_xlabel(x_label)
-        ax[1].set_ylabel('Relative Error (%)')
+        ax[0].set_xlabel(x_label,fontsize=14) 
+        if self.units == ' ':
+            ax[0].set_ylabel('Absolute Error',fontsize=14)
+        else:
+            ax[0].set_ylabel('Absolute Error [{}]'.format(self.units),fontsize=14)
+        ax[1].set_xlabel(x_label,fontsize=14)
+        ax[1].set_ylabel('Relative Error (%)',fontsize=14)
       
         if abs(average_absolute_error) < 1:
 #        ax[0].ticklabel_format(axis='y',style='scientific',scilimits=(0,0))
@@ -112,7 +115,7 @@ class QATestError(object):
                      xy=(.03, .940),
                      xycoords='figure fraction',
                      horizontalalignment='left',
-                     verticalalignment='top',fontsize=10)
+                     verticalalignment='top',fontsize=14)
 
                       
         ax[1].annotate('Maximum Relative Error = {:.2g}% \n' 
@@ -121,10 +124,11 @@ class QATestError(object):
                      xy=(.03, .48),
                      xycoords='figure fraction',
                      horizontalalignment='left',
-                     verticalalignment='top',fontsize=10)
+                     verticalalignment='top',fontsize=14)
 
       
-
+        ax[0].tick_params(labelsize=14)
+        ax[1].tick_params(labelsize=14)
         
         f.suptitle(self.variable,fontsize=14)
         variable_string = self.variable.replace(" ","_")
