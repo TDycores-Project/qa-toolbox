@@ -87,7 +87,7 @@ def main(options):
 
     if options.test:
         test = QADocumentationRegressionTest(root_dir)
-        test.write_index_file()
+        test.write_index_file(options.doc_dir)
         test.compare_files()
         
     os.chdir(root_dir)

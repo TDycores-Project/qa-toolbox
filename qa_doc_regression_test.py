@@ -64,10 +64,10 @@ class QADocumentationRegressionTest(object):
         
         self.root_dir = root_dir
         
-    def write_index_file(self):
+    def write_index_file(self,doc_dir):
         testlog = QATestLog(self.root_dir)  ###
         testlog.log_success(self.root_dir+'/regression_tests/documentation_test','title')
-        doc_dir = self.root_dir + '/regression_tests/documentation_test/docs'
+#        doc_dir = self.root_dir + '/regression_tests/documentation_test/docs'
         doc = QATestDocIndex(testlog,doc_dir)
         doc.write_index()
         
