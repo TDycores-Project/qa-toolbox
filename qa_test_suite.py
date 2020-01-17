@@ -40,7 +40,7 @@ def commandline_options():
     parser.add_argument('--doc_dir', action='store',
                         help='directory for documenting test results')
     
-    parser.add_argument('--test', action='store',
+    parser.add_argument('--doc_test', action='store',
                         help='when set to True runs documentation test')
                         
 #    parser.add_argument('-a', '--all', action='store_true',
@@ -85,10 +85,12 @@ def main(options):
     print(options)
     
 
-    if options.test:
+    if options.doc_test:
         test = QADocumentationRegressionTest(root_dir)
         test.write_index_file(options.doc_dir)
         test.compare_files()
+        
+        return 0
         
     os.chdir(root_dir)
         

@@ -71,16 +71,23 @@ class QADocumentationRegressionTest(object):
         doc = QATestDocIndex(testlog,doc_dir)
         doc.write_index()
         
+        self.doc_dir=doc_dir
+        
         
     def compare_files(self):
-        rst_files = ['title.rst','docs/index.rst','docs/intro_documentation_test.rst','docs/include_toctree_documentation_test_title.rst']
+        doc_dir=self.doc_dir
+        rst_files = ['title.rst','{}/index.rst'.format(doc_dir),'{}/intro_documentation_test.rst'.format(doc_dir),'{}/include_toctree_documentation_test_title.rst'.format(doc_dir)]
         
         for i in range(len(rst_files)):
-            match = cmp(rst_files[i],rst_files[i]+'.gold')
+            if i == 0:
+                gold_file = rst_files[i].strip().split('/')[-1]+'.gold'
+            else:
+                gold_file = 'docs/'+rst_files[i].strip().split('/')[-1]+'.gold'
+            match = cmp(rst_files[i],gold_file)
             if not match:
-                print_err_msg('no match with {}'.format(rst_files[i]))
+                print_err_msg('Gold files does not match with {}'.format(rst_files[i]))
                 
-        print('match')
+        print('Documentation files match with gold files, exiting program')
         
 #        cmp('title.rst','title.rst.gold')
 #        cmp('docs/index.rst','docs/index.rst.gold')
