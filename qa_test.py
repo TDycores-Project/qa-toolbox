@@ -201,61 +201,67 @@ class QATest(object):
         list_of_swap_dict=self._process_swap_options()
         self._check_simulators(available_simulators)
 
-        i_attempt = 0
-        passed = False
 
         cwd = os.getcwd()
-        print(cwd)
-        print(self.root_dir)
-        print(cwd.replace(self.root_dir,''))
-        doc = QATestDoc(cwd,cwd.replace(self.root_dir,''))
-        doc.set_title(self.title)
-        doc.set_template(self._template)
+#        print(cwd)
+#        print(self.root_dir)
+#        print(cwd.replace(self.root_dir,''))
+        self.doc = QATestDoc(cwd,cwd.replace(self.root_dir,''))
+        self.doc.set_title(self.title)
+        self.doc.set_template(self._template)
 
-        for i in range(len(list_of_swap_dict)):
-            run_number = i+1
-            doc_run = QATestDocRun(run_number)
-  
-            swap_dict = None
-            if len(list_of_swap_dict) > 0:
-                #if len(list_of_swap_dict) > 1:
-                #    run_number += 1
-                swap_dict = list_of_swap_dict[i]
-            annotation = None
-            if swap_dict:
-                annotation = 'Run {}\n'.format(run_number)
-                annotation += dict_to_string(swap_dict)
-            solutions = {}
-            isimulator = 0
-            
-            for simulator in self._simulators:
-                mapped_simulator_name = self._mapped_simulator_names[isimulator]
-                if run_number == 1:
-                     doc.add_simulator(mapped_simulator_name)
-                print_header('-',mapped_simulator_name)
-                filename = self._swap(mapped_simulator_name,simulator.get_suffix(),
-                                      run_number,swap_dict)
-                doc_run.set_input_filename(mapped_simulator_name,filename)
-                if len(self.map_options) > 0:
-                    simulator.update_dict(self.map_options)
-                solutions[mapped_simulator_name] = \
-                    simulator.run(filename,annotation)
-                isimulator += 1
-            #self._compare_solutions(solutions)
-            ##pass in template and run number
-            compare_solutions = \
-                QASolutionComparison(solutions,self._output_options,
-                                     self._mapped_simulator_names,
-                                     self._template,run_number,
-                                     doc_run)
-            compare_solutions.process_opt_file()
-            doc.add_run(doc_run)
+        for i in range(len(list_of_swap_dict)):  
+            doc_run = self.run_single(i,list_of_swap_dict)
+            self.doc.add_run(doc_run)
+
             #compare gold file results for regression tests
         if self.regression == True:
                 regression_test = QARegressionTest()
                 regression_test.compare_values()
-        doc.write()
+        self.doc.write()
         debug_pop()
+        
+    def run_single(self,i,list_of_swap_dict):
+        run_number = i+1
+        doc_run = QATestDocRun(run_number)
+  
+        swap_dict = None
+        if len(list_of_swap_dict) > 0:
+            #if len(list_of_swap_dict) > 1:
+            #    run_number += 1
+            swap_dict = list_of_swap_dict[i]
+        annotation = None
+        if swap_dict:
+            annotation = 'Run {}\n'.format(run_number)
+            annotation += dict_to_string(swap_dict)
+        solutions = {}
+        isimulator = 0
+        
+        for simulator in self._simulators:
+            mapped_simulator_name = self._mapped_simulator_names[isimulator]
+            if run_number == 1:
+                 self.doc.add_simulator(mapped_simulator_name)
+            print_header('-',mapped_simulator_name)
+            filename = self._swap(mapped_simulator_name,simulator.get_suffix(),
+                                  run_number,swap_dict)
+            doc_run.set_input_filename(mapped_simulator_name,filename)
+            if len(self.map_options) > 0:
+                simulator.update_dict(self.map_options)
+            solutions[mapped_simulator_name] = \
+                simulator.run(filename,annotation)
+            isimulator += 1
+        #self._compare_solutions(solutions)
+        ##pass in template and run number
+        compare_solutions = \
+            QASolutionComparison(solutions,self._output_options,
+                                 self._mapped_simulator_names,
+                                 self._template,run_number,
+                                 doc_run)
+        compare_solutions.process_opt_file()
+        self.compare_solutions = compare_solutions
+        
+        return doc_run
+        
 
 
     def _swap(self,simulator_mapped_name,simulator_suffix,run_number,
