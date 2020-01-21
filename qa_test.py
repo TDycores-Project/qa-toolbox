@@ -196,25 +196,32 @@ class QATest(object):
         print('simulators: '+list_to_string(debug_simulator_list))
         debug_pop()
 
-    def run(self,available_simulators):
-        debug_push('QATest run')
+    def initialize_run(self,available_simulators):
+        debug_push('QATest initialize_run')
         list_of_swap_dict=self._process_swap_options()
         self._check_simulators(available_simulators)
 
 
         cwd = os.getcwd()
-#        print(cwd)
-#        print(self.root_dir)
-#        print(cwd.replace(self.root_dir,''))
+        print(cwd)
+        print(self.root_dir)
+        print(cwd.replace(self.root_dir,''))
         self.doc = QATestDoc(cwd,cwd.replace(self.root_dir,''))
         self.doc.set_title(self.title)
         self.doc.set_template(self._template)
+        
+        debug_pop()
+        
+        return list_of_swap_dict
+        
+    def run(self,list_of_swap_dict):
+        debug_push('QATest run')
 
         for i in range(len(list_of_swap_dict)):  
             doc_run = self.run_single(i,list_of_swap_dict)
             self.doc.add_run(doc_run)
 
-            #compare gold file results for regression tests
+        #compare gold file results for regression tests
         if self.regression == True:
                 regression_test = QARegressionTest()
                 regression_test.compare_values()
@@ -222,6 +229,7 @@ class QATest(object):
         debug_pop()
         
     def run_single(self,i,list_of_swap_dict):
+        debug_push('QATest run_single')
         run_number = i+1
         doc_run = QATestDocRun(run_number)
   
@@ -260,9 +268,10 @@ class QATest(object):
         compare_solutions.process_opt_file()
         self.compare_solutions = compare_solutions
         
-        return doc_run
+        debug_pop()
         
-
+        return doc_run
+    
 
     def _swap(self,simulator_mapped_name,simulator_suffix,run_number,
               swap_dict=None):

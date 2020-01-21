@@ -49,25 +49,14 @@ class QATestConvergence(QATest):
         if not print_error:
             self._output_options['print_error'] = True
         
-    def run(self,available_simulators):
+    def run(self,list_of_swap_dict):
         debug_push('QASolutionConvergence run')
-        list_of_swap_dict=self._process_swap_options()
-        self._check_simulators(available_simulators)
         
         self.process_convergence_options()
-
-        cwd = os.getcwd()
-        print(cwd)
-        print(self.root_dir)
-        print(cwd.replace(self.root_dir,''))
-        self.doc = QATestDoc(cwd,cwd.replace(self.root_dir,''))
-        self.doc.set_title(self.title)
-        self.doc.set_template(self._template)
 
         for i in range(len(list_of_swap_dict)):
             doc_run = self.run_single(i,list_of_swap_dict)
         
-
             if self._convergence_observation:
                 max_error = self.compare_solutions.get_observation_max_error()
             else:
