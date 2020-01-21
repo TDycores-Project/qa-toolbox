@@ -213,14 +213,14 @@ class QATestDoc(object):
 .. _{0}:
     
 {1}
-{2}
+{0}
 {1}
-:ref:`{0}-results summary`
+:ref:`{2}-results summary`
 
-:ref:`{0}-description`
+:ref:`{2}-description`
 
-:ref:`{0}-detailed results`
-""".format(self._filename_root,'*'*len(self._title),self._title))
+:ref:`{2}-detailed results`
+""".format(self._title,'*'*len(self._title),self._filename_root))
      
         f.write("""
 .. _{}-results summary:            
@@ -497,8 +497,9 @@ QA Test Suite Documentation
         for folder_path,tests in file_dict.items(): 
             folder = folder_path.strip().split('/')[-1]
             for i in range(len(tests)):
+                test=tests[i].lower().replace(" ","_")
                 toctree="""
-   include_toctree_{}_{}.rst""".format(folder,tests[i])
+   include_toctree_{}_{}.rst""".format(folder,test)
                 f.write(toctree)                
         f.close()
         
@@ -507,11 +508,12 @@ QA Test Suite Documentation
         for folder_path,tests in file_dict.items():
             folder = folder_path.strip().split('/')[-1]            
             for i in range(len(tests)):
-                filename = '{}/include_toctree_{}_{}.rst'.format(self._doc_dir,folder,tests[i])
+                test=tests[i].lower().replace(" ","_")
+                filename = '{}/include_toctree_{}_{}.rst'.format(self._doc_dir,folder,test)
                 f = open(filename, 'w')
                 toctree = """
 .. include:: //{}/{}.rst                
-                """.format(folder_path,tests[i])
+                """.format(folder_path,test)
                 f.write(toctree)
                 f.close()
         
