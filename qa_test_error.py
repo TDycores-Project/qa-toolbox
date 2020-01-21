@@ -66,16 +66,19 @@ class QATestError(object):
         average_absolute_error = self._get_average_absolute_error(absolute_area,absolute_times)
         average_relative_error = self._calc_average_relative_error(relative_times,relative_values)
       
-        f,ax = plt.subplots(2,1,figsize=(9,8))
+        f,ax = plt.subplots(2,1,figsize=(11,9))  #9,8
         plt.subplots_adjust(hspace=0.5)
 
         ax[0].plot(absolute_times,absolute_values,marker='x')
         ax[1].plot(relative_times,relative_values*100,marker='x')
       
-        ax[0].set_xlabel(x_label) 
-        ax[0].set_ylabel('Absolute Error')
-        ax[1].set_xlabel(x_label)
-        ax[1].set_ylabel('Relative Error (%)')
+        ax[0].set_xlabel(x_label,fontsize=14) 
+        if self.units == ' ':
+            ax[0].set_ylabel('Absolute Error',fontsize=14)
+        else:
+            ax[0].set_ylabel('Absolute Error [{}]'.format(self.units),fontsize=14)
+        ax[1].set_xlabel(x_label,fontsize=14)
+        ax[1].set_ylabel('Relative Error (%)',fontsize=14)
       
         if abs(average_absolute_error) < 1:
 #        ax[0].ticklabel_format(axis='y',style='scientific',scilimits=(0,0))
@@ -112,7 +115,7 @@ class QATestError(object):
                      xy=(.03, .940),
                      xycoords='figure fraction',
                      horizontalalignment='left',
-                     verticalalignment='top',fontsize=10)
+                     verticalalignment='top',fontsize=14)
 
                       
         ax[1].annotate('Maximum Relative Error = {:.2g}% \n' 
@@ -121,16 +124,18 @@ class QATestError(object):
                      xy=(.03, .48),
                      xycoords='figure fraction',
                      horizontalalignment='left',
-                     verticalalignment='top',fontsize=10)
+                     verticalalignment='top',fontsize=14)
 
       
-
+        ax[0].tick_params(labelsize=14)
+        ax[1].tick_params(labelsize=14)
         
         f.suptitle(self.variable,fontsize=14)
+        variable_string = self.variable.replace(" ","_")
         if self.observation == True:
-            filename = '{}_{}_{}_{}_{}_run{}_error.png'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],self.variable,self.template,self.run_number)
+            filename = '{}_{}_{}_{}_{}_run{}_error.png'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],variable_string,self.template,self.run_number)
         else:
-            filename = '{}_{}_{}_run{}_error.png'.format(self.converted_time,self.variable,self.template,self.run_number)
+            filename = '{}_{}_{}_run{}_error.png'.format(self.converted_time,variable_string,self.template,self.run_number)
         plt.savefig(filename)
         if self.plot_to_screen == True:
             plt.show()
@@ -163,13 +168,14 @@ class QATestError(object):
 #        self.average_absolute_error = self._get_average_absolute_error_2D(absolute_area,total_area)
             
 #        self.absolute_relative_area=self._calc_absolute_relative_error_2D(dimension1,dimension1,values1,absolute_area)
-
+        variable_string = self.variable.replace(" ","_")
+        
         self.calc_error_stats_2D(dimension1,dimension2,values1,values2)
 
         if self.observation == True:
-            filename='{}_{}_{}_{}_{}_run{}_error.stat'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],self.variable,self.template,self.run_number)
+            filename='{}_{}_{}_{}_{}_run{}_error.stat'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],variable_string,self.template,self.run_number)
         else:
-            filename = '{}_{}_{}_run{}_error.stat'.format(self.converted_time,self.variable,self.template,self.run_number)
+            filename = '{}_{}_{}_run{}_error.stat'.format(self.converted_time,variable_string,self.template,self.run_number)
       
       ###save to write to text file
         with open(filename,'w') as f:
@@ -189,12 +195,12 @@ class QATestError(object):
     def print_error_1D(self,dimension1,values1,dimension2,values2,time_unit= ' ', difference_string='all'):
         self.calc_error_stats_1D(dimension1,values1,dimension2,values2,difference_string)
 
-        
+        variable_string = self.variable.replace(" ","_")
         
         if self.observation == True:
-            filename = '{}_{}_{}_{}_{}_run{}_error.stat'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],self.variable,self.template,self.run_number)
+            filename = '{}_{}_{}_{}_{}_run{}_error.stat'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],variable_string,self.template,self.run_number)
         else:
-            filename = '{}_{}_{}_run{}_error.stat'.format(self.converted_time,self.variable,self.template,self.run_number)
+            filename = '{}_{}_{}_run{}_error.stat'.format(self.converted_time,variable_string,self.template,self.run_number)
       
       ###save to write to text file
         with open(filename,'w') as f:
@@ -551,13 +557,14 @@ class QATestError(object):
         
         X,Y = np.meshgrid(x,y)
 
-        
-        plt.figure(figsize=(11,10))
-        plt.contourf(X,Y,absolute_error)
-        plt.xlabel(xlabel)
-        plt.ylabel(ylabel)
-#        plt.clabel(surface)
-        plt.annotate('Maximum Absolute Error = {:.2g} \n'    #update precision
+        fig, ax = plt.subplots(2,1,figsize=(9,8))
+        plt.subplots_adjust(hspace=0.5)
+
+        c1 = ax[0].contourf(X,Y,absolute_error)
+        ax[0].set_xlabel(xlabel,fontsize=14)
+        ax[0].set_ylabel(ylabel,fontsize=14)
+
+        ax[0].annotate('Maximum Absolute Error = {:.2g} \n'    
                        'Average Absolute Error = {:.2g} \n'.format \
                        (maximum_absolute_error, average_absolute_error), 
                      xy=(.03, .950),
@@ -565,47 +572,51 @@ class QATestError(object):
                      horizontalalignment='left',
                      verticalalignment='top',fontsize=14)
         if abs(average_absolute_error) < 1:
-            plt.colorbar(format='%.2e')
+            cbar = fig.colorbar(c1,format='%.2e',ax=ax[0])
                 
         if (abs(average_absolute_error)) >= 1 and abs(average_absolute_error < 1000): 
-            plt.colorbar(format='%.2f')
+            cbar = fig.colorbar(c1,format='%.2f',ax=ax[0])
           
         if abs(average_absolute_error > 1000):
-            plt.colorbar(format='%.2e')
+            cbar = fig.colorbar(c1,format='%.2e',ax=ax[0])
 
+        cbar.ax.tick_params(labelsize=14)
+        if self.units == ' ':
+            cbar.set_label('Absolute Error',rotation=90,fontsize=14)
+        else:
+            cbar.set_label('Absolute Error [{}]'.format(self.units),rotation=90,fontsize=14)
 
-#        plt.colorbar(format='%.0e')
-        plt.title(self.variable,fontsize=18)
-        if self.plot_to_screen == True:
-            plt.show()
-        plt.close()
+        c2= ax[1].contourf(X,Y,relative_error*100)
+        ax[1].set_xlabel(xlabel,fontsize=14)
+        ax[1].set_ylabel(ylabel,fontsize=14)
 
-        
-        plt.figure(figsize=(11,10))
-        plt.contourf(X,Y,relative_error*100)
-        plt.xlabel(xlabel)
-        plt.ylabel(ylabel)
-#        plt.clabel(surface)
-        plt.annotate('Maximum Relative Error = {:.2g}% \n'    #update precision
+        ax[1].annotate('Maximum Relative Error = {:.2g}% \n'    #update precision
                        'Average Relative Error = {:.2g}% \n'.format \
                        (maximum_relative_error*100, average_relative_error*100), 
-                     xy=(.03, .950),
+                     xy=(.03, .480),
                      xycoords='figure fraction',
                      horizontalalignment='left',
                      verticalalignment='top',fontsize=14)
         
         if abs(average_relative_error) < 1:
-            plt.colorbar(format='%.2e')
+            cbar = fig.colorbar(c1,format='%.2e',ax=ax[1])
                   
         if (abs(average_relative_error)) >= 1 and (abs(average_relative_error) < 1000):
-            plt.colorbar(format='%.2f')
+            cbar = fig.colorbar(c1,format='%.2f',ax=ax[1])
                              
         if abs(average_relative_error >= 1000):
-            plt.colorbar(format='%.2e')
+            cbar = fig.colorbar(c1,format='%.2e',ax=ax[1])
             
-#        plt.colorbar(format='%.3e')
-        plt.title(self.variable)
-        filename = '{}_{}_{}_run{}_error.png'.format(self.converted_time,self.variable,self.template,self.run_number)
+        variable_string = self.variable.replace(" ","_")
+            
+        ax[0].tick_params(labelsize=14)
+        ax[1].tick_params(labelsize=14)
+                                    
+        cbar.ax.tick_params(labelsize=14)
+        cbar.set_label('Relative Error',rotation=90,fontsize=14)
+
+        plt.suptitle(self.variable,fontsize=14)
+        filename = '{}_{}_{}_run{}_error.png'.format(self.converted_time,variable_string,self.template,self.run_number)
         plt.savefig(filename)
         if self.plot_to_screen == True:
             plt.show()

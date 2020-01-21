@@ -70,7 +70,7 @@ class QASimulatorTDycore(QASimulator):
         time = 0.
 #        time = 1.e6
         solution.set_time_unit('y')
-        solution.write_dataset(time,all_values,'Liquid_Pressure','Time Slice')
+        solution.write_dataset(time,all_values,'Liquid Pressure','Time Slice')
         fin.close()
         solution.destroy()
         return solution_filename
