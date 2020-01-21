@@ -60,7 +60,7 @@ class QASolutionComparison(object):
         plot_error = qa_lookup(self.output_options,'plot_error',False)
         print_error = qa_lookup(self.output_options,'print_error',False)
         self.plot_to_screen = qa_lookup(self.output_options,'plot_to_screen',False)
-        self.error_units = qa_lookup(self.output_options,'error_units',' ')
+        self.variable_units = qa_lookup(self.output_options,'variable_units',' ')
           
 #        if 'plot_error' in self.output_options:
 #          plot_error = self.output_options['plot_error']
@@ -201,12 +201,28 @@ class QASolutionComparison(object):
                                                  levels,alpha=0.75)
                             x_axis_old=x_axis
                             y_axis_old=y_axis
+#                            cbar = plt.colorbar()
+                            if np.mean(solution[:,:]) < 1:
+                                cbar = plt.colorbar(format='%.2e')
+                  
+                            if (np.mean(solution[:,:]) >= 1) and (np.mean(solution[:,:]) < 1000):
+                                cbar = plt.colorbar(format='%.2f')
+                                
+                            if np.mean(solution[:,:] >= 1000):
+                                cbar = plt.colorbar(format='%.2e')
+                                
+                            cbar.ax.tick_params(labelsize=14)
+                            if self.variable_units == ' ':
+                                cbar.set_label('{}'.format(variable),rotation=90,fontsize=16)
+                            else:
+                                cbar.set_label('{} [{}]'.format(variable,self.variable_units),rotation=90,fontsize=16)
                         else:
                             check_coordinates_2D(x_axis,x_axis_old,y_axis,y_axis_old)
                             surface = plt.contour(Y,X,solution[:,:],levels,
                                                 colors='black',
                                                 linewidth=0.5)
                             plt.clabel(surface,inline=True,fontsize=10)
+
                         solution_handles.append(surface)
                                                     
                     elif self.plot_dimension == '3D':
@@ -262,7 +278,8 @@ class QASolutionComparison(object):
                     
                 elif self.plot_dimension == '2D':
 
-                    placeholder = 1 
+                    placeholder = 1
+                    
                 
                 plt.xlabel(self.x_string_time_slice,fontsize=16)
                 plt.ylabel(self.y_string_time_slice,fontsize=16)
@@ -291,7 +308,7 @@ class QASolutionComparison(object):
                     plt.show()
                 plt.close()
               
-                error = QATestError(prefix,variable,self.template,self.run_number,self.plot_to_screen,self.error_units,False,self.plot_dimension)
+                error = QATestError(prefix,variable,self.template,self.run_number,self.plot_to_screen,self.variable_units,False,self.plot_dimension)
                 if plot_error:                                     
                     filename = error.plot_error(x_loc[0],y_loc[0],z_loc[0],solutions[0],x_loc[1],y_loc[1],z_loc[1],solutions[1],self.x_string_time_slice,self.y_string_time_slice)
                     doc_var.add_error_png(filename)
@@ -414,7 +431,7 @@ class QASolutionComparison(object):
                     plt.show()
                 plt.close()
                 
-                error = QATestError(location,variable,self.template,self.run_number,self.plot_to_screen,self.error_units,observation=True)  
+                error = QATestError(location,variable,self.template,self.run_number,self.plot_to_screen,self.variable_units,observation=True)  
                 if plot_error:                                     
                     filename = error.plot_error_1D(times[0],solutions[0],times[1],solutions[1],self.x_string_observation)
                     doc_var.add_error_png(filename)
