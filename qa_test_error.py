@@ -547,13 +547,13 @@ class QATestError(object):
                      verticalalignment='top',fontsize=14)
         
         if abs(average_relative_error) < 1:
-            cbar = fig.colorbar(c1,format='%.2e',ax=ax[1])
+            cbar = fig.colorbar(c2,format='%.2e',ax=ax[1])
                   
         if (abs(average_relative_error)) >= 1 and (abs(average_relative_error) < 1000):
-            cbar = fig.colorbar(c1,format='%.2f',ax=ax[1])
+            cbar = fig.colorbar(c2,format='%.2f',ax=ax[1])
                              
         if abs(average_relative_error >= 1000):
-            cbar = fig.colorbar(c1,format='%.2e',ax=ax[1])
+            cbar = fig.colorbar(c2,format='%.2e',ax=ax[1])
             
         variable_string = self.variable.replace(" ","_")
             
@@ -561,7 +561,7 @@ class QATestError(object):
         ax[1].tick_params(labelsize=14)
                                     
         cbar.ax.tick_params(labelsize=14)
-        cbar.set_label('Relative Error',rotation=90,fontsize=14)
+        cbar.set_label('Relative Error %',rotation=90,fontsize=14)
 
         plt.suptitle(self.variable,fontsize=14)
 
