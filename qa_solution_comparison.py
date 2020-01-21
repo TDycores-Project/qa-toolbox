@@ -201,12 +201,21 @@ class QASolutionComparison(object):
                                                  levels,alpha=0.75)
                             x_axis_old=x_axis
                             y_axis_old=y_axis
-                            cbar = plt.colorbar()
+#                            cbar = plt.colorbar()
+                            if np.mean(solution[:,:]) < 1:
+                                cbar = plt.colorbar(format='%.2e')
+                  
+                            if (np.mean(solution[:,:]) >= 1) and (np.mean(solution[:,:]) < 1000):
+                                cbar = plt.colorbar(format='%.2f')
+                                
+                            if np.mean(solution[:,:] >= 1000):
+                                cbar = plt.colorbar(format='%.2e')
+                                
                             cbar.ax.tick_params(labelsize=14)
                             if self.variable_units == ' ':
-                                cbar.set_label('{}'.format(variable),rotation=90,fontsize=14)
+                                cbar.set_label('{}'.format(variable),rotation=90,fontsize=16)
                             else:
-                                cbar.set_label('{} [{}]'.format(variable,self.variable_units),rotation=90,fontsize=14)
+                                cbar.set_label('{} [{}]'.format(variable,self.variable_units),rotation=90,fontsize=16)
                         else:
                             check_coordinates_2D(x_axis,x_axis_old,y_axis,y_axis_old)
                             surface = plt.contour(Y,X,solution[:,:],levels,
