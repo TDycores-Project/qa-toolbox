@@ -10,12 +10,12 @@ from qa_solution import QASolutionWriter
 from simulator_modules.simulator import QASimulator
 
 time_mapping = {}
-time_mapping['PRES'] = 'Liquid_Pressure'
-time_mapping['SAT_L'] = 'Liquid_Saturation'
+time_mapping['PRES'] = 'Liquid Pressure'
+time_mapping['SAT_L'] = 'Liquid Saturation'
 
 obs_mapping = {}
-obs_mapping['PRES'] = 'Liquid_Pressure'
-obs_mapping['SAT_L'] = 'Liquid_Saturation'
+obs_mapping['PRES'] = 'Liquid Pressure'
+obs_mapping['SAT_L'] = 'Liquid Saturation'
 
 eps=1e-3
 

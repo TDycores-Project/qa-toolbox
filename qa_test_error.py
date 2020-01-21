@@ -110,10 +110,11 @@ class QATestError(object):
                      verticalalignment='top',fontsize=10)
         
         f.suptitle(self.variable,fontsize=14)
+        variable_string = self.variable.replace(" ","_")
         if self.observation == True:
-            filename = '{}_{}_{}_{}_{}_run{}_error.png'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],self.variable,self.template,self.run_number)
+            filename = '{}_{}_{}_{}_{}_run{}_error.png'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],variable_string,self.template,self.run_number)
         else:
-            filename = '{}_{}_{}_run{}_error.png'.format(self.converted_time,self.variable,self.template,self.run_number)
+            filename = '{}_{}_{}_run{}_error.png'.format(self.converted_time,variable_string,self.template,self.run_number)
         plt.savefig(filename)
         if self.plot_to_screen == True:
             plt.show()
@@ -135,12 +136,15 @@ class QATestError(object):
         return filename
             
     def print_error_2D(self,dimension1,dimension2,values1,values2):
+
+        variable_string = self.variable.replace(" ","_")
+        
         self.calc_error_stats_2D(dimension1,dimension2,values1,values2)
 
         if self.observation == True:
-            filename = '{}_{}_{}_{}_{}_run{}_error.stat'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],self.variable,self.template,self.run_number)
+            filename='{}_{}_{}_{}_{}_run{}_error.stat'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],variable_string,self.template,self.run_number)
         else:
-            filename = '{}_{}_{}_run{}_error.stat'.format(self.converted_time,self.variable,self.template,self.run_number)
+            filename = '{}_{}_{}_run{}_error.stat'.format(self.converted_time,variable_string,self.template,self.run_number)
       
       ###save to write to text file
         with open(filename,'w') as f:
@@ -158,10 +162,12 @@ class QATestError(object):
     def print_error_1D(self,dimension1,values1,dimension2,values2,time_unit = ' ', difference_string='all'):
         self.calc_error_stats_1D(dimension1,values1,dimension2,values2,difference_string)
 
+        variable_string = self.variable.replace(" ","_")
+        
         if self.observation == True:
-            filename = '{}_{}_{}_{}_{}_run{}_error.stat'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],self.variable,self.template,self.run_number)
+            filename = '{}_{}_{}_{}_{}_run{}_error.stat'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],variable_string,self.template,self.run_number)
         else:
-            filename = '{}_{}_{}_run{}_error.stat'.format(self.converted_time,self.variable,self.template,self.run_number)
+            filename = '{}_{}_{}_run{}_error.stat'.format(self.converted_time,variable_string,self.template,self.run_number)
       
       ###save to write to text file
         with open(filename,'w') as f:
@@ -493,7 +499,7 @@ class QATestError(object):
         plt.contourf(X,Y,absolute_error)
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
-#        plt.clabel(surface)
+
         plt.annotate('Maximum Absolute Error = {:.2g} \n'    #update precision
                        'Average Absolute Error = {:.2g} \n'.format \
                        (maximum_absolute_error, average_absolute_error), 
@@ -510,7 +516,6 @@ class QATestError(object):
         if abs(average_absolute_error > 1000):
             plt.colorbar(format='%.2e')
 
-#        plt.colorbar(format='%.0e')
         plt.title(self.variable,fontsize=18)
         if self.plot_to_screen == True:
             plt.show()
@@ -520,7 +525,7 @@ class QATestError(object):
         plt.contourf(X,Y,relative_error*100)
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
-#        plt.clabel(surface)
+
         plt.annotate('Maximum Relative Error = {:.2g}% \n'    #update precision
                        'Average Relative Error = {:.2g}% \n'.format \
                        (maximum_relative_error*100, average_relative_error*100), 
@@ -538,8 +543,10 @@ class QATestError(object):
         if abs(average_relative_error >= 1000):
             plt.colorbar(format='%.2e')
             
+        variable_string = self.variable.replace(" ","_")
+
         plt.title(self.variable)
-        filename = '{}_{}_{}_run{}_error.png'.format(self.converted_time,self.variable,self.template,self.run_number)
+        filename = '{}_{}_{}_run{}_error.png'.format(self.converted_time,variable_string,self.template,self.run_number)
         plt.savefig(filename)
         if self.plot_to_screen == True:
             plt.show()
@@ -578,7 +585,6 @@ class QATestError(object):
         maximum_absolute_error_location = []
         maximum_relative_error_location = []
         times = []
-
            
         for i in range(len(stat_file)):
 
@@ -693,9 +699,7 @@ class QATestError(object):
         maximum_relative_error_location_x = []
         maximum_relative_error_location_y = []
         times = []
-        
-
-           
+                   
         for i in range(len(stat_file)):
             filename = stat_file[i]
 
@@ -827,7 +831,6 @@ class QATestError(object):
             y_locations.append(float(split_filename[1]))
             z_locations.append(float(split_filename[2]))
 
-
             fin = open(stat_file[i],'r')
             for line in fin:
                 words = line.strip().split()
@@ -845,14 +848,13 @@ class QATestError(object):
                             maximum_relative_error_time.append(value)
                         else:
                             maximum_relative_error.append(value)
-                
-            
+                            
                 elif ('Average' in words):
                     if ('Absolute' in words):
                         average_absolute_error.append(value)
                     elif ('Relative' in words):
                         average_relative_error.append(value)
-    #            for line in fin:
+
 
         maximum_absolute_error_all_locations = max(maximum_absolute_error)
         index = argmax(maximum_absolute_error)  

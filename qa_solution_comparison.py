@@ -95,11 +95,12 @@ class QASolutionComparison(object):
                     print_err_msg('QACompareSolutions: Negative time in times '
                                   'array indicates steady state. Yet, there '
                                   'is more than one time.')
+                doc_slice = QATestDocTimeSlice('steady state',plot_time_units)
             else:
                 plot_time_units = self.output_options['plot_time_units']
                 sec_over_tunits = unit_conversion(plot_time_units)
                 converted_time = time/sec_over_tunits
-            doc_slice = QATestDocTimeSlice(converted_time,plot_time_units)
+                doc_slice = QATestDocTimeSlice(converted_time,plot_time_units)
             for variable in self.variables:
                 doc_var = QATestDocVariable(variable)
             
@@ -248,7 +249,8 @@ class QASolutionComparison(object):
                 prefix = 'ss'
                 if not time < 0.:
                     prefix = '{}'.format(converted_time)
-                filename = '{}_{}_{}_run{}.png'.format(prefix,variable,
+                variable_string = variable.replace(" ","_")
+                filename = '{}_{}_{}_run{}.png'.format(prefix,variable_string,
                                self.template,self.run_number) 
                 doc_var.add_solution_png(filename)
                 plt.title(variable,fontsize=18)
@@ -364,8 +366,9 @@ class QASolutionComparison(object):
                              xycoords='figure fraction',
                              horizontalalignment='left',
                              verticalalignment='top',fontsize=14)
+                variable_string = variable.replace(" ","_")
                 filename = '{}_{}_{}_{}_{}_run{}.png'.format(
-                          location[0],location[1],location[2],variable,
+                          location[0],location[1],location[2],variable_string,
                           self.template,self.run_number)
                 doc_var.add_solution_png(filename)
                 plt.savefig(filename)
