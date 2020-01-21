@@ -232,7 +232,7 @@ Results Summary
                     
         for run in self._runs:
                 f.write('\n')
-                scenario_string = 'Scenario {}'.format(run._run_number)
+                scenario_string = 'Scenario {} - Time Slice'.format(run._run_number)
                 f.write("{}\n".format(scenario_string))
                 f.write("{}\n".format('-'*len(scenario_string)))
                                 
@@ -291,11 +291,10 @@ Results Summary
                     run._maximum_average_relative_error_times[variable_string]))
                 
                 if run._maximum_absolute_error_index_observation:
+                    scenario_string = 'Scenario {} - Observation Point'.format(run._run_number)
                     f.write("""
-Observation Point
-^^^^^^^^^^^^^^^^^
-
-""")
+{}\n""".format(scenario_string))
+                    f.write("{}\n".format('-'*len(scenario_string)))
                     for variable in run._observations[0]._variables:       
                         variable_string = variable._name 
                         f.write("\n")
@@ -379,7 +378,7 @@ Detailed Results
         width_percent = 60
                 
         for run in self._runs:
-            scenario_string = 'Scenario {}'.format(run._run_number)
+            scenario_string = 'Scenario {} - Time Slice'.format(run._run_number)
             f.write("{}\n".format(scenario_string))
             f.write("{}\n".format('-'*len(scenario_string)))
             f.write("\n")
@@ -416,11 +415,9 @@ Detailed Results
 
                     
             if len(run._observations) > 0:
-                f.write("""
-Observation Point
-^^^^^^^^^^^^^^^^^
-
-""")
+                scenario_string = 'Scenario {} - Observation Point'.format(run._run_number)
+                f.write("{}\n".format(scenario_string))
+                f.write("{}\n".format('-'*len(scenario_string)))
             k = 0    
             for observation in run._observations:              
                 observation_string = '{}'.format(observation._location)
