@@ -1,0 +1,11 @@
+[output_options]
+times = -999
+variables = Gas Pressure
+plot_time_units = 'y'
+plot_dimension = 2D
+plot_title = Kolditz 2.2.3
+plot_x_label = Distance x [m]
+plot_y_label = Distance y [m]
+plot_error = True
+print_error = True
+variable_units = Pa

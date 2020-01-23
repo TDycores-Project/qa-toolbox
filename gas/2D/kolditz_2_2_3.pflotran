@@ -1,0 +1,200 @@
+ 
+SIMULATION
+  SIMULATION_TYPE SUBSURFACE
+  PROCESS_MODELS
+    SUBSURFACE_FLOW flow
+      MODE GENERAL
+    /
+  /
+END
+
+SUBSURFACE
+
+GRID
+  TYPE structured
+  NXYZ swap{nx,15} swap{ny,15} 1
+  BOUNDS
+    0.d0 0.d0 0.d0
+    1.d0 1.d0 1.d0
+  END
+END
+
+REGION all
+  COORDINATES
+    0.0d0 0.0d0 0.0d0
+    1d0 1d0 1d0
+  /
+END
+
+REGION west_face
+  FACE WEST
+  COORDINATES
+    0.d0 0.d0 0.d0
+    0.d0 1d0 1d0
+  /
+END
+
+REGION east_face
+  FACE EAST
+  COORDINATES
+    1d0 0.d0 0.d0
+    1d0 1d0 1d0
+  /
+END
+
+REGION north_face
+  FACE NORTH
+  COORDINATES
+    0.d0 1d0 0.d0
+    1d0 1d0 1d0
+  /
+END
+
+REGION south_face
+  FACE SOUTH
+  COORDINATES
+    0.d0  0.d0  0.d0
+    1d0 0.d0 1d0
+  /
+END
+
+MATERIAL_PROPERTY plate
+  ID 1
+  POROSITY 0.50
+  TORTUOSITY 1.d0
+  ROCK_DENSITY 2.8E3
+  HEAT_CAPACITY 100.
+  THERMAL_CONDUCTIVITY_DRY 1 W/m-C
+  THERMAL_CONDUCTIVITY_WET 1 W/m-C
+  CHARACTERISTIC_CURVES cc1
+  PERMEABILITY
+    PERM_X 1.d-15
+    PERM_Y 1.d-15
+    PERM_Z 1.d-15
+  /
+END
+
+CHARACTERISTIC_CURVES cc1
+  SATURATION_FUNCTION VAN_GENUCHTEN
+    LIQUID_RESIDUAL_SATURATION 0.5d-1
+    M 0.75
+    ALPHA 1.d-3
+  /
+  PERMEABILITY_FUNCTION MUALEM
+    LIQUID_RESIDUAL_SATURATION 0.05d0
+    M 0.5d0
+  /
+  PERMEABILITY_FUNCTION MUALEM_VG_GAS
+    LIQUID_RESIDUAL_SATURATION 0.05d0
+    GAS_RESIDUAL_SATURATION 0.1d0
+    M 0.5d0
+  /
+END
+
+STRATA
+  REGION all
+  MATERIAL plate
+END
+
+FLUID_PROPERTY
+  DIFFUSION_COEFFICIENT 1.d-9
+END
+
+EOS GAS
+ VISCOSITY CONSTANT 1.0d-5 Pa-s
+END
+
+TIME
+  FINAL_TIME 10 yr
+  INITIAL_TIMESTEP_SIZE 1.d-4 day
+  MAXIMUM_TIMESTEP_SIZE 0.01d0 yr at 0.d0 yr
+END
+
+OUTPUT
+  SNAPSHOT_FILE
+    NO_PRINT_INITIAL
+    #NO_PRINT_FINAL
+    FORMAT HDF5
+  /
+END
+
+DATASET flux_bc_north
+  HDF5_DATASET_NAME x_line_cell_centered_north
+  FILENAME dataset.h5
+END
+
+DATASET flux_bc_east
+  HDF5_DATASET_NAME y_line_cell_centered_east
+  FILENAME dataset.h5
+END
+
+FLOW_CONDITION initial
+  TYPE
+    TEMPERATURE dirichlet
+    MOLE_FRACTION dirichlet
+    GAS_PRESSURE dirichlet
+  /
+  TEMPERATURE 25.d0 C
+  MOLE_FRACTION 0.98
+  GAS_PRESSURE 1.0d5 Pa
+END
+
+FLOW_CONDITION east_face
+  TYPE
+    TEMPERATURE dirichlet
+    LIQUID_FLUX neumann
+    GAS_FLUX neumann
+  /
+  TEMPERATURE 25.d0 C
+  LIQUID_FLUX 0.d0 m/s
+  GAS_FLUX DATASET flux_bc_east
+END
+
+FLOW_CONDITION north_face
+  TYPE
+    TEMPERATURE dirichlet
+    LIQUID_FLUX neumann
+    GAS_FLUX neumann
+  /
+  TEMPERATURE 25.d0 C
+  LIQUID_FLUX 0.d0 m/s
+  GAS_FLUX DATASET flux_bc_north
+END
+
+FLOW_CONDITION dirichlet_pressure
+  TYPE
+    TEMPERATURE dirichlet
+    MOLE_FRACTION dirichlet
+    GAS_PRESSURE dirichlet
+  /
+  TEMPERATURE 25.d0 C
+  MOLE_FRACTION 0.98
+  GAS_PRESSURE 1.0d5 Pa
+END
+
+INITIAL_CONDITION initial
+  REGION all
+  FLOW_CONDITION initial
+END
+
+BOUNDARY_CONDITION west_face
+  REGION west_face
+  FLOW_CONDITION dirichlet_pressure
+END
+
+BOUNDARY_CONDITION south_face
+  REGION south_face
+  FLOW_CONDITION dirichlet_pressure
+END
+
+BOUNDARY_CONDITION east_face
+  FLOW_CONDITION east_face
+  REGION east_face
+END
+
+BOUNDARY_CONDITION north_face
+  FLOW_CONDITION north_face
+  REGION north_face
+END
+
+END_SUBSURFACE

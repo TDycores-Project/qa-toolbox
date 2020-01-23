@@ -1,0 +1,65 @@
+import sys
+import os
+import traceback
+
+sys.path.insert(0,'../..')
+sys.path.insert(0,'../simulator_module')
+
+import numpy as np
+import math
+
+from qa_common import *
+
+from qa_solution import QASolutionWriter
+from simulator_modules.python import *
+
+filename = __file__
+epsilon_value = 1.e-30
+
+def main(options):
+
+    print('Beginning {}.'.format(filename))
+    nx = swap{nx,15}
+    ny = swap{ny,15}
+    Lx = 1
+    Ly = 1
+    dx = Lx/nx
+    dy = Ly/ny
+    tunit = 'y'
+
+    p0 = 1.0e5
+
+    p_soln = np.zeros((nx,ny))
+    x_soln = np.linspace(0.+(dx/2.),Lx-(dx/2.),nx)
+    y_soln = np.linspace(0.+(dy/2.),Ly-(dy/2.),ny)
+    z_soln = np.array([0.5])
+    t_soln = np.array([10.0])
+
+    solution_filename = get_python_solution_filename(filename)
+    solution = QASolutionWriter(solution_filename,tunit)
+    solution.write_coordinates(x_soln,y_soln,z_soln)
+
+    i = -1
+    for x in x_soln:
+        i = i + 1
+        j = -1
+        for y in y_soln:
+            j = j + 1
+            p_soln[i,j] = p0*np.sqrt(1+3*((x*y)/(Lx*Ly)))
+
+    solution.write_dataset(t_soln[0],p_soln,'Gas Pressure')
+
+    solution.destroy()
+    print('Finished with {}.'.format(filename))
+
+
+if __name__ == "__main__":
+   cmdl_options=[]
+   try:
+      suite_status=main(cmdl_options)
+      sys.exit(suite_status)
+   except Exception as error:
+     print(str(error))
+     traceback.print_exc()
+     print("failure")
+     sys.exit(1)
