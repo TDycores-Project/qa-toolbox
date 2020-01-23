@@ -39,9 +39,9 @@ class QATestManager(object):
     def process_config_file(self,root_dir,config_file):
         debug_push('QATestManager process_config_file')
         if config_file is None:
-            raise RuntimeError("Error, must provide a config filename")
+            print_err_msg("Error, must provide a config filename")
         if not os.path.isfile(config_file):
-            print('.cfg file '+config_file+' not found in '
+            print_err_msg('.cfg file '+config_file+' not found in '
                   'QATestManager.process_config_file.')
         self._path, filename = os.path.split(config_file)
         os.chdir(self._path)

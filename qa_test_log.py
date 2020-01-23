@@ -4,16 +4,17 @@ from pathlib import Path
 
 class QATestLog(object):
     
-    def __init__(self,root_dir):
+    def __init__(self,root_dir,incremental_testing):
 
         self.successful_tests = root_dir+'/successful_tests.log'
         self.failed_tests = root_dir+'/failed_tests.log'
         self.unrun_tests = root_dir+'/unrun_tests.log'
  
         # initialize each file
-        open(self.successful_tests,'w').close()
-        open(self.failed_tests,'w').close()
-        open(self.unrun_tests,'w').close()
+        if not incremental_testing:
+            open(self.successful_tests,'w').close()
+            open(self.failed_tests,'w').close()
+            open(self.unrun_tests,'w').close()
         
     def log_success(self,path,test):
         test = test.lower().replace(" ","_")
