@@ -10,11 +10,16 @@ class QATestLog(object):
         self.failed_tests = root_dir+'/failed_tests.log'
         self.unrun_tests = root_dir+'/unrun_tests.log'
  
+        self.past_tests = None
         # initialize each file
-        if not incremental_testing:
-            open(self.successful_tests,'w').close()
-            open(self.failed_tests,'w').close()
-            open(self.unrun_tests,'w').close()
+        if incremental_testing:
+
+            with open(self.successful_tests,'r') as f:
+                self.past_tests = set(f)
+                       
+        open(self.successful_tests,'w').close()
+        open(self.failed_tests,'w').close()
+        open(self.unrun_tests,'w').close()
         
     def log_success(self,path,test):
         test = test.lower().replace(" ","_")
@@ -37,6 +42,17 @@ class QATestLog(object):
                     
     def read_contents(self):
         log_dict = {}
+        
+        if self.past_tests:
+            for val in self.past_tests:
+                match = False
+                with open(self.successful_tests,'r+') as f:
+                    for line in f:
+                        if line.strip() == val.strip():
+                            match = True
+                    if not match:
+                        f.write('{} \n'.format(val.strip()))
+                        
         with open(self.successful_tests,'r') as f:
             for line in f:
                 tests = line.strip().split('/')
@@ -46,5 +62,6 @@ class QATestLog(object):
                     log_dict[folder_path].append(tests[-1])
                 else:
                     log_dict[folder_path] = [tests[-1]]
+                                
         return log_dict
             

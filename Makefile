@@ -16,13 +16,11 @@ clean_tests :
 ##	-find . -type f -name '*.rst' -print0 | xargs -0 rm
 	-find . -type f -name '*run1.py' -print0 | xargs -0 rm
 	-find . -type f -name '*run2.py' -print0 | xargs -0 rm
-	-find . -type f -name '*python_run1_python.h5' -print0 | xargs -0 rm
-	-find . -type f -name '*pflotran_run1_pflotran.h5' -print0 | xargs -0 rm
-	-find . -type f -name '*python_run2_python.h5' -print0 | xargs -0 rm
-	-find . -type f -name '*pflotran_run2_pflotran.h5' -print0 | xargs -0 rm
-	-find . -type f -name '*pflotran_run1_pft.h5' -print0 | xargs -0 rm
-	-find . -type f -name '*tough3_run1_tough3.h5' -print0 | xargs -0 rm
-	-find . -type f -name '*tough3_tough3.h5' -print0 | xargs -0 rm
+	-find . -type f -name '*pflotran_run*.h5' -print0 | xargs -0 rm
+	-find . -type f -name '*python_run*.h5' -print0 | xargs -0 rm
+	-find . -type f -name '*pflotran_run*.h5' -print0 | xargs -0 rm
+	-find . -type f -name '*tdycore_run*.h5' -print0 | xargs -0 rm
+	-find . -type f -name '*tough3_run*.h5' -print0 | xargs -0 rm
 	-find . -type f -name 'FOFT*' -print0 | xargs -0 rm
 	-find . -type f -name 'OUTPUT*' -print0 | xargs -0 rm
 #	-find . -type f -name '*.h5' -print0 | xargs -0 rm
