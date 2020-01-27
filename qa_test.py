@@ -206,6 +206,7 @@ class QATest(object):
         print(cwd)
         print(self.root_dir)
         print(cwd.replace(self.root_dir,''))
+
         self.doc = QATestDoc(cwd,cwd.replace(self.root_dir,''))
         self.doc.set_title(self.title)
         self.doc.set_template(self._template)
@@ -277,8 +278,6 @@ class QATest(object):
               swap_dict=None):
         debug_push('QATest _swap')
         in_filename = self._template+'.'+simulator_mapped_name
-        #run_number_string = ''
-        #if run_number > 0:
         run_number_string = '_run{}'.format(run_number)
         out_filename = self._template+'_'+simulator_mapped_name+ \
                        run_number_string+simulator_suffix
@@ -293,8 +292,6 @@ class QATest(object):
                     print('swap_dict empty')
             swapper.swap_new(in_filename,out_filename,
                              swap_dict)
-#        elif os.path.isfile(in_filename):
-#            shutil.copy(in_filename, out_filename)
         else:
             print_err_msg('{} defined in .cfg file, section [{}] not found in {}'.format(in_filename, self.name, os.getcwd()))
 

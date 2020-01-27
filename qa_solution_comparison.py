@@ -44,33 +44,18 @@ class QASolutionComparison(object):
         if debug_verbose():
             print(self.solution_dictionary)
         
-        self.plot_dimension = qa_lookup(self.output_options, 'plot_dimension','fail_on_missing_keyword')#self.output_options['plot_dimension']
-        x_string = qa_lookup(self.output_options,'plot_x_label','fail_on_missing_keyword').split(',')#self.output_options['plot_x_label'].split(',')
-        y_string = qa_lookup(self.output_options,'plot_y_label','fail_on_missing_keyword').split(',')#self.output_options['plot_y_label'].split(',')
-        self.title = qa_lookup(self.output_options,'plot_title','fail_on_missing_keyword')#self.output_options['plot_title']
-        self.variables = [x.strip() for x in qa_lookup(self.output_options,'variables','fail_on_missing_keyword').split(',')]#self.output_options['variables'].split(',')
-        ###checking optional parameters
-#        if 'plot_type' in self.output_options.keys():
-#            plot_type = [x.strip() for x in self.output_options['plot_type'].split(',')]
-#        else:
-#            plot_type = ['time slice']
+        self.plot_dimension = qa_lookup(self.output_options, 'plot_dimension','fail_on_missing_keyword')
+        x_string = qa_lookup(self.output_options,'plot_x_label','fail_on_missing_keyword').split(',')
+        y_string = qa_lookup(self.output_options,'plot_y_label','fail_on_missing_keyword').split(',')
+        self.title = qa_lookup(self.output_options,'plot_title','fail_on_missing_keyword')
+        self.variables = [x.strip() for x in qa_lookup(self.output_options,'variables','fail_on_missing_keyword').split(',')]
             
-        plot_type = [x.strip() for x in qa_lookup(self.output_options,'plot_type','time slice').split(',')]   #self.output_options['plot_type']
+        plot_type = [x.strip() for x in qa_lookup(self.output_options,'plot_type','time slice').split(',')]   
         
         plot_error = qa_lookup(self.output_options,'plot_error',False)
         print_error = qa_lookup(self.output_options,'print_error',False)
         self.plot_to_screen = qa_lookup(self.output_options,'plot_to_screen',False)
         self.variable_units = qa_lookup(self.output_options,'variable_units',' ')
-          
-#        if 'plot_error' in self.output_options:
-#          plot_error = self.output_options['plot_error']
-#        else:
-#          plot_error = 'False'
-#          
-#        if 'print_error' in self.output_options:
-#          print_error = self.output_options['print_error']
-#        else:
-#          print_error = 'False'
 
         for i in range(len(plot_type)):
             plot = plot_type[i]
@@ -83,22 +68,18 @@ class QASolutionComparison(object):
 
                 
             elif plot=='time slice':
-                
-#                times = time_strings_to_float_list(
-#                    self.output_options['times'].split(','))
+
                 times = time_strings_to_float_list(
                     qa_lookup(self.output_options,'times','fail_on_missing_keyword').split(','))
                 
                 self.x_string_time_slice = x_string[i]
                 self.y_string_time_slice = y_string[i]
                 self.plot_time_slice(times,plot_error,print_error)
-                
-                
+                                
             else:
                 print_err_msg('{} specified in output_options as plot_type not recognized. '
                               'Available options are: time slice or observation'.format(plot))
-                
-              
+                              
         debug_pop()      
               
     def plot_time_slice(self,times,plot_error,print_error):
@@ -148,13 +129,11 @@ class QASolutionComparison(object):
                     solution_object = QASolutionReader(filename)
                     x, y, z = solution_object.get_coordinates()
 
-
                     solution = solution_object.get_solution(time,variable,Time_Slice=True)
                     solution_object.destroy()
-                    
-
-                
+               
                     if plot_error or print_error:
+
                         solutions.append(solution)
                         x_loc.append(x)
                         y_loc.append(y)
@@ -163,7 +142,7 @@ class QASolutionComparison(object):
                             print('WARNING: More than two '
                                           'simulators run yet error set to True. '
                                           'Can only compare two solutions at a time.')
-                                                
+
                     s_min = min(s_min,(np.amin(solution)))
                     s_max = max(s_max,(np.amax(solution)))
                 
@@ -172,11 +151,7 @@ class QASolutionComparison(object):
                         if isimulator == 0:
                             plt.figure(figsize=(12,8))
 
-                        x_axis = find_axis_1D(x,y,z)
-                        ###sort x_axis
-#                        solution = [x for _, x in sorted(zip(x_axis,solution))]
-#                        x_axis = sorted(x_axis)
-                        
+                        x_axis = find_axis_1D(x,y,z)                       
 
                         x_min = min(x_min,math.floor(np.amin(x_axis)))
                         x_max = max(x_max,math.ceil(np.amax(x_axis)))
@@ -240,10 +215,6 @@ class QASolutionComparison(object):
                             surface1=ax.contourf(Y,X,solution[2,:,:],zdir='z',offset =0.2)
                             ax.set_zlim((0.,1.))
                             plt.colorbar(surface)
-#                            print (solution[0,:,:])
-                           # T = mpl.cm.hot(solution[3,:,:])
-                           # Z=np.zeros(X.shape)+z_min
-                           # ax.plot_surface(X,Y,Z,facecolors=T)
                         else:
                             surface=ax.contour(Y,X,solution[0,:,:],zdir='z',offset=z_max,colors='black')
                             plt.clabel(surface,inline=True,fontsize=18)
@@ -256,8 +227,8 @@ class QASolutionComparison(object):
                 ax = plt.gca()
                 
                 if self.plot_dimension == '1D': 
-                    
-                    buffer=abs(x_max-x_min)*0.05 ###buffer is 5% of total axis on both sides
+                    ###buffer is 5% of total axis on both sides
+                    buffer=abs(x_max-x_min)*0.05 
                     plt.xlim([x_min-buffer,x_max+buffer])
                     buffer=abs(s_max-s_min)*0.05
                     plt.ylim([s_min-buffer,s_max+buffer])
@@ -265,16 +236,12 @@ class QASolutionComparison(object):
                     
                     if abs((s_max-s_min)/2.) < 1:
                         ax.yaxis.set_major_formatter(FormatStrFormatter('%.2e'))
-#                        plt.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
-#                        plt.rc('font', size=16)
                         
                     if abs((s_max-s_min)/2.) >= 1 and abs((s_max-s_min)/2.) < 1000: 
                         ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
           
                     if abs((s_max-s_min)/2.) > 1000:
                         ax.yaxis.set_major_formatter(FormatStrFormatter('%.2e'))
-#                        plt.ticklabel_format(axis='y',style='sci',scilimits=(0,0))
-#                        plt.rc('font', size=16)
                     
                 elif self.plot_dimension == '2D':
 
@@ -330,7 +297,7 @@ class QASolutionComparison(object):
                 self.doc_run.add_max_relative_error(variable,error)
                 self.doc_run.add_max_average_absolute_error(variable,error)
                 self.doc_run.add_max_average_relative_error(variable,error)
-                
+     
                 self.time_slice_error_solution_convergence = error.maximum_relative_error_all_times
         
         debug_pop()        
@@ -388,8 +355,8 @@ class QASolutionComparison(object):
                     isimulator += 1
                     
                 ax = plt.gca() 
-                
-                buffer=abs(t_max-t_min)*0.05 ###buffer is 5% of total axis on both sides
+                ###buffer is 5% of total axis on both sides
+                buffer=abs(t_max-t_min)*0.05 
                 plt.xlim([t_min-buffer,t_max+buffer])
                 buffer=abs(s_max-s_min)*0.05
                 plt.ylim([s_min-buffer,s_max+buffer])
@@ -397,7 +364,6 @@ class QASolutionComparison(object):
                     
                 if abs((s_max-s_min)/2.) < 1:
                     ax.yaxis.set_major_formatter(FormatStrFormatter('%.2e'))
-
                         
                 if abs((s_max-s_min)/2.) >= 1 and abs((s_max-s_min)/2.) < 1000: 
                     ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
@@ -405,11 +371,7 @@ class QASolutionComparison(object):
                 if abs((s_max-s_min)/2.) > 1000:
                     ax.yaxis.set_major_formatter(FormatStrFormatter('%.2e'))
 
-                    
-                #plt.xlim([t_min,t_max])
-                #plt.ylim([s_min,s_max])
                 plt.legend(handles=solution_handles,fontsize=14)
-
               
                 plt.xlabel(self.x_string_observation, fontsize=16)
                 plt.ylabel(self.y_string_observation, fontsize=16)
