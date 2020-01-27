@@ -57,7 +57,6 @@ class QASimulatorCrunchFlow(QASimulator):
                     
         first = True
         
-
         for i in range(len(c_out)):
             fin = open(c_out[i], 'r')
             log = False
@@ -175,8 +174,7 @@ class QASimulatorCrunchFlow(QASimulator):
             if first == True:
                 solution.write_time(all_values[0])
                 first = False
-              
-            
+                          
             for n in range(1,len(all_values)):
                 if variables[n] in obs_mapping:
                     new_key = time_mapping[variables[n]]
@@ -240,12 +238,7 @@ class QASimulatorCrunchFlow(QASimulator):
     
     def update_dict(self,output_options):
         debug_push('QASimulatorCRUNCHFLOW update_dict')
-#        for value in output_options.values():
-#            new_entry = [x.strip() for x in value.split(',')]
-#            time_mapping[new_entry[0]] = new_entry[1]
-#            obs_mapping[new_entry[0]] = new_entry[1]
         for key, value in output_options.items():
-#            new_entry=value.strip()
             time_mapping[key.strip()] = value.strip()
             obs_mapping[key.strip()] = value.strip()
         debug_pop()

@@ -20,6 +20,7 @@ h5_mapping['Material_ID'] = 'Material_ID'
 h5_mapping['Liquid_Pressure [Pa]'] = 'Liquid Pressure'
 h5_mapping['Liquid_Saturation'] = 'Liquid Saturation'
 h5_mapping['Gas_Pressure [Pa]'] = 'Gas Pressure'
+h5_mapping['Liquid_Pressure'] = 'Liquid Pressure'
 
 
 obs_mapping = {}
