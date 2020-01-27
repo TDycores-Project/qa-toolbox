@@ -213,14 +213,14 @@ class QATestDoc(object):
 .. _{0}:
     
 {1}
-{2}
+{0}
 {1}
-:ref:`{0}-results summary`
+:ref:`{2}-results summary`
 
-:ref:`{0}-description`
+:ref:`{2}-description`
 
-:ref:`{0}-detailed results`
-""".format(self._filename_root,'*'*len(self._title),self._title))
+:ref:`{2}-detailed results`
+""".format(self._title,'*'*len(self._title),self._filename_root))
      
         f.write("""
 .. _{}-results summary:            
@@ -232,7 +232,7 @@ Results Summary
                     
         for run in self._runs:
                 f.write('\n')
-                scenario_string = 'Scenario {}'.format(run._run_number)
+                scenario_string = 'Scenario {} - Time Slice'.format(run._run_number)
                 f.write("{}\n".format(scenario_string))
                 f.write("{}\n".format('-'*len(scenario_string)))
                                 
@@ -291,11 +291,10 @@ Results Summary
                     run._maximum_average_relative_error_times[variable_string]))
                 
                 if run._maximum_absolute_error_index_observation:
+                    scenario_string = 'Scenario {} - Observation Point'.format(run._run_number)
                     f.write("""
-Observation Point
-^^^^^^^^^^^^^^^^^
-
-""")
+{}\n""".format(scenario_string))
+                    f.write("{}\n".format('-'*len(scenario_string)))
                     for variable in run._observations[0]._variables:       
                         variable_string = variable._name 
                         f.write("\n")
@@ -379,7 +378,7 @@ Detailed Results
         width_percent = 60
                 
         for run in self._runs:
-            scenario_string = 'Scenario {}'.format(run._run_number)
+            scenario_string = 'Scenario {} - Time Slice'.format(run._run_number)
             f.write("{}\n".format(scenario_string))
             f.write("{}\n".format('-'*len(scenario_string)))
             f.write("\n")
@@ -416,11 +415,9 @@ Detailed Results
 
                     
             if len(run._observations) > 0:
-                f.write("""
-Observation Point
-^^^^^^^^^^^^^^^^^
-
-""")
+                scenario_string = 'Scenario {} - Observation Point'.format(run._run_number)
+                f.write("{}\n".format(scenario_string))
+                f.write("{}\n".format('-'*len(scenario_string)))
             k = 0    
             for observation in run._observations:              
                 observation_string = '{}'.format(observation._location)
@@ -462,7 +459,7 @@ class QATestDocIndex(object):
             print_err_msg('Document Directory Path: {} does not exsist'.format(self._doc_dir))
         
         
-    def write_index(self):#,testlog_file):
+    def write_index(self):
         file_dict = self.testlog.read_contents()
         
         self.write_toctree(file_dict)
@@ -497,8 +494,9 @@ QA Test Suite Documentation
         for folder_path,tests in file_dict.items(): 
             folder = folder_path.strip().split('/')[-1]
             for i in range(len(tests)):
+                test=tests[i].lower().replace(" ","_")
                 toctree="""
-   include_toctree_{}_{}.rst""".format(folder,tests[i])
+   include_toctree_{}_{}.rst""".format(folder,test)
                 f.write(toctree)                
         f.close()
         
@@ -507,11 +505,12 @@ QA Test Suite Documentation
         for folder_path,tests in file_dict.items():
             folder = folder_path.strip().split('/')[-1]            
             for i in range(len(tests)):
-                filename = '{}/include_toctree_{}_{}.rst'.format(self._doc_dir,folder,tests[i])
+                test=tests[i].lower().replace(" ","_")
+                filename = '{}/include_toctree_{}_{}.rst'.format(self._doc_dir,folder,test)
                 f = open(filename, 'w')
                 toctree = """
 .. include:: //{}/{}.rst                
-                """.format(folder_path,tests[i])
+                """.format(folder_path,test)
                 f.write(toctree)
                 f.close()
         

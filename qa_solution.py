@@ -42,7 +42,7 @@ class QASolutionWriter(object):
     def write_coordinates(self,x,y,z):
         debug_push('QASolutionWriter write_coordinates')
         # x, y, z are 1D numpy arrays
-        group_name = 'Time Slice/Coordinates' ##will coordinates ever be different with time slice??
+        group_name = 'Time Slice/Coordinates' 
         self._f[group_name+'/X'] = x
         self._f[group_name+'/Y'] = y
         self._f[group_name+'/Z'] = z
@@ -51,7 +51,6 @@ class QASolutionWriter(object):
         
     def write_time(self,t):
         debug_push('QASolutionWriter write_time')
-        ###observation files with different times???
         group_name = 'Observation/Time'
         self._f[group_name+'/times'] = t
         self._f[group_name].attrs['time unit'] = self._tunit   
@@ -116,7 +115,7 @@ class QASolutionReader(object):
 
 
         
-    def process_groups(self): ###update for both
+    def process_groups(self): 
         debug_push('QASolutionReader process_groups')
 
         for key in list(self._f.keys()):

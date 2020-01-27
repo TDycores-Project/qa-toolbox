@@ -22,7 +22,6 @@ class QATestLog(object):
         open(self.unrun_tests,'w').close()
         
     def log_success(self,path,test):
-        test = test.lower().replace(" ","_")
         with open(self.successful_tests,"a+") as f:
             f.write('{}/{} \n'.format(path,test))
 
