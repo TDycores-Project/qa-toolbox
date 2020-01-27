@@ -15,6 +15,7 @@ from qa_test import QATest
 from qa_debug import *
 from qa_common import *
 from qa_test_log import QATestLog
+from qa_test_convergence import QATestConvergence
 
 
 class QATestManager(object):
@@ -53,14 +54,39 @@ class QATestManager(object):
         
         sections = config.sections()
         for section in sections:
-            name = section            
-            test = QATest(name,root_dir,list_to_dict(config.items(section)))
+            name = section
+
+            if self.check_for_solution_convergence(name):
+                test = QATestConvergence(name,root_dir,list_to_dict(config.items(section)))
+            else:
+                test = QATest(name,root_dir,list_to_dict(config.items(section)))
             self._tests[name] = test
         debug_pop()
             
     def run_tests(self,testlog):
         debug_push('QATestManager run_tests')
         for key, test_case in self._tests.items():
-            test_case.run(self.available_simulators)
+            list_of_swap_dict = test_case.initialize_run(self.available_simulators)
+            test_case.run(list_of_swap_dict)
             testlog.log_success(self._path,test_case.title)
         debug_pop()
+        
+    def check_for_solution_convergence(self,name):
+        debug_push('QATestManager check_options')
+        filename = name +'.opt'
+        if not os.path.isfile(filename):
+            print_err_msg('Options file name {} does not exist in folder {}'.format(filename,os.getcwd()))
+        config = configparser.ConfigParser()
+        config.read(filename)
+        sections = config.sections()
+        
+        qa_solution_convergence = False
+        for section in sections:
+            if section == 'solution_convergence':
+                qa_solution_convergence = True
+                
+        debug_pop()   
+
+        return qa_solution_convergence
+        
+              

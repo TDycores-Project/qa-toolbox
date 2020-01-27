@@ -299,8 +299,8 @@ class QASolutionReader(object):
                 variable_key = key
                 break
         if not variable_key:
-              print_err_msg('Variable "{}" specified in options file not found in Observation group in h5 file. Available variables include:{}'. \
-                            format(variable,list(group.keys())))
+              print_err_msg('Variable "{}" specified in options file not found in Observation group in h5 file {}. Available variables include:{}'. \
+                            format(variable,self._filename,list(group.keys())))
         array = np.array(group[variable_key])
         array = np.array(array[:,0,0])
 #        print(array.shape)
@@ -319,8 +319,8 @@ class QASolutionReader(object):
             if time < 0 or abs(time-t) < eps:
                 group = g
         if not group:
-            print_err_msg('Time "{}" specified in options file not found in Time Slice group in h5 file. '
-                          'Available times: {}'.format(t,available_times))
+            print_err_msg('Time "{}" specified in options file not found in Time Slice group in h5 file {}. '
+                          'Available times: {}'.format(t,self._filename,available_times))
 
         variable_key = None
 
@@ -330,8 +330,8 @@ class QASolutionReader(object):
                 variable_key = key
                 break
         if not variable_key:
-              print_err_msg('Variable "{}" specified in options file not found in Time Slice group in h5 file. Available variables include:{}'. \
-                            format(variable,list(group.keys())))
+              print_err_msg('Variable "{}" specified in options file not found in Time Slice group in h5 file {}. Available variables include:{}'. \
+                            format(variable,self._filename,list(group.keys())))
 
         array = np.array(group[variable_key])
 

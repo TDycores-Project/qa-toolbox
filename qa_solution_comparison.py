@@ -297,6 +297,8 @@ class QASolutionComparison(object):
                 self.doc_run.add_max_relative_error(variable,error)
                 self.doc_run.add_max_average_absolute_error(variable,error)
                 self.doc_run.add_max_average_relative_error(variable,error)
+     
+                self.time_slice_error_solution_convergence = error.maximum_relative_error_all_times
         
         debug_pop()        
         
@@ -413,7 +415,19 @@ class QASolutionComparison(object):
                 self.doc_run.add_max_relative_error_observation(variable,error)
                 self.doc_run.add_max_average_absolute_error_observation(variable, error) 
                 self.doc_run.add_max_average_relative_error_observation(variable, error)
+
+                self.observation_error_solution_convergence = error.maximum_relative_error_all_locations
+
         debug_pop()
-
-
+                
+    def get_time_slice_max_error(self):
+        error_solution_convergence = self.time_slice_error_solution_convergence.split()[0]
+        return string_to_number(error_solution_convergence)
+    
+    def get_observation_max_error(self):
+        try:
+            error_solution_convergence = self.observation_error_solution_convergence.split()[0]
+        except:
+            print_err_msg('Observation comparison requested in solution convergence but no observation data recieved in options file')
+        return string_to_number(error_solution_convergence)
 
