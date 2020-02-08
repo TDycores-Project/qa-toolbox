@@ -1,7 +1,7 @@
 Problem Description Setup
 =========================
 
-In order to properly document the problem set up create a text file using the following file format ``description_template.txt`` where template is defined in the configuration file. Type in what you wish to be displayed under problem description such as reference for test, grid spacing, initial conditions, material properties etc. Equations can be specified using sphinx math format.
+In order to properly document the problem set up create a text file using the following file format ``description_template.txt`` where template is what is defined in the configuration file. Type in what you wish to be displayed under problem description in the documentation, such as references for test, grid spacing, initial conditions, material properties etc. Equations can be specified using sphinx math format.
 
 An example problem description:
 
