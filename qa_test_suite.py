@@ -38,9 +38,9 @@ def commandline_options():
 
     parser.add_argument('--doc_dir', action='store',
                         help='directory for documenting test results')
-                        
-#    parser.add_argument('-a', '--all', action='store_true',
-#                         help='run all tests.')
+    
+    parser.add_argument('--incremental_testing', action='store_true',
+                         help='allows for incremental testing with qa tests')
 
 #    parser.add_argument('-m', '--mpiexec', nargs=1, default=None,
 #                        help="path to the executable for mpiexec (mpirun, etc)"
@@ -72,6 +72,7 @@ def scanfolder(parent_dir,extension):
     #return file_path strings in lists
     return file_list
 
+
 def main(options):
     txtwrap = textwrap.TextWrapper(width=78, subsequent_indent=4*" ")
     
@@ -102,8 +103,8 @@ def main(options):
     simulators_dict = locate_simulators() 
 
 
-    testlog = QATestLog(root_dir)
-
+    testlog = QATestLog(root_dir,options.incremental_testing)
+    
     
 
     # loop through config files, cd into the appropriate directory,
