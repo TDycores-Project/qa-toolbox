@@ -37,7 +37,7 @@ class QATestManager(object):
             string += str(value)
         return string
         
-    def process_config_file(self,root_dir,config_file):
+    def process_config_file(self,root_dir,config_file,testlog):
         debug_push('QATestManager process_config_file')
         if config_file is None:
             print_err_msg("Error, must provide a config filename")
@@ -53,14 +53,22 @@ class QATestManager(object):
         debug_pop() 
         
         sections = config.sections()
+        directory_dict = {}
         for section in sections:
             name = section
 
-            if self.check_for_solution_convergence(name):
-                test = QATestConvergence(name,root_dir,list_to_dict(config.items(section)))
-            else:
-                test = QATest(name,root_dir,list_to_dict(config.items(section)))
-            self._tests[name] = test
+            if name == 'info':
+               info_dict = list_to_dict(config.items(section))
+               directory_title = info_dict['title']
+               testlog.log_directory_names(directory_title,self._path)
+               
+            else:   
+                if self.check_for_solution_convergence(name):
+                    test = QATestConvergence(name,root_dir,list_to_dict(config.items(section)))
+                else:
+                    test = QATest(name,root_dir,list_to_dict(config.items(section)))
+                self._tests[name] = test
+                
         debug_pop()
             
     def run_tests(self,testlog):

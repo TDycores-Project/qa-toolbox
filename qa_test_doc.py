@@ -461,9 +461,10 @@ class QATestDocIndex(object):
         
     def write_index(self):
         file_dict = self.testlog.read_contents()
+        directory_titles = self.testlog.get_directory_titles()
         
         self.write_toctree(file_dict)
-        self.write_introfiles(file_dict)
+        self.write_introfiles(file_dict,directory_titles)
         
         f = open('{}/index.rst'.format(self._doc_dir),'w')
         
@@ -514,9 +515,14 @@ QA Test Suite Documentation
                 f.write(toctree)
                 f.close()
         
-    def write_introfiles(self, file_dict):        
+    def write_introfiles(self, file_dict,directory_titles):        
         for folder_path, test in file_dict.items():
             folder = folder_path.strip().split('/')[-1]
+
+            if folder_path in directory_titles.keys():
+                title = directory_titles[folder_path]
+            else:
+                title = folder
             filename = '{}/intro_{}.rst'.format(self._doc_dir,folder)
             intro = """
 .. {}-qa-tests:
@@ -524,7 +530,7 @@ QA Test Suite Documentation
 {} QA Tests
 {}
 
-            """.format(folder,folder,'='*(len(folder)+9))
+            """.format(folder,title,'='*(len(title)+9))
             
             intro_links = [None]*len(test)
             if len(test) == 1:

@@ -116,7 +116,7 @@ def main(options):
         print(config_file)
         
         test_manager = QATestManager(simulators_dict)
-        test_manager.process_config_file(root_dir,config_file)
+        test_manager.process_config_file(root_dir,config_file,testlog)
         test_manager.run_tests(testlog)
 
 

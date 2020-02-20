@@ -1,5 +1,6 @@
 import sys
 import os
+from qa_common import *
 from pathlib import Path
 
 class QATestLog(object):
@@ -11,6 +12,7 @@ class QATestLog(object):
         self.unrun_tests = root_dir+'/unrun_tests.log'
  
         self.past_tests = None
+        self.directory_dict = {}
         # initialize each file
         if incremental_testing:
 
@@ -32,7 +34,13 @@ class QATestLog(object):
     def log_unrun(self,path,test):
         with open(unrun_tests,"a+") as f:
             f.write('{}/{} \n'.format(path,test))
-                
+    
+    def log_directory_names(self,directory_title,path):
+        self.directory_dict[path] = directory_title
+        
+    def get_directory_titles(self):
+        return self.directory_dict
+            
     def _copy_contents_to_file(self,file_to_read,file_to_write):
         with open(file_to_read, "r") as f1:
             with open(file_to_write, "a+") as f2:
@@ -61,6 +69,6 @@ class QATestLog(object):
                     log_dict[folder_path].append(tests[-1])
                 else:
                     log_dict[folder_path] = [tests[-1]]
-                                
+                               
         return log_dict
             
