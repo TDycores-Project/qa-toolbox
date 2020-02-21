@@ -1,5 +1,6 @@
 import sys
 import os
+from qa_common import *
 from pathlib import Path
 
 class QATestLog(object):
@@ -12,13 +13,18 @@ class QATestLog(object):
         self.unrun_tests = root_dir+'/unrun_tests.log'
  
         self.past_tests = None
+        self.past_regression_tests = None
+        self.directory_dict = {}
         # initialize each file
         if incremental_testing:
 
             with open(self.successful_tests,'r') as f:
                 self.past_tests = set(f)
+            with open(self.successful_regression_tests,'r') as f:
+                self.past_regression_tests = set(f)
                        
         open(self.successful_tests,'w').close()
+        open(self.successful_regression_tests,'w').close()
         open(self.failed_tests,'w').close()
         open(self.unrun_tests,'w').close()
         
@@ -37,7 +43,13 @@ class QATestLog(object):
     def log_unrun(self,path,test):
         with open(unrun_tests,"a+") as f:
             f.write('{}/{} \n'.format(path,test))
-                
+    
+    def log_directory_names(self,directory_title,path):
+        self.directory_dict[path] = directory_title
+        
+    def get_directory_titles(self):
+        return self.directory_dict
+            
     def _copy_contents_to_file(self,file_to_read,file_to_write):
         with open(file_to_read, "r") as f1:
             with open(file_to_write, "a+") as f2:
@@ -47,12 +59,14 @@ class QATestLog(object):
     def read_contents(self,regression=False):
         if regression:
             tests = self.successful_regression_tests
+            past_tests = self.past_regression_tests
         else:
             tests = self.successful_tests
+            past_tests = self.past_tests
         log_dict = {}
         
-        if self.past_tests:
-            for val in self.past_tests:
+        if past_tests:
+            for val in past_tests:
                 match = False
                 with open(tests,'r+') as f:
                     for line in f:
@@ -70,6 +84,6 @@ class QATestLog(object):
                     log_dict[folder_path].append(tests[-1])
                 else:
                     log_dict[folder_path] = [tests[-1]]
-                                
+                               
         return log_dict
             

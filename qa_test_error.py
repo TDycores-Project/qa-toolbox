@@ -504,7 +504,7 @@ class QATestError(object):
         
         X,Y = np.meshgrid(x,y)
 
-        fig, ax = plt.subplots(2,1,figsize=(9,8))
+        fig, ax = plt.subplots(2,1,figsize=(8,13))
         plt.subplots_adjust(hspace=0.5)
 
         c1 = ax[0].contourf(X,Y,absolute_error)

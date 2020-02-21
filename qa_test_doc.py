@@ -461,9 +461,8 @@ class QATestDocIndex(object):
         
     def write_index(self):
         file_dict = self.testlog.read_contents()
-        
-        self.write_toctree(file_dict)
-        self.write_introfiles(file_dict)
+        regression_dict = self.testlog.read_contents(regression=True)
+        directory_titles = self.testlog.get_directory_titles()
         
         f = open('{}/index.rst'.format(self._doc_dir),'w')
         
@@ -483,9 +482,21 @@ QA Test Suite Documentation
             f.write("""
    intro_{}.rst
             """.format(folder))
+#####must add toctree label back in or else will not work
+        f.write("""
+----  
 
-            
-            
+.. toctree::
+   :maxdepth: 2              
+        """)
+        for folder_path in regression_dict.keys():
+            folder = folder_path.strip().split('/')[-1]
+            f.write("""
+   intro_{}.rst                
+            """.format(folder))
+           
+        file_dict.update(regression_dict)   
+        
         toctree_intro = """
 .. toctree::
    :hidden:
@@ -499,6 +510,9 @@ QA Test Suite Documentation
    include_toctree_{}_{}.rst""".format(folder,test)
                 f.write(toctree)                
         f.close()
+        
+        self.write_toctree(file_dict)
+        self.write_introfiles(file_dict,directory_titles)
         
     def write_toctree(self,file_dict):
         
@@ -514,17 +528,22 @@ QA Test Suite Documentation
                 f.write(toctree)
                 f.close()
         
-    def write_introfiles(self, file_dict):        
+    def write_introfiles(self, file_dict,directory_titles):        
         for folder_path, test in file_dict.items():
             folder = folder_path.strip().split('/')[-1]
+
+            if folder_path in directory_titles.keys():
+                title = directory_titles[folder_path]
+            else:
+                title = folder
             filename = '{}/intro_{}.rst'.format(self._doc_dir,folder)
             intro = """
 .. {}-qa-tests:
 
-{} QA Tests
+{}
 {}
 
-            """.format(folder,folder,'='*(len(folder)+9))
+            """.format(folder,title,'='*(len(title)+9))
             
             intro_links = [None]*len(test)
             if len(test) == 1:
