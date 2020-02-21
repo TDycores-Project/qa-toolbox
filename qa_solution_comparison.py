@@ -149,7 +149,7 @@ class QASolutionComparison(object):
                     if self.plot_dimension == '1D':
 
                         if isimulator == 0:
-                            plt.figure(figsize=(12,8))
+                            plt.figure(figsize=(11,9))
 
                         x_axis = find_axis_1D(x,y,z)                       
 
@@ -169,7 +169,7 @@ class QASolutionComparison(object):
                         y_min = min(y_min,math.floor(np.amin(y_axis)))
                         y_max = max(y_max,math.ceil(np.amax(y_axis)))
                         if isimulator == 0:
-                            plt.figure(figsize=(11,10))
+                            plt.figure(figsize=(8,6))
                             levels = np.linspace(s_min,s_max,11)
                             X,Y = np.meshgrid(x_axis,y_axis)
                             surface = plt.contourf(Y,X,solution[:,:],
@@ -191,12 +191,14 @@ class QASolutionComparison(object):
                                 cbar.set_label('{}'.format(variable),rotation=90,fontsize=16)
                             else:
                                 cbar.set_label('{} [{}]'.format(variable,self.variable_units),rotation=90,fontsize=16)
+                            fill_legend = '{} (fill)'.format(simulator)
                         else:
                             check_coordinates_2D(x_axis,x_axis_old,y_axis,y_axis_old)
                             surface = plt.contour(Y,X,solution[:,:],levels,
                                                 colors='black',
                                                 linewidth=0.5)
                             plt.clabel(surface,inline=True,fontsize=10)
+                            contour_legend = '{} (contour)'.format(simulator)
 
                         solution_handles.append(surface)
                                                     
@@ -256,8 +258,16 @@ class QASolutionComparison(object):
                 if not time < 0.:
                     plot_converted_time = format_floating_number(converted_time)
                     temp_title += ' @ {} {}'.format(plot_converted_time,plot_time_units)
-
-                plt.annotate(temp_title, 
+                if self.plot_dimension == '2D':
+                    plt.annotate('{} \n'                                 
+                                 '{}, {} \n'.format(temp_title,fill_legend,contour_legend),                                
+                                 xy=(.03, .990),
+                                 xycoords='figure fraction',
+                                 horizontalalignment='left',
+                                 verticalalignment='top',fontsize=16)
+                    
+                else:
+                    plt.annotate(temp_title, 
                                  xy=(.03, .990),
                                  xycoords='figure fraction',
                                  horizontalalignment='left',
@@ -269,7 +279,7 @@ class QASolutionComparison(object):
                 filename = '{}_{}_{}_run{}.png'.format(prefix,variable_string,
                                self.template,self.run_number) 
                 doc_var.add_solution_png(filename)
-                plt.title(variable,fontsize=18)
+
                 plt.savefig(filename)
                 if self.plot_to_screen==True:
                     plt.show()
