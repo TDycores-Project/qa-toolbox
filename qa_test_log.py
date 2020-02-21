@@ -7,6 +7,7 @@ class QATestLog(object):
     def __init__(self,root_dir,incremental_testing):
 
         self.successful_tests = root_dir+'/successful_tests.log'
+        self.successful_regression_tests = root_dir+'/successful_regression_tests.log'
         self.failed_tests = root_dir+'/failed_tests.log'
         self.unrun_tests = root_dir+'/unrun_tests.log'
  
@@ -24,6 +25,10 @@ class QATestLog(object):
     def log_success(self,path,test):
         with open(self.successful_tests,"a+") as f:
             f.write('{}/{} \n'.format(path,test))
+            
+    def log_regression(self,path,test):
+        with open(self.successful_regression_tests,"a+") as f:
+            f.write('{}/{} \n'.format(path,test))
 
     def log_failure(self,path,test):
         with open(self.fauled_tests,"a+") as f:
@@ -39,20 +44,24 @@ class QATestLog(object):
                 for line in f1:
                     f2.write(line)
                     
-    def read_contents(self):
+    def read_contents(self,regression=False):
+        if regression:
+            tests = self.successful_regression_tests
+        else:
+            tests = self.successful_tests
         log_dict = {}
         
         if self.past_tests:
             for val in self.past_tests:
                 match = False
-                with open(self.successful_tests,'r+') as f:
+                with open(tests,'r+') as f:
                     for line in f:
                         if line.strip() == val.strip():
                             match = True
                     if not match:
                         f.write('{} \n'.format(val.strip()))
                         
-        with open(self.successful_tests,'r') as f:
+        with open(tests,'r') as f:
             for line in f:
                 tests = line.strip().split('/')
                 s = '/'
