@@ -57,6 +57,10 @@ class QATestManager(object):
         for section in sections:
             name = section
 
+            section_dict = list_to_dict(config.items(section))
+            self.regression=qa_lookup(section_dict,'regression_test',False)
+            
+
             if name == 'info':
                info_dict = list_to_dict(config.items(section))
                directory_title = info_dict['title']
@@ -76,7 +80,10 @@ class QATestManager(object):
         for key, test_case in self._tests.items():
             list_of_swap_dict = test_case.initialize_run(self.available_simulators)
             test_case.run(list_of_swap_dict)
-            testlog.log_success(self._path,test_case.title)
+            if self.regression:
+                testlog.log_regression(self._path,test_case.title)
+            else:
+                testlog.log_success(self._path,test_case.title)
         debug_pop()
         
     def check_for_solution_convergence(self,name):

@@ -34,6 +34,7 @@ clean_tests :
 	-find . -type f -name 'include_*.rst' -print0 | xargs -0 -r rm
 	-find . -type f -name 'intro_*.rst' -print0 | xargs -0 -r rm
 	-find . -type f -name 'successful_tests.log' -print0 | xargs -0 -r rm
+	-find . -type f -name 'successful_regression_tests.log' -print0 | xargs -0 -r rm
 
 run_tests :
 	$(PYTHON) $(QA_TEST_SUITE) --doc_dir $(DOC_DIR)
