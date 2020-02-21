@@ -56,6 +56,7 @@ class QATestManager(object):
         for section in sections:
             name = section
 
+            self.section_dict = list_to_dict(config.items(section))
             if self.check_for_solution_convergence(name):
                 test = QATestConvergence(name,root_dir,list_to_dict(config.items(section)))
             else:
