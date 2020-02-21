@@ -231,6 +231,118 @@ Results Summary
 """.format(self._filename_root))
                     
         for run in self._runs:
+            if len(run._time_slices)==1 and run._time_slices[0]._time=='steady state':
+                        
+                f.write('\n')
+                scenario_string = 'Scenario {} - Time Slice'.format(run._run_number)
+                f.write("{}\n".format(scenario_string))
+                f.write("{}\n".format('-'*len(scenario_string)))
+                                
+                variable_num = 0
+                if run._maximum_absolute_error_index:
+                    for variable in run._time_slices[0]._variables:
+                        variable_string = variable._name 
+                        f.write("\n")
+                        f.write("Variable: {}".format(variable_string))
+                    
+                        f.write("""
+                        
+.. list-table::
+   :widths: 50 40 40
+   :header-rows: 1
+   
+   * - 
+     - Value
+     - Location
+   * - :ref:`Maximum Absolute Error <{}_{}_{}_figure{}>`
+     - {}
+     - {}
+   * - :ref:`Maximum Relative Error <{}_{}_{}_figure{}>`
+     - {}
+     - {}
+   * - :ref:`Maximum Average Absolute Error <{}_{}_{}_figure{}>`
+     - {}
+     - 
+   * - :ref:`Maximum Average Relative Error <{}_{}_{}_figure{}>`
+     - {}
+     -
+     
+     
+         """.format(self._filename_root,run._run_number,variable_string,
+                    run._maximum_absolute_error_index[variable_string],
+                    run._maximum_absolute_errors[variable_string],
+                    run._maximum_absolute_error_locations[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_relative_error_index[variable_string],
+                    run._maximum_relative_errors[variable_string],
+                    run._maximum_relative_error_locations[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_average_absolute_error_index[variable_string],
+                    run._maximum_average_absolute_errors[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_average_relative_error_index[variable_string],
+                    run._maximum_average_relative_errors[variable_string]))
+                            
+                            
+                if run._maximum_absolute_error_index_observation:
+                    scenario_string = 'Scenario {} - Observation Point'.format(run._run_number)
+                    f.write("""
+{}\n""".format(scenario_string))
+                    f.write("{}\n".format('-'*len(scenario_string)))
+                    for variable in run._observations[0]._variables:       
+                        variable_string = variable._name 
+                        f.write("\n")
+                        f.write("Variable: {}".format(variable_string))
+
+                        f.write("""
+                        
+.. list-table::
+   :widths: 40 25 25 25
+   :header-rows: 1
+   
+   * - 
+     - Value
+     - Time
+     - Location
+   * - :ref:`Maximum Absolute Error <{}_{}_{}_observation_figure{}>`
+     - {}
+     - {}
+     - {}
+   * - :ref:`Maximum Relative Error <{}_{}_{}_observation_figure{}>`
+     - {}
+     - {}
+     - {}
+   * - :ref:`Maximum Average Absolute Error <{}_{}_{}_observation_figure{}>`
+     - {}
+     - 
+     - {}
+   * - :ref:`Maximum Average Relative Error <{}_{}_{}_observation_figure{}>`
+     - {}
+     - 
+     - {}
+     
+     
+         """.format(self._filename_root,run._run_number,variable_string,
+                    run._maximum_absolute_error_index_observation[variable_string],
+                    run._maximum_absolute_errors_observation[variable_string],
+                    run._maximum_absolute_error_times_observation[variable_string],
+                    run._maximum_absolute_error_locations_observation[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_relative_error_index_observation[variable_string],
+                    run._maximum_relative_errors_observation[variable_string],
+                    run._maximum_relative_error_times_observation[variable_string],
+                    run._maximum_relative_error_locations_observation[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_average_absolute_error_index_observation[variable_string],
+                    run._maximum_average_absolute_errors_observation[variable_string],
+                    run._maximum_average_absolute_error_location_observation[variable_string],
+                    self._filename_root,run._run_number,variable_string,
+                    run._maximum_average_relative_error_index_observation[variable_string],
+                    run._maximum_average_relative_errors_observation[variable_string],
+                    run._maximum_average_relative_error_location_observation[variable_string]))
+                            
+            else:
+
                 f.write('\n')
                 scenario_string = 'Scenario {} - Time Slice'.format(run._run_number)
                 f.write("{}\n".format(scenario_string))
