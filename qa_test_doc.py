@@ -459,7 +459,7 @@ Results Summary
                     run._maximum_average_relative_errors_observation[variable_string],
                     run._maximum_average_relative_error_location_observation[variable_string]))
                         
-        description_file = '{}/description_{}.txt'.format(self._doc_dir,self._template) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
+        description_file = '{}/{}.description'.format(self._doc_dir,self._template) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
 
         try:
             with open(description_file,'r') as file:
@@ -674,6 +674,21 @@ QA Test Suite Documentation
             f.write(intro)
             for i in range(len(test)):
                 f.write(intro_links[i])
+ 
+            description_file = "{}/{}.description".format(folder_path,folder)
+
+            try:
+                with open(description_file,'r') as file:
+                    description_text = file.read()
+            except:
+                description_text = " "
+    
+            f.write("""
+
+{}
+                    
+            """.format(description_text))
+                
             f.close()
         
       
