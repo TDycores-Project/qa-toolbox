@@ -82,8 +82,6 @@ def scanfolder(parent_dir,extension):
 def main(options):
     txtwrap = textwrap.TextWrapper(width=78, subsequent_indent=4*" ")
     
-    root_dir = os.getcwd()
-       
     check_options(options)
     print(options)
     
@@ -93,11 +91,15 @@ def main(options):
     config_filename = options.config_file
     if not os.path.exists(config_filename):
         config_filename = 'default_config_files.txt'
-    config_root_dir = os.path.dirname(config_filename)
+    root_dir = os.path.dirname(config_filename)
+    if root_dir == '':
+        root_dir = os.getcwd()
     
     # regression tests must come first in list of config files
     config_files = []
-    config_files.append('{}/regression_tests/test.cfg'.format(root_dir)) 
+    path = os.path.dirname(os.path.realpath(__file__))
+    config_files.append('{}/regression_tests/test.cfg'.format(path))
+    print(config_files)
     for line in open(config_filename,'r'):
         line=line.strip()
           # rstrip to remove EOL. otherwise, errors when opening file
@@ -105,7 +107,7 @@ def main(options):
             if line.startswith('/'):
                 full_path = line.rstrip()
             else:
-                full_path = config_root_dir+'/'+line.rstrip()
+                full_path = root_dir+'/'+line.rstrip()
             config_files.append(full_path) 
 
     simulators_dict = locate_simulators(options.simulators_file) 
@@ -117,12 +119,11 @@ def main(options):
     start = time.time()
     report = {}
     for config_file in config_files:
-        if not config_root_dir == '':
-            os.chdir(config_root_dir)
+        os.chdir(root_dir)
         print(config_file)
         
         test_manager = QATestManager(simulators_dict)
-        test_manager.process_config_file(config_root_dir,config_file,testlog)
+        test_manager.process_config_file(root_dir,config_file,testlog)
         test_manager.run_tests(testlog)
 
 
