@@ -117,7 +117,8 @@ def main(options):
     start = time.time()
     report = {}
     for config_file in config_files:
-        os.chdir(config_root_dir)
+        if not config_root_dir == '':
+            os.chdir(config_root_dir)
         print(config_file)
         
         test_manager = QATestManager(simulators_dict)
