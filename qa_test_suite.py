@@ -85,7 +85,6 @@ def main(options):
     check_options(options)
     print(options)
     
-
     print("Running QA tests :") 
     
     config_filename = options.config_file
@@ -99,7 +98,6 @@ def main(options):
     config_files = []
     path = os.path.dirname(os.path.realpath(__file__))
     config_files.append('{}/regression_tests/test.cfg'.format(path))
-    print(config_files)
     for line in open(config_filename,'r'):
         line=line.strip()
           # rstrip to remove EOL. otherwise, errors when opening file
@@ -120,13 +118,10 @@ def main(options):
     report = {}
     for config_file in config_files:
         os.chdir(root_dir)
-        print(config_file)
         
         test_manager = QATestManager(simulators_dict)
         test_manager.process_config_file(root_dir,config_file,testlog)
         test_manager.run_tests(testlog)
-
-
 
     doc = QATestDocIndex(testlog,options.doc_dir)
     doc.write_index()
