@@ -13,20 +13,18 @@ from simulator_modules.tough2 import QASimulatorTOUGH2
 from simulator_modules.tough3 import QASimulatorTOUGH3
 from simulator_modules.tdycore import QASimulatorTDycore
 
-
-
-def locate_simulators():
+def locate_simulators(simulators_filename):
     debug_push('simulator_factory.locate_simulators')
-    if os.path.exists('simulators.sim'):
-      sim_file = 'simulators.sim'
-    else:
-      sim_file='default_simulators.sim'
+    sim_file = simulators_filename
+    if not os.path.exists(sim_file):
+        sim_file='default_simulators.sim'
     config = configparser.ConfigParser()
     config.read(sim_file)
     simulators = config.items('simulators')
     simulator_dict = {}
     to_be_removed = []
     for simulator, path in simulators:
+        path = os.path.expandvars(path)
         if debug_verbose():
             print('Searching for "{}" mapped to "{}".'.format(path,simulator))
         if not os.path.isfile(path):
