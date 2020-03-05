@@ -6,7 +6,8 @@ import configparser
 
 #Define directories and files
 toolbox_dir = os.getcwd()
-main_dir = sys.argv[0] #input argument for where running tests
+main_dir = sys.argv[1] #input argument for where running tests
+
 
 sim_file = 'simulators.sim'
 config_file = 'config_files.txt'
@@ -19,15 +20,15 @@ if not os.path.exists(sim_file):
 
 
 #Patterns to match
-patterns = ['.*\.stat(?!\.gold)','documentation.*\.rst','^include_.*\.rst','^intro_.*\.rst',
+patterns = ['.*\.stat(?!\.gold)','.*_doc\.rst','^include_.*\.rst','^intro_.*\.rst',
                  'successful_tests.log','successful_regression_tests.log',
                  '.*\.tec','.*\.stdout','.*\.out','.*\_run\d.*\.png','.*\.in']
-python_patterns = ['.*_run\d*\.py','.*_python_run\d*\.h5']
-pflotran_patterns = ['.*_pflotran_run\d*\.h5']
+python_patterns = ['.*_run\d*\.py','.*_run\d*_python\.h5']
+pflotran_patterns = ['.*_run\d*_pflotran\.h5','.*_run\d*_pft\.h5']
 tough_patterns = ['FOFT*','OUTPUT*','GENER','SAVE','TABLE','MESHA',
-                  'MESHB','MESHB','INCON','.*_tough3_run\d*\.h5']
-tdycore_patterns = ['.*_tdycore_run\d*\.h5']
-crunch_patterns = ['.*_crunchflow_run\d*\.h5']
+                  'MESHB','MESHB','INCON','.*_run\d*_tough3\.h5']
+tdycore_patterns = ['.*_run\d*_tdycore\.h5']
+crunch_patterns = ['.*_run\d*_crunchflow\.h5']
 
 
 

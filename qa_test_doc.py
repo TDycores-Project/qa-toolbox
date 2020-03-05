@@ -208,7 +208,7 @@ class QATestDoc(object):
 
     def write(self):   
 
-        f = open(self._filename_root+'.rst','w')
+        f = open(self._filename_root+'_doc.rst','w')
         f.write("""
 .. _{0}:
     
