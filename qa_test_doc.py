@@ -90,7 +90,7 @@ class QATestDocRun():
 
     def set_input_filename(self,simulator,filename):
         self._filenames[simulator] = filename
-
+        
     def add_time_slice(self,doc_time_slice):
         self._time_slices.append(doc_time_slice)
     
@@ -220,6 +220,8 @@ class QATestDoc(object):
 :ref:`{2}-description`
 
 :ref:`{2}-detailed results`
+
+:ref:`{2}-input files`
 """.format(self._title,'*'*len(self._title),self._filename_root))
      
         f.write("""
@@ -459,7 +461,7 @@ Results Summary
                     run._maximum_average_relative_errors_observation[variable_string],
                     run._maximum_average_relative_error_location_observation[variable_string]))
                         
-        description_file = '{}/description_{}.txt'.format(self._doc_dir,self._template) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
+        description_file = '{}/{}.description'.format(self._doc_dir,self._template) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
 
         try:
             with open(description_file,'r') as file:
@@ -556,6 +558,27 @@ Detailed Results
                                  self._doc_dir,
                                  variable._error_png[0],width_percent))
                 k += 1
+                
+        f.write("""
+.. _{}-input files:
+    
+Input Files
+===========                
+        """.format(self._filename_root))  
+            
+        for run in self._runs:
+            scenario_string = 'Scenario {}'.format(run._run_number)
+            f.write("""
+{}
+{}                        
+
+                        """.format(scenario_string,'-'*len(scenario_string)))
+            for simulator in self._simulators:
+                f.write("""                        
+The {} input file can be downloaded
+:download:`here </{}/{}>`                       
+
+                        """.format(simulator,self._doc_dir,run._filenames[simulator]))
 
         f.close()
 
@@ -674,6 +697,21 @@ QA Test Suite Documentation
             f.write(intro)
             for i in range(len(test)):
                 f.write(intro_links[i])
+ 
+            description_file = "{}/{}.description".format(folder_path,folder)
+
+            try:
+                with open(description_file,'r') as file:
+                    description_text = file.read()
+            except:
+                description_text = " "
+    
+            f.write("""
+
+{}
+                    
+            """.format(description_text))
+                
             f.close()
         
       
