@@ -43,18 +43,27 @@ def list_to_string(list_):
     
 def time_strings_to_float_list(strings):
     list_of_times = []
+
+    try:
+        w = strings[-1].split()
+        if len(w) > 1:
+            units = w[1]
+        else:
+            print_err_msg('must specify units on last time or all times')
+    except:
+        print_err_msg('error converting float in list_to_floats')
+        
     for string in strings:
         
-        try:
-            w = string.split()
-            
-            # time in seconds
-            time = float(w[0])
-            if len(w) > 1:
-                time *= unit_conversion(w[1])
-        except:
-            print('error converting float in list_to_floats')
-            raise
+        w = string.split()
+        
+        # time in seconds
+        time = float(w[0])
+        if len(w) > 1:
+            time *= unit_conversion(w[1])
+        else:
+            time *= unit_conversion(units)
+
         list_of_times.append(time)
     return list_of_times
 
