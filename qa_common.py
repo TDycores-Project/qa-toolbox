@@ -49,7 +49,7 @@ def time_strings_to_float_list(strings):
         if len(w) > 1:
             units = w[1]
         else:
-            print_err_msg('must specify units on last time or all times')
+            print_err_msg('Must specify units on last time or all times in options file')
     except:
         print_err_msg('error converting float in list_to_floats')
         
