@@ -3,11 +3,19 @@ import re
 import os
 
 import configparser
+from simulator_modules.simulator_factory import locate_simulators
+
+from simulator_modules.crunchflow import QASimulatorCrunchFlow
+from simulator_modules.pflotran import QASimulatorPFLOTRAN
+from simulator_modules.python import QASimulatorPython
+from simulator_modules.tough2 import QASimulatorTOUGH2
+from simulator_modules.tough3 import QASimulatorTOUGH3
+from simulator_modules.tdycore import QASimulatorTDycore
 
 #Define directories and files
 toolbox_dir = os.getcwd()
 main_dir = sys.argv[1] #input argument for where running tests
-
+config_dir = sys.argv[2]
 
 sim_file = 'simulators.sim'
 config_file = 'config_files.txt'
@@ -23,35 +31,15 @@ if not os.path.exists(sim_file):
 patterns = ['.*\.stat(?!\.gold)','.*_doc\.rst','^include_.*\.rst','^intro_.*\.rst',
                  'successful_tests.log','successful_regression_tests.log',
                  '.*\.tec','.*\.stdout','.*\.out','.*\_run\d.*\.png','.*\.in']
-python_patterns = ['.*_run\d*\.py','.*_run\d*_python\.h5']
-pflotran_patterns = ['.*_run\d*_pflotran\.h5','.*_run\d*_pft\.h5']
-tough_patterns = ['FOFT*','OUTPUT*','GENER','SAVE','TABLE','MESHA',
-                  'MESHB','MESHB','INCON','.*_run\d*_tough3\.h5']
-tdycore_patterns = ['.*_run\d*_tdycore\.h5']
-crunch_patterns = ['.*_run\d*_crunchflow\.h5']
-
 
 
 #######################
 #process simulators.sim
 #######################
 
-config = configparser.ConfigParser()
-config.read(sim_file)
-simulators = config.items('simulators')
-for simulator, path in simulators:
-    if simulator == 'pflotran':
-        patterns = patterns + pflotran_patterns
-    if simulator == 'python':
-        patterns = patterns + python_patterns
-    if simulator == 'tough3':
-        patterns = patterns + tough_patterns
-    if simulator == 'crunchflow':
-        patterns = patterns + crunch_patterns
-    if simulator == 'tdycore':
-        patterns = patterns + tdycore_patterns
-
-
+sim_dict = locate_simulators()
+for simulator in sim_dict.values():
+    patterns = patterns + simulator.output_file_patterns()
 
 #########################
 #process config_files.txt
@@ -69,39 +57,39 @@ for line in open(config_file):
             full_path = toolbox_dir+'/'+line.rstrip()
         test_paths.append(full_path) 
 
-dir_expression = '^'+ toolbox_dir + '(?!/\.\.).'            
+toolbox_expression = '^'+ toolbox_dir + '(?!/\.\.).'   
+main_expression = '^'+ main_dir + '(?!/\.\.).'
+config_expression = '^'+ config_dir + '(?!/\.\.).'         
 for test in test_paths:   
-    if not re.match(dir_expression,test):
+    if not (re.match(toolbox_expression,test) or not re.match(main_expression,test) or not re.match(config_expression,test)):
         path, filename = os.path.split(test)
-        for root, dirs, files in os.walk(path):
-            for pattern in patterns:
-                for filename in filter(lambda x: re.match(pattern,x),files):
-                    try:
-                        os.remove(os.path.join(root,filename))
-                    except:
-                        print('{}/{} not found'.format(root,filename))
+        for pattern in patterns:
+            for file in filter(lambda x: re.match(pattern,x),os.listdir(path)):
+                try:
+                    os.remove(os.path.join(path,file))
+                except:
+                    print('{}/{} not found'.format(path,file))
+        
 
 
 #############################################
 #delete files in qatoolbox and main directory
 #############################################
-                    
-                    
-for root, dirs, files in os.walk(toolbox_dir):
-    for pattern in patterns:
-        for filename in filter(lambda x: re.match(pattern,x),files):
-            try:
-                os.remove(os.path.join(root,filename))
-            except:
-                print('{}/{} not found'.format(root,filename))
-            
-            
-            
+directories = [toolbox_dir]
 if main_dir != toolbox_dir:
-    for root, dirs, files in os.walk(main_dir):
+    directories.append(main_dir)
+
+if config_dir != main_dir or config_dir != toolbox_dir:
+    directories.append(main_dir)
+    
+                
+for i in range(len(directories)):   
+    for root, dirs, files in os.walk(directories[i]):
         for pattern in patterns:
             for filename in filter(lambda x: re.match(pattern,x),files):
                 try:
                     os.remove(os.path.join(root,filename))
                 except:
                     print('{}/{} not found'.format(root,filename))
+
+                 

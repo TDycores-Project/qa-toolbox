@@ -35,6 +35,10 @@ class QASimulatorPFLOTRAN(QASimulator):
         self._name = 'pflotran'
         self._suffix = '.in'
         debug_pop()
+        
+    def output_file_patterns(self):
+        patterns = ['.*_run\d*_pflotran\.h5','.*_run\d*_pft\.h5']
+        return patterns     
 
     def run(self,filename,annotation):
         debug_push('QASimulatorPFLOTRAN _run')

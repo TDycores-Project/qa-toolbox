@@ -31,6 +31,11 @@ class QASimulatorTOUGH3(QASimulator):
         self._elements = None
         self.locations = None
         debug_pop()
+        
+    def output_file_patterns(self):
+        patterns = ['FOFT*','OUTPUT*','GENER','SAVE','TABLE','MESHA',
+                  'MESHB','MESHB','INCON','.*_run\d*_tough3\.h5']
+        return patterns 
 
     def run(self,filename,annotation):
         debug_push('QASimulatorTOUGH3 _run')

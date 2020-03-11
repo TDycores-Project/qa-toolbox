@@ -29,6 +29,12 @@ class QASimulatorPython(QASimulator):
         solution_filename = get_h5_output_filename(filename,self._name)
         debug_pop()
         return solution_filename
+    
+    def output_file_patterns(self):
+        patterns = ['.*_run\d*\.py','.*_run\d*_python\.h5']
+        return patterns
 
 def get_python_solution_filename(script_name):
     return '{}_python.h5'.format(script_name.rstrip('.py'))
+
+
