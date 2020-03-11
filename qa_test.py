@@ -201,11 +201,10 @@ class QATest(object):
         list_of_swap_dict=self._process_swap_options()
         self._check_simulators(available_simulators)
 
-
         cwd = os.getcwd()
-        print(cwd)
-        print(self.root_dir)
-        print(cwd.replace(self.root_dir,''))
+#        print(cwd)
+#        print(self.root_dir)
+#        print(cwd.replace(self.root_dir,''))
 
         self.doc = QATestDoc(cwd,cwd.replace(self.root_dir,''))
         self.doc.set_title(self.title)
