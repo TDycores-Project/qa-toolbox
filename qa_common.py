@@ -46,8 +46,11 @@ def time_strings_to_float_list(strings):
 
     try:
         w = strings[-1].split()
+
         if len(w) > 1:
             units = w[1]
+        elif float(w[0]) == -999.:
+            units = 's'
         else:
             print_err_msg('Must specify units on last time or all times in options file')
     except:
