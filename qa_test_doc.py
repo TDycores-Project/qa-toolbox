@@ -465,9 +465,9 @@ Results Summary
 
         try:
             with open(description_file,'r') as file:
-                description_text = file.read()
+                description_text = file.readlines()
         except:
-            description_text = "TO BE ADDED LATER"
+            description_text = ["TO BE ADDED LATER"]
 
         f.write("""
 .. _{}-description:
@@ -475,10 +475,18 @@ Results Summary
 The Problem Description
 =======================
 
-{}
+""".format(self._filename_root))
 
 
-""".format(self._filename_root,description_text))
+        for i in range(len(description_text)):
+            if re.match('.*\.\. figure:: (?!/).*',description_text[i]): #does not start with /
+                split_text = description_text[i].split()
+                relative_path = split_text[-1]
+
+                path = '/'+self._doc_dir+'/'+relative_path
+                split_text[-1] = path
+                description_text[i] = " ".join(split_text) +'\n'
+            f.write('{}'.format(description_text[i]))
 
         f.write("""
 
@@ -702,15 +710,29 @@ QA Test Suite Documentation
 
             try:
                 with open(description_file,'r') as file:
-                    description_text = file.read()
+                    description_text = file.readlines()
             except:
-                description_text = " "
+                description_text = [" "]
     
-            f.write("""
-
-{}
-                    
-            """.format(description_text))
+            f.write("\n")
+            
+            for i in range(len(description_text)):
+                if re.match('.*\.\. figure:: (?!/).*',description_text[i]): #does not start with /
+                    split_text = description_text[i].split()
+                    relative_path = split_text[-1]
+    
+                    path = '/'+folder_path+'/'+relative_path
+                    split_text[-1] = path
+                    description_text[i] = " ".join(split_text) +'\n'
+                f.write('{}'.format(description_text[i]))
+                
+            f.write("\n")
+            
+#            f.write("""
+#
+#{}
+#                    
+#            """.format(description_text))
                 
             f.close()
         
