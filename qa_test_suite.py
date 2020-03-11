@@ -38,9 +38,15 @@ def commandline_options():
 
     parser.add_argument('--doc_dir', action='store',
                         help='directory for documenting test results')
-    
+
     parser.add_argument('--incremental_testing', action='store_true',
                          help='allows for incremental testing with qa tests')
+
+    parser.add_argument('--config_file', action='store',
+                        help='user defined config file')
+
+    parser.add_argument('--simulators_file', action='store',
+                        help='user defined simulators file')
 
 #    parser.add_argument('-m', '--mpiexec', nargs=1, default=None,
 #                        help="path to the executable for mpiexec (mpirun, etc)"
@@ -76,36 +82,35 @@ def scanfolder(parent_dir,extension):
 def main(options):
     txtwrap = textwrap.TextWrapper(width=78, subsequent_indent=4*" ")
     
-    root_dir = os.getcwd()
-       
     check_options(options)
     print(options)
     
-
     print("Running QA tests :") 
     
-    
-    if os.path.exists('config_files.txt'):
-      filename = 'config_files.txt'
-    else:
-      filename='default_config_files.txt'
+    config_filename = options.config_file
+    if not os.path.exists(config_filename):
+        config_filename = 'default_config_files.txt'
+    root_dir = os.path.dirname(config_filename)
+    if root_dir == '':
+        root_dir = os.getcwd()
     
     # regression tests must come first in list of config files
     config_files = []
-    config_files.append('{}/regression_tests/test.cfg'.format(root_dir)) 
-    for line in open(filename,'r'):
-      line=line.strip()
-        # rstrip to remove EOL. otherwise, errors when opening file
-      if len(line) > 0 and not line.startswith('#'):
-        full_path = root_dir+'/'+line.rstrip()
-        config_files.append(full_path) 
+    path = os.path.dirname(os.path.realpath(__file__))
+    config_files.append('{}/regression_tests/test.cfg'.format(path))
+    for line in open(config_filename,'r'):
+        line=line.strip()
+          # rstrip to remove EOL. otherwise, errors when opening file
+        if len(line) > 0 and not line.startswith('#'):
+            if line.startswith('/'):
+                full_path = line.rstrip()
+            else:
+                full_path = root_dir+'/'+line.rstrip()
+            config_files.append(full_path) 
 
-    simulators_dict = locate_simulators() 
-
+    simulators_dict = locate_simulators(options.simulators_file) 
 
     testlog = QATestLog(root_dir,options.incremental_testing)
-    
-    
 
     # loop through config files, cd into the appropriate directory,
     # read the appropriate config file and run the various tests.
@@ -113,13 +118,10 @@ def main(options):
     report = {}
     for config_file in config_files:
         os.chdir(root_dir)
-        print(config_file)
         
         test_manager = QATestManager(simulators_dict)
         test_manager.process_config_file(root_dir,config_file,testlog)
         test_manager.run_tests(testlog)
-
-
 
     doc = QATestDocIndex(testlog,options.doc_dir)
     doc.write_index()

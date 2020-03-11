@@ -3,6 +3,8 @@
 PYTHON = python3
 QA_TEST_SUITE = qa_test_suite.py
 DOC_DIR = ${PWD}/docs
+CONFIG_FILE = config_files.txt
+SIMULATORS_FILE = simulators.sim
 
 all : clean_tests run_tests
 
@@ -37,7 +39,7 @@ clean_tests :
 	-find . -type f -name 'successful_regression_tests.log' -print0 | xargs -0 -r rm
 
 run_tests :
-	$(PYTHON) $(QA_TEST_SUITE) --doc_dir $(DOC_DIR)
+	$(PYTHON) $(QA_TEST_SUITE) --doc_dir $(DOC_DIR) --config_file $(CONFIG_FILE) --simulators_file $(SIMULATORS_FILE)
 
 run_incremental_tests :
-	$(PYTHON) $(QA_TEST_SUITE) --doc_dir $(DOC_DIR) --incremental_testing
+	$(PYTHON) $(QA_TEST_SUITE) --doc_dir $(DOC_DIR) --config_file $(CONFIG_FILE) --simulators_file $(SIMULATORS_FILE) --incremental_testing
