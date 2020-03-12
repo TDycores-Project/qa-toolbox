@@ -18,10 +18,9 @@ main_dir = sys.argv[1] #input argument for where running tests
 config_dir = sys.argv[2]
 
 sim_file = 'simulators.sim'
-config_file = 'config_files.txt'
 
-if not os.path.exists(config_file):
-    config_file = 'default_config_files.txt'
+if not os.path.exists(config_dir):
+    config_dir = 'default_config_files.txt'
     
 if not os.path.exists(sim_file):
     sim_file = 'default_simulators.sim'
@@ -37,7 +36,7 @@ patterns = ['.*\.stat(?!\.gold)','.*_doc\.rst','^include_.*\.rst','^intro_.*\.rs
 #process simulators.sim
 #######################
 
-sim_dict = locate_simulators()
+sim_dict = locate_simulators(sim_file)
 for simulator in sim_dict.values():
     patterns = patterns + simulator.output_file_patterns()
 
@@ -48,7 +47,7 @@ for simulator in sim_dict.values():
 
 test_paths=[]
 
-for line in open(config_file):
+for line in open(config_dir):
     line=line.strip()
     if len(line) > 0 and not line.startswith('#'):
         if line.startswith('/'):
