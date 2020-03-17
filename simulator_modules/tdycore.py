@@ -21,6 +21,10 @@ class QASimulatorTDycore(QASimulator):
         self._suffix = '.in'
         debug_pop()
 
+    def output_file_patterns(self):
+        patterns = ['.*_run\d*_tdycore\.h5']
+        return patterns 
+    
     def run(self,filename,annotation):
         debug_push('QASimulatorTDycore _run')
         command = []

@@ -20,6 +20,10 @@ class QASimulatorCrunchFlow(QASimulator):
         self._name = 'crunchflow'
         self._suffix = '.in'
         debug_pop()
+        
+    def output_file_patterns(self):
+        patterns = ['.*_run\d*_crunchflow\.h5']
+        return patterns 
 
     def run(self,filename,annotation):
         debug_push('QASimulatorCrunchFlow _run')
