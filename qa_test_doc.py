@@ -666,7 +666,7 @@ QA Test Suite Documentation
                 filename = '{}/include_toctree_{}_{}.rst'.format(self._doc_dir,folder,test)
                 f = open(filename, 'w')
                 toctree = """
-.. include:: //{}/{}.rst                
+.. include:: //{}/{}_doc.rst                
                 """.format(folder_path,test)
                 f.write(toctree)
                 f.close()
