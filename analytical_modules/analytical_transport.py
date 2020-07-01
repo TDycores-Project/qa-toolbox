@@ -16,11 +16,20 @@ class AnalyticalTransport1D(Analytical):
         self._c0 = -999.
         debug_pop()
 
+    def set_nx(self,nx):
+        self._nx = nx
+
+    def set_Lx(self,Lx):
+        self._Lx = Lx
+
     def set_velocity(self,v):
         self._v = v
 
     def set_diffusion(self,D):
         self._D = D
+
+    def set_c0(self,c0):
+        self._c0 = c0
 
     def get_time_midpoint(self):
         debug_push('AnalyticalTransport1D get_time_midpoint')
