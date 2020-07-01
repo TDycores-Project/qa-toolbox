@@ -606,7 +606,8 @@ class QATestDocIndex(object):
         file_dict = self.testlog.read_contents()
         regression_dict = self.testlog.read_contents(regression=True)
         directory_titles = self.testlog.get_directory_titles()
-        
+        subdir_names = self.testlog.get_subdir_names()
+        print(subdir_names)
         f = open('{}/index.rst'.format(self._doc_dir),'w')
         
         intro = """
@@ -655,7 +656,7 @@ QA Test Suite Documentation
         f.close()
         
         self.write_toctree(file_dict)
-        self.write_introfiles(file_dict,directory_titles)
+        self.write_introfiles(file_dict,directory_titles,subdir_names)
         
     def write_toctree(self,file_dict):
         
@@ -671,10 +672,11 @@ QA Test Suite Documentation
                 f.write(toctree)
                 f.close()
         
-    def write_introfiles(self, file_dict,directory_titles):        
+    def write_introfiles(self, file_dict,directory_titles,sub_dir):        
         for folder_path, test in file_dict.items():
             folder = folder_path.strip().split('/')[-1]
-
+            
+            sub_dir_dict = {}
             if folder_path in directory_titles.keys():
                 title = directory_titles[folder_path]
             else:
@@ -688,24 +690,55 @@ QA Test Suite Documentation
 
             """.format(folder,title,'='*(len(title)+9))
             
-            intro_links = [None]*len(test)
-            if len(test) == 1:
-                intro_links[0] = """
+            intro_links = []#[None]*len(test)
+#            if len(test) == 1:
+#                intro_links[0] = """
+#* :ref:`{}`
+#                """.format(test[0])
+#            else:
+#                for i in range(len(test)):
+#                    intro_links[i] = """
+#{}
+#{}
+#* :ref:`{}`
+#                """.format(test[i],'-'*len(test[i]),test[i])
+
+            for i in range(len(test)):
+                full_id = '{}/{}'.format(folder_path,test[i])
+                if full_id in sub_dir.keys():
+                    sub_dir_name = sub_dir[full_id]
+                    if sub_dir_name in sub_dir_dict.keys():
+                        sub_dir_dict[sub_dir_name].append(test[i])
+                    else:
+                        sub_dir_dict[sub_dir_name] = [test[i]]
+                else:
+
+                    intro_links.append("""
 * :ref:`{}`
-                """.format(test[0])
-            else:
-                for i in range(len(test)):
-                    intro_links[i] = """
-{}
-{}
-* :ref:`{}`
-                """.format(test[i],'-'*len(test[i]),test[i])
+                """.format(test[i]))
+
                 
             f = open(filename, 'w')
             f.write(intro)
-            for i in range(len(test)):
+            for i in range(len(intro_links)):
                 f.write(intro_links[i])
  
+            print(sub_dir_dict)
+            
+            for sub_name, test_names in sub_dir_dict.items():
+                
+                intro_sub = """
+
+{}
+{}
+            """.format(sub_name,'-'*len(sub_name))
+                f.write(intro_sub)
+                for i in range(len(test_names)):
+                    f.write("""
+* :ref:`{}`                                           
+                                           """.format(test_names[i]))
+                
+                    
             description_file = "{}/{}.description".format(folder_path,folder)
 
             try:

@@ -15,6 +15,7 @@ class QATestLog(object):
         self.past_tests = None
         self.past_regression_tests = None
         self.directory_dict = {}
+        self.subdir_dict = {}
         # initialize each file
         if incremental_testing:
 
@@ -44,11 +45,18 @@ class QATestLog(object):
         with open(unrun_tests,"a+") as f:
             f.write('{}/{} \n'.format(path,test))
     
-    def log_directory_names(self,directory_title,path):
+    def log_directory_names(self,directory_title,path):       
         self.directory_dict[path] = directory_title
         
     def get_directory_titles(self):
         return self.directory_dict
+    
+    def log_subdir_names(self,sub_dir,path,test):
+        full_path = '{}/{}'.format(path,test)
+        self.subdir_dict[full_path] = sub_dir
+        
+    def get_subdir_names(self):
+        return self.subdir_dict
             
     def _copy_contents_to_file(self,file_to_read,file_to_write):
         with open(file_to_read, "r") as f1:

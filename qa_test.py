@@ -56,6 +56,7 @@ class QATest(object):
         self._process_opt_file()
         self.swap_dict = {}
         self._template = self._section_dict['template']
+        self._sub_dir=qa_lookup(self._section_dict,'sub_dir',None)
         self.regression=qa_lookup(self._section_dict,'regression_test',False)
         debug_pop()
 
@@ -196,7 +197,7 @@ class QATest(object):
         print('simulators: '+list_to_string(debug_simulator_list))
         debug_pop()
 
-    def initialize_run(self,available_simulators):
+    def initialize_run(self,available_simulators,testlog):
         debug_push('QATest initialize_run')
         list_of_swap_dict=self._process_swap_options()
         self._check_simulators(available_simulators)
@@ -209,7 +210,9 @@ class QATest(object):
         self.doc = QATestDoc(cwd,cwd.replace(self.root_dir,''))
         self.doc.set_title(self.title)
         self.doc.set_template(self._template)
-        
+        if self._sub_dir:
+            testlog.log_subdir_names(self._sub_dir,cwd,self.title)
+
         debug_pop()
         
         return list_of_swap_dict
