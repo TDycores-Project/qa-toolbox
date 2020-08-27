@@ -72,7 +72,8 @@ class QASolutionWriter(object):
             self._f[group_name].attrs['time'] = '{}'.format(dimension)
             self._f[group_name].attrs['time unit'] = '{}'.format(self._tunit)
           
-        elif group == 'Observation':    
+        elif group == 'Observation': 
+            
             group_name = '{}/Location: {:9.3e} {:9.3e} {:9.3e} {}'.format(group, \
                         dimension[0],dimension[1],dimension[2],self._sunit)
             self._f[group_name+'/'+dataset_name] = soln
@@ -96,17 +97,19 @@ class QASolutionWriter(object):
 class QASolutionReader(object):
 
 
-    def __init__(self,filename):
+    def __init__(self,filename,simulator=None):
         debug_push('QASolutionReader init')
         self._filename = filename
         try:
-            self._f = h5py.File(filename,'r')
+            self._f = h5py.File(filename,'a') ##better way?
         except:
             print_err_msg('Unable to open {}.'.format(filename))
         self._coordinates_group = None
         self._time_group = None
         self._time_slice_solutions = []
         self._observation_solutions=[]
+        self._reading_custom_labels = False
+        self._simulator = simulator
         
         self.process_groups()
         
@@ -144,14 +147,23 @@ class QASolutionReader(object):
                 for lkey in list(self._f[key].keys()):
                     if lkey.startswith('Time'):
                         self._time_group = self._f[key+'/'+lkey]
-                    elif lkey.startswith('Location'):
+                    elif lkey.startswith('Location') and not self._reading_custom_labels:
                         w = lkey.split()    
                         location = [float(w[1]),float(w[2]),float(w[3])]  ###save with more precision??
                         self._observation_solutions.append([location,self._f[key+'/'+lkey]])
-                    else:
-                        print_err_msg('Unrecognized key "{}" '.format(lkey),
-                                'in QASolutionReader process_groups/',
-                                'Solutions')
+                    elif lkey.startswith('Label'):
+                        w = lkey.split(':')
+                        s = ', '
+
+                        location = s.join(w[1:])#w#.strip()## what if has colon
+
+                        self._observation_solutions.append([location,self._f[key+'/'+lkey]])
+                        self._reading_custom_labels = True
+#                    else:
+#                        print_err_msg('Unrecognized key "{}" '.format(lkey),
+#                                'in QASolutionReader process_groups/',
+#                                'Solutions')
+                        ###put this back in
                 if self._observation_solutions == None:
                     print_err_msg('No time array found in Observation h5 file {}'.format(self._filename))
                 elif len(self._observation_solutions)==0:
@@ -282,11 +294,15 @@ class QASolutionReader(object):
         available_locations = []
         for l, g in self._observation_solutions:
             available_locations.append(l)
+            if self._reading_custom_labels:
 
-            if ((abs(location[0]-l[0]) < eps_loc) and 
-               (abs(location[1]-l[1]) < eps_loc) and 
-               (abs(location[2]-l[2]) < eps_loc)):                   
-                group = g
+                if location.strip() == l.strip():
+                    group = g
+            else:
+                if ((abs(location[0]-l[0]) < eps_loc) and 
+                    (abs(location[1]-l[1]) < eps_loc) and 
+                    (abs(location[2]-l[2]) < eps_loc)):                   
+                        group = g
               
         if (group==None): 
             print_err_msg('Location "{}" not found in Observation group in h5 file {}\n'.format(location,
@@ -307,6 +323,21 @@ class QASolutionReader(object):
 
         debug_pop()
         return array
+
+
+    def change_observation_label(self):
+        labels = []
+        for l, g in self._observation_solutions:
+            
+            label = input("Label for {} {} {} observation point on {}:".format(l[0],l[1],l[2],self._simulator))
+            if label != "skip":
+                new_group = '/Observation/Label: {}'.format(label)
+                old_group = '/Observation/Location: 2.490e+01 5.000e-01 5.000e+00 m'
+                self._f[new_group] = g
+#            del g old group still in ...figure out how to delete it so doesn't process it above
+                labels.append(label) #error check if labels == none
+        return labels
+
         
     def get_solution_3D(self,time,variable):
         debug_push('QASolutionReader get_solution_3D')

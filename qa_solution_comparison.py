@@ -61,6 +61,10 @@ class QASolutionComparison(object):
             plot = plot_type[i]
             if plot == 'observation':                
                     
+                #check output options 
+                #read solution
+                self.user_obs_label = qa_lookup(self.output_options,'custom_observation_labels',False)  #capitals??
+                #
                 locations = location_strings_to_float_list(self.output_options['locations'])
                 self.x_string_observation = x_string[i]
                 self.y_string_observation = y_string[i]
@@ -316,8 +320,26 @@ class QASolutionComparison(object):
         debug_push('QACompareSolutions plot_observation_file')
         
         stat_files_by_var_dict = {}
+        if self.user_obs_label:
+            locations = []
+            for simulator in self.mapped_simulator_names:
+                filename = self.solution_dictionary[simulator]
+
+                solution_object = QASolutionReader(filename,simulator)
+                location = solution_object.change_observation_label()
+                #multiple locations?? ##error messaging, labeled put on one simulator and not the other
+                for l in location: #faster way?
+                    if l not in locations:
+                        locations.append(l)
+                solution_object.destroy()
+ 
+        
         for location in locations:
-            location_string = '{}, {}, {}'.format(location[0],location[1],
+
+            if self.user_obs_label:
+                location_string = location
+            else:
+                location_string = '{}, {}, {}'.format(location[0],location[1],
                                                   location[2])
             doc_obs = QATestDocObservation(location_string)
             
@@ -342,6 +364,7 @@ class QASolutionComparison(object):
                     time = solution_object.get_time()
                     time_unit = solution_object.get_time_unit()
                     
+                    ##here
                     solution = solution_object.get_solution(location,variable,Observation=True)
                     solution_object.destroy()
                   
@@ -395,7 +418,13 @@ class QASolutionComparison(object):
                              horizontalalignment='left',
                              verticalalignment='top',fontsize=14)
                 variable_string = variable.replace(" ","_")
-                filename = '{}_{}_{}_{}_{}_run{}.png'.format(
+                if self.user_obs_label:
+                    filename = '{}_{}_{}_run{}.png'.format(
+                          location,variable_string,
+                          self.template,self.run_number)
+                else:
+                
+                    filename = '{}_{}_{}_{}_{}_run{}.png'.format(
                           location[0],location[1],location[2],variable_string,
                           self.template,self.run_number)
                 doc_var.add_solution_png(filename)
@@ -404,7 +433,7 @@ class QASolutionComparison(object):
                     plt.show()
                 plt.close()
                 
-                error = QATestError(location,variable,self.template,self.run_number,self.plot_to_screen,self.variable_units,observation=True)  
+                error = QATestError(location,variable,self.template,self.run_number,self.plot_to_screen,self.variable_units,observation=True,custom_obs_labels=self.user_obs_label)  
                 if plot_error:                                     
                     filename = error.plot_error_1D(times[0],solutions[0],times[1],solutions[1],self.x_string_observation)
                     doc_var.add_error_png(filename)

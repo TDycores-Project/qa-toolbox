@@ -17,7 +17,7 @@ class QATestError(object):
     
     def __init__(self,converted_time=None,variable=None,template=None,
                  run_number=None,plot_to_screen=False,units=' ',
-                 observation=False,dimension='1D'):
+                 observation=False,custom_obs_labels=False,dimension='1D'):
         debug_push('QATestError init')
         self.converted_time = converted_time
         self.variable = variable
@@ -26,6 +26,7 @@ class QATestError(object):
         self.plot_to_screen = plot_to_screen
         self.dimension = dimension
         self.observation = observation
+        self.custom_obs_labels = custom_obs_labels
         self.units = units
         debug_pop()
     
@@ -121,7 +122,10 @@ class QATestError(object):
         f.suptitle(self.variable,fontsize=14)
         variable_string = self.variable.replace(" ","_")
         if self.observation == True:
-            filename = '{}_{}_{}_{}_{}_run{}_error.png'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],variable_string,self.template,self.run_number)
+            if self.custom_obs_labels: ##name needs to be separated by _? must take into account spaces
+                filename = '{}_{}_{}_run{}_error.png'.format(self.converted_time.strip(),variable_string,self.template,self.run_number)
+            else: 
+                filename = '{}_{}_{}_{}_{}_run{}_error.png'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],variable_string,self.template,self.run_number)
         else:
             filename = '{}_{}_{}_run{}_error.png'.format(self.converted_time,variable_string,self.template,self.run_number)
         plt.savefig(filename)
@@ -174,7 +178,10 @@ class QATestError(object):
         variable_string = self.variable.replace(" ","_")
         
         if self.observation == True:
-            filename = '{}_{}_{}_{}_{}_run{}_error.stat'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],variable_string,self.template,self.run_number)
+            if self.custom_obs_labels:
+                filename = '{}_{}_{}_run{}_error.stat'.format(self.converted_time,variable_string,self.template,self.run_number)
+            else:
+                filename = '{}_{}_{}_{}_{}_run{}_error.stat'.format(self.converted_time[0],self.converted_time[1],self.converted_time[2],variable_string,self.template,self.run_number)
         else:
             filename = '{}_{}_{}_run{}_error.stat'.format(self.converted_time,variable_string,self.template,self.run_number)
       
@@ -837,18 +844,24 @@ class QATestError(object):
         maximum_absolute_error_time = []
         maximum_relative_error_time = []
         
-        x_locations = []
-        y_locations = []
-        z_locations = []
+        if self.custom_obs_labels:
+            locations = []
+        else:
+            x_locations = []
+            y_locations = []
+            z_locations = []
            
         for i in range(len(stat_file)):
 
             filename = stat_file[i]
             
             split_filename = filename.split('_')
-            x_locations.append(float(split_filename[0]))
-            y_locations.append(float(split_filename[1]))
-            z_locations.append(float(split_filename[2]))
+            if self.custom_obs_labels:
+                locations.append(split_filename[0])
+            else:
+                x_locations.append(float(split_filename[0]))
+                y_locations.append(float(split_filename[1]))
+                z_locations.append(float(split_filename[2]))
 
             fin = open(stat_file[i],'r')
             for line in fin:
@@ -881,9 +894,12 @@ class QATestError(object):
         
         maximum_absolute_error_time_all_locations = maximum_absolute_error_time[index]
         
-        maximum_absolute_error_x_location = x_locations[index]
-        maximum_absolute_error_y_location = y_locations[index]
-        maximum_absolute_error_z_location = z_locations[index]
+        if self.custom_obs_labels:
+            maximum_absolute_error_location = locations[index]
+        else:
+            maximum_absolute_error_x_location = x_locations[index]
+            maximum_absolute_error_y_location = y_locations[index]
+            maximum_absolute_error_z_location = z_locations[index]
         
         
         maximum_relative_error_all_locations = max(maximum_relative_error)
@@ -891,40 +907,61 @@ class QATestError(object):
         self.maximum_relative_error_observation_index = index
         
         maximum_relative_error_time_all_locations = maximum_relative_error_time[index]
-        maximum_relative_error_x_location = x_locations[index]
-        maximum_relative_error_y_location = y_locations[index]
-        maximum_relative_error_z_location = z_locations[index]
+        if self.custom_obs_labels:
+            maximum_relative_error_location = locations[index]
+        else:
+            maximum_relative_error_x_location = x_locations[index]
+            maximum_relative_error_y_location = y_locations[index]
+            maximum_relative_error_z_location = z_locations[index]
 
         
         maximum_average_absolute_error = max((average_absolute_error))
         index = argmax(average_absolute_error)
         self.maximum_average_absolute_error_observation_index = index
         
-        maximum_average_absolute_error_x_location = x_locations[index]
-        maximum_average_absolute_error_y_location = y_locations[index]
-        maximum_average_absolute_error_z_location = z_locations[index]
+        if self.custom_obs_labels:
+            maximum_average_absolute_error_location = locations[index]
+        else:
+            maximum_average_absolute_error_x_location = x_locations[index]
+            maximum_average_absolute_error_y_location = y_locations[index]
+            maximum_average_absolute_error_z_location = z_locations[index]
         
         maximum_average_relative_error = max((average_relative_error))
         index = argmax(average_relative_error)
         self.maximum_average_relative_error_observation_index = index
         
-        maximum_average_relative_error_x_location = x_locations[index]
-        maximum_average_relative_error_y_location = y_locations[index]
-        maximum_average_relative_error_z_location = z_locations[index]
+        if self.custom_obs_labels:
+            maximum_average_relative_error_location = locations[index]
+        else:
+            maximum_average_relative_error_x_location = x_locations[index]
+            maximum_average_relative_error_y_location = y_locations[index]
+            maximum_average_relative_error_z_location = z_locations[index]
         
         self.maximum_absolute_error_all_locations = '{} {} \n'.format(maximum_absolute_error_all_locations,self.units)
         self.maximum_absolute_error_time_all_locations = '{} {}'.format(maximum_absolute_error_time_all_locations, tunit)
-        self.maximum_absolute_error_locations = '{},{},{}'.format(maximum_absolute_error_x_location,maximum_absolute_error_y_location,maximum_absolute_error_z_location)
+        if self.custom_obs_labels:
+            self.maximum_absolute_error_locations = '{}'.format(maximum_absolute_error_location)
+        else:
+            self.maximum_absolute_error_locations = '{},{},{}'.format(maximum_absolute_error_x_location,maximum_absolute_error_y_location,maximum_absolute_error_z_location)
         
         self.maximum_relative_error_all_locations = '{} %'.format(maximum_relative_error_all_locations)
         self.maximum_relative_error_time_all_locations ='{} {}'.format(maximum_relative_error_time_all_locations,tunit)
-        self.maximum_relative_error_locations = '{},{},{}'.format(maximum_relative_error_x_location,maximum_relative_error_y_location,maximum_relative_error_z_location)
+        if self.custom_obs_labels:
+            self.maximum_relative_error_locations = '{}'.format(maximum_relative_error_location)
+        else:
+            self.maximum_relative_error_locations = '{},{},{}'.format(maximum_relative_error_x_location,maximum_relative_error_y_location,maximum_relative_error_z_location)
         
         self.maximum_average_absolute_error_observation = '{} {}'.format(maximum_average_absolute_error, self.units)
-        self.maximum_average_absolute_error_location = '{},{},{}'.format(maximum_average_absolute_error_x_location,maximum_average_absolute_error_y_location,maximum_average_absolute_error_z_location)
+        if self.custom_obs_labels:
+            self.maximum_average_absolute_error_location = '{}'.format(maximum_average_absolute_error_location)
+        else:
+            self.maximum_average_absolute_error_location = '{},{},{}'.format(maximum_average_absolute_error_x_location,maximum_average_absolute_error_y_location,maximum_average_absolute_error_z_location)
         
         self.maximum_average_relative_error_observation = '{} {}'.format(maximum_average_relative_error,self.units)
-        self.maximum_average_relative_error_location = '{},{},{}'.format(maximum_average_relative_error_x_location,maximum_average_relative_error_y_location,maximum_average_relative_error_z_location)
+        if self.custom_obs_labels:
+            self.maximum_average_relative_error_location = '{}'.format(maximum_average_relative_error_location)
+        else:
+            self.maximum_average_relative_error_location = '{},{},{}'.format(maximum_average_relative_error_x_location,maximum_average_relative_error_y_location,maximum_average_relative_error_z_location)
         
         filename = '{}_{}_run{}_observation_error_documentation.stat'.format(self.variable,self.template,self.run_number)
       

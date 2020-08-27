@@ -17,7 +17,7 @@ class QASimulator:
         self._name = ''
         self._suffix = ''
         self._path = path
-        self._timeout = 300.
+        self._timeout = 300000000000. ##timeout update message
         debug_pop()
 
     def get_name(self):
