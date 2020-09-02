@@ -151,19 +151,21 @@ class QASolutionReader(object):
                         w = lkey.split()    
                         location = [float(w[1]),float(w[2]),float(w[3])]  ###save with more precision??
                         self._observation_solutions.append([location,self._f[key+'/'+lkey]])
+                    elif lkey.startswith('Location') and self._reading_custom_labels:
+                        next
                     elif lkey.startswith('Label'):
                         w = lkey.split(':')
-                        s = ', '
 
-                        location = s.join(w[1:])#w#.strip()## what if has colon
+                        s = ':'
+                        location = s.join(w[1:])
 
                         self._observation_solutions.append([location,self._f[key+'/'+lkey]])
                         self._reading_custom_labels = True
-#                    else:
-#                        print_err_msg('Unrecognized key "{}" '.format(lkey),
-#                                'in QASolutionReader process_groups/',
-#                                'Solutions')
-                        ###put this back in
+                    else:
+                        print_err_msg('Unrecognized key "{}" '.format(lkey),
+                                'in QASolutionReader process_groups/',
+                                'Solutions')
+                        
                 if self._observation_solutions == None:
                     print_err_msg('No time array found in Observation h5 file {}'.format(self._filename))
                 elif len(self._observation_solutions)==0:
@@ -331,11 +333,18 @@ class QASolutionReader(object):
             
             label = input("Label for {} {} {} observation point on {}:".format(l[0],l[1],l[2],self._simulator))
             if label != "skip":
+                label = label.replace(" ","_")
+                if label in labels:
+                    print_err_msg('Duplicate label ({}) found for same simulator: {}'.format(label,self._simulator))
+                
                 new_group = '/Observation/Label: {}'.format(label)
                 old_group = '/Observation/Location: 2.490e+01 5.000e-01 5.000e+00 m'
                 self._f[new_group] = g
+
 #            del g old group still in ...figure out how to delete it so doesn't process it above
-                labels.append(label) #error check if labels == none
+
+                labels.append(label) 
+
         return labels
 
         

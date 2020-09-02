@@ -61,11 +61,12 @@ class QASolutionComparison(object):
             plot = plot_type[i]
             if plot == 'observation':                
                     
-                #check output options 
-                #read solution
+
                 self.user_obs_label = qa_lookup(self.output_options,'custom_observation_labels',False)  #capitals??
-                #
-                locations = location_strings_to_float_list(self.output_options['locations'])
+                if self.user_obs_label:
+                    locations = {}
+                else:
+                    locations = location_strings_to_float_list(self.output_options['locations'])
                 self.x_string_observation = x_string[i]
                 self.y_string_observation = y_string[i]
                 self.plot_observation_file(locations,plot_error,print_error)
@@ -321,19 +322,32 @@ class QASolutionComparison(object):
         
         stat_files_by_var_dict = {}
         if self.user_obs_label:
-            locations = []
+            
             for simulator in self.mapped_simulator_names:
                 filename = self.solution_dictionary[simulator]
 
                 solution_object = QASolutionReader(filename,simulator)
-                location = solution_object.change_observation_label()
-                #multiple locations?? ##error messaging, labeled put on one simulator and not the other
-                for l in location: #faster way?
-                    if l not in locations:
-                        locations.append(l)
+                location_list = solution_object.change_observation_label()
+
+                locations[simulator] = location_list
+     #           for l in location: #faster way?
+     #               if l not in locations:
+     #                   locations.append(l)
                 solution_object.destroy()
- 
-        
+
+            all_equal = True
+            for value in locations.values():
+                if value != location_list:
+                    all_equal = False
+                    break
+
+            if all_equal == True:
+                locations = location_list
+            else:
+                print_err_msg('User inputted labels for each simulator do not match. '
+                              'Perhaps spelling error.')
+                
+
         for location in locations:
 
             if self.user_obs_label:
