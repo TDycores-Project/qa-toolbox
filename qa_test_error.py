@@ -49,6 +49,16 @@ class QATestError(object):
         elif self.dimension == '2D':
             dimension1,dimension2 = find_axis_2D(x1,y1,z1)                
             filename = self._plot_error_2D(dimension1,dimension2,values1,values2,x_label,y_label)
+   
+    
+    
+    
+        elif self.dimension == '3D':
+            dimension1,dimension2 = find_axis_3D(x1,y1,z1)                
+            filename = self._plot_error_2D(dimension1,dimension2,values1,values2,x_label,y_label)
+        
+        
+        
         
         debug_pop()
         return filename
@@ -594,6 +604,10 @@ class QATestError(object):
             
         elif self.dimension == '2D':
             self._calc_error_metrics_over_all_times_2D(stat_file,tunit)
+        
+        elif self.dimension == '3D':
+            self._calc_error_metrics_over_all_times_2D(stat_file,tunit)
+            
                     
     def _calc_error_metrics_over_all_times_1D(self,stat_file,tunit):
            

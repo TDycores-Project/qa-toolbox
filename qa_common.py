@@ -208,11 +208,18 @@ def find_axis_2D(x,y,z):
         x_axis = x
         y_axis = y
         
-#    if x_axis == None and y_axis == None:
-#        raise Exception('Invalid coordinates, check x,y, and z')
+    if x_axis == None and y_axis == None:
+        raise Exception('Invalid coordinates, check x,y, and z')
         
     return x_axis, y_axis
     
+def find_axis_3D(x,y,z):
+    x_axis = x
+    y_axis = y
+    
+    return x_axis, y_axis
+
+
 def print_err_msg(*strings):
     list = []
     for string in strings:

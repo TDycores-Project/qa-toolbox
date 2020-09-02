@@ -64,6 +64,10 @@ class QASolutionWriter(object):
             soln = np.reshape(soln,(soln.shape[0],1,1))
         elif soln.ndim == 2:
             soln = np.reshape(soln,(soln.shape[0],soln.shape[1],1))
+#        elif soln.ndim == 3:
+#            soln = soln[:,:,0]
+#            soln = np.reshape(soln,(soln.shape[0],soln.shape[1],1)) 
+#
         dataset_name = dataset_name.replace('/','_')
         ###Change group names to 1 Time, 1 Location, 2 Time, 2 Location?
         if group == 'Time Slice':
@@ -266,6 +270,14 @@ class QASolutionReader(object):
             elif sizex == 1 and sizey > 1 and sizez > 1:
                 array = self.convert_to_2D(array,'YZ')
 
+            # array is 3D
+#            elif sizex > 1 and sizey > 1 and sizez > 1:
+#                array = self.convert_to_3D(array,'XY')
+#            elif sizex > 1 and sizey > 1 and sizez > 1:
+#                array = self.convert_to_3D(array,'XZ')
+#            elif sizex > 1 and sizey > 1 and sizez > 1:
+#                array = self.convert_to_3D(array,'YZ')
+
         elif Observation == True:
             array = self.get_observation_solution(dimension,variable)            
             
@@ -352,6 +364,25 @@ class QASolutionReader(object):
         array = self.convert_to_1D(array,direction,isection1,isection2)
         debug_pop()
         return array
+
+
+# Probably dont need this, solution is already 3D from PFLOTRAN as a default   
+#    def convert_to_3D(self,array,plane,isection=None):
+#        if isection == None:
+#            isection = 0
+#        if plane == 'XY':
+#            array = np.array(array[:,:,isection])
+#        elif plane == 'XZ':
+#            array = np.array(array[:,isection,:])
+#        elif plane == 'YZ':
+#            array = np.array(array[isection,:,:])
+#        else:
+#            raise Exception('Plane "{}" not recognized in convert_to_3D'. \
+#                            format(plane))
+#        return array
+
+
+
 
     def convert_to_2D(self,array,plane,isection=None):
         if isection == None:

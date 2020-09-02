@@ -1,2 +1,3 @@
 [simulators]
 python = python3
+pflotran = /Users/spejord/pflotran/src/pflotran/pflotran
