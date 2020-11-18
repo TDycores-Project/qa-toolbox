@@ -68,20 +68,20 @@ class Javandel(AnalyticalTransport1D):
         x = self.get_rounded_even_spaced_numbers(dx,self._nx)
     
         if self._alpha < epsilon_value and self._lambda < epsilon_value and \
-           self._R-1. < epsilon_value: 
-            # use Equation (45)
+           abs(self._R-1.) < epsilon_value: 
+            # use Equation (45) - first-type
             for i in range(self._nx):
                 c[i] = self.A3(x[i],t)
                 if t > self._t0:
                     c[i] -= self.A3(x[i],t-self._t0)
         elif self._alpha < epsilon_value and self._lambda < epsilon_value:
-            # use Equation (44)
+            # use Equation (44) - first-type
             for i in range(self._nx): 
                 c[i] = self.A2(x[i],t)
                 if t > self._t0:
                     c[i] -= self.A2(x[i],t-self._t0)
         elif self._alpha < epsilon_value and self._lambda > epsilon_value:
-            # use Equation (40)
+            # use Equation (40) - first-type
             for i in range(self._nx): 
                 c[i] = self.A1_constant(x[i],t)
                 if t > self._t0:
@@ -89,7 +89,7 @@ class Javandel(AnalyticalTransport1D):
         elif self._alpha > epsilon_value and self._lambda > epsilon_value:
             # Equation (35)
             if abs(self._alpha-self._lambda) > epsilon_value:
-                # use Equation (36a)
+                # use Equation (36a) - third-type
                 for i in range(self._nx): 
                     c[i] = math.exp(-self._alpha*t)*self.A1(x[i],t)
                     if t > self._t0:
@@ -97,7 +97,7 @@ class Javandel(AnalyticalTransport1D):
                                  self.A1(x[i],t-self._t0)* \
                                  math.exp(-self._alpha*self._t0)
             else:
-                # use Equation (36b)
+                # use Equation (36b) - first-type
                 for i in range(self._nx): 
                     c[i] = math.exp(-self._alpha*t)*self.A2(x[i],t)
                     if t > self._t0:
@@ -111,7 +111,7 @@ class Javandel(AnalyticalTransport1D):
         return x, c
     
     # TODO(geh): simplify the 2*sqrt(DRt) below
-    def A1(self,x,t): 
+    def A1(self,x,t): # third-type
         # Equation (38)
         U = math.sqrt(self._v*self._v+4.*self._D*self._R* \
                       (self._lambda-self._alpha))    
@@ -128,7 +128,7 @@ class Javandel(AnalyticalTransport1D):
                     0.5*(self._R*x+self._v*t)/math.sqrt(self._D*self._R*t))
         return A1_            
 
-    def A1_constant(self,x,t): 
+    def A1_constant(self,x,t): # first-type
         # Equation (42)
         U = math.sqrt(self._v*self._v + 4.*self._D*self._R*self._lambda)
         # Equation (41)
@@ -144,7 +144,7 @@ class Javandel(AnalyticalTransport1D):
                     0.5*(self._R*x+self._v*t)/math.sqrt(self._D*self._R*t))
         return A1_constant_
 
-    def A2(self,x,t): 
+    def A2(self,x,t): # first-type
         # Equation (39)
         A2_ = \
             0.5*math.erfc(0.5*(self._R*x-self._v*t)/ \
@@ -157,7 +157,7 @@ class Javandel(AnalyticalTransport1D):
                     0.5*(self._R*x+self._v*t)/math.sqrt(self._D*self._R*t))
         return A2_            
 
-    def A3(self,x,t): 
+    def A3(self,x,t): # first-type
         # Equation (46)
         A3_ = \
             0.5*math.erfc(0.5*(x-self._v*t)/math.sqrt(self._D*t))+ \
