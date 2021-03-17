@@ -54,7 +54,8 @@ def time_strings_to_float_list(strings):
         else:
             print_err_msg('Must specify units on last time or all times in options file')
     except:
-        print_err_msg('error converting float in list_to_floats')
+        print_err_msg('error converting float in '+
+                      time_strings_to_float_list.__name__)
         
     for string in strings:
         
@@ -80,7 +81,8 @@ def time_strings_to_float_list_for_documentation(strings):
             # time in seconds
             time = float(w[0])
         except:
-            print('error converting float in list_to_floats')
+            print('error converting float in list_to_floats'+
+                  time_strings_to_float_list_for_documentation.__name__)
             raise
         list_of_times.append(time)
     return list_of_times
