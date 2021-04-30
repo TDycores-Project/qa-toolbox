@@ -67,152 +67,71 @@ class QASimulatorSTOMP(QASimulator):
                 if (name.startswith('plot'):
                     tslice_out.append(name)
 
-        solution.set_time_unit(time_unit)
-
-
-        # h5_filename='{}_stp.h5'.format(root)
-        # time_slice=False
-        # observation_file=False
-
-        try:
-            f=File(h5_filename, 'r')
-            time_slice=True
-        except:
-            print('No time slice file found, checking for observation file')
-
-        if time_slice:
-            x, y, z=self.get_cell_centered_coordinates_h5(h5_filename)
-            solution.write_coordinates(x, y, z)
-
-            first=True
-            group_name='Time Slice'
-
-            for tkey in list(f.keys()):
-                if tkey.startswith('Time'):
-                    w=tkey.split()
-                    time_string=float(w[1])
-                    if first:
-                        first=False
-                        if len(w) < 3:
-                            print('Time without unit in {}.'.format(h5_filename))
-                            raise
-                    solution.set_time_unit(w[2])
-                    for dkey in list(f[tkey].keys()):
-
-                        if dkey in h5_mapping:
-                            new_key=h5_mapping[dkey]
-                        else:
-                            new_key=dkey
-                        solution.write_dataset(time_string,
-                                               np.array(f[tkey+'/'+dkey]), new_key, group_name)
-
-            f.close()
-
-        try:
-            fin=open(tec_filename, 'r')
-            observation_file=True
-        except:
-            print('No observation file found')
-
-        if observation_file:
-            group_name='Observation'
-            header=[]
-            all_values=[]
+        for i in range(len(tslice_out)):
+            # read file
+            fin = open(tslice_out[i], 'r')
             for line in fin:
-
-                if ('Time' in line):
-                    header=[x.strip('"').strip().strip(' "')
-                              for x in line.split(',')]
-                else:
-                    values=line.strip().split()
-                    all_values.append(values)
-
-            all_values=np.asarray(all_values, dtype=np.float64).transpose()
-
-            solution.set_time_unit(header[0].split()[1].strip('[').strip(']'))
-            solution.write_time(all_values[0])
-
-            for i in range(1, len(header)):
-
-                s=[x.strip(')').strip('(') for x in header[i].split()]
-
-                location_string=s[-3:]
-                location_floats=[float(i) for i in location_string]
-                variable=all_values[i]
-
-                dkey=header[i].split(' obs_pt')[0]
-
-                if dkey in obs_mapping:
-                    new_key=obs_mapping[dkey]
-                else:
-                    new_key=dkey
-                solution.write_dataset(location_floats,
-                                       variable, new_key, group_name)
-        debug_pop()
-        return solution_filename
-
-    def get_cell_centered_coordinates_h5(self, filename):
-        debug_push('QASimulatorSTOMP get_cell_centered_coordinates_h5')
-        x, y, z=self.get_coordinates_h5(filename, True)
-        debug_pop()
-        return x, y, z
-
-    def get_coordinates_h5(self, filename, cell_centered=False):
-        debug_push('QASimulatorSTOMP get_coordinates_h5')
-        try:
-            f=File(filename, 'r')
-        except:
-            print('Unable to read {}'.format(filename))
-            raise
-
-        keys=f.keys()
-        # list_of_keys = list(keys)
-
-        x=[]
-        y=[]
-        z=[]
-        found=False
-        for ckey in list(f.keys()):
-            if ckey.startswith('Coordinates'):
-                found=True
-                for dkey in list(f[ckey].keys()):
-                    full_key=ckey+'/'+dkey
-                    if dkey.startswith('X'):
-                        x=np.array(f[full_key])
-                    elif dkey.startswith('Y'):
-                        y=np.array(f[full_key])
-                    elif dkey.startswith('Z'):
-                        z=np.array(f[full_key])
-                    else:
-                        raise ValueError('Unrecognized key in ',
-                                         'get_coordinates_h5')
-        if not found:
-            raise ValueError('Coordinates group not found in ',
-                             '{}.'.format(filename))
-        if x.size == 0:
-            raise ValueError('X coordinates dataset not found in ',
-                             '{}.'.format(filename))
-        if y.size == 0:
-            raise ValueError('Y coordinates dataset not found in ',
-                             '{}.'.format(filename))
-        if z.size == 0:
-            raise ValueError('Z coordinates dataset not found in ',
-                             '{}.'.format(filename))
-        if cell_centered:
-            xc=np.zeros(x.size-1, '=f8')
-            yc=np.zeros(y.size-1, '=f8')
-            zc=np.zeros(z.size-1, '=f8')
-            for i in range(xc.size):
-                xc[i]=0.5*(x[i]+x[i+1])
-            for i in range(yc.size):
-                yc[i]=0.5*(y[i]+y[i+1])
-            for i in range(zc.size):
-                zc[i]=0.5*(z[i]+z[i+1])
-            x=xc
-            y=yc
-            z=zc
-        debug_pop()
-        return x, y, z
+                line = line.strip()
+                if line == []:
+                    continue
+                # get time
+                if ('Time =  ' in line):
+                    words = line.split()
+                    time_units = words[5].split(',')
+                    time = time_units[0]
+                    units = time_units[1]
+                #get coordinates
+                if ('X-Direction Nodal Vertices, m' in line):
+                    # continue reading the following lines
+                    for line in fin:
+                        line = line.strip()
+                        words = line.split()
+                        # get x-centroid
+                        x_centroid = (float(words[0]) + float(words[1])) * 0.5
+                        x.append(x_centroid)
+                        if not words:
+                            break
+                if ('Y-Direction Nodal Vertices, m' in line):
+                    # continue reading the following lines
+                    for line in fin:
+                        line = line.strip()
+                        words = line.split()
+                        line_counter += 1
+                        # get y-centroid
+                        y_centroid = (float(words[0]) + float(words[2])) * 0.5
+                        y.append(y_centroid)
+                        if not words:
+                            break
+                if ('Z-Direction Nodal Vertices, m' in line):
+                    # continue reading the following lines
+                    for line in fin:
+                        line = line.strip()
+                        words = line.split()
+                        # get z-centroid
+                        z_centroid = (float(words[0]) + float(words[4])) * 0.5
+                        z.append(z_centroid)
+                        if not words:
+                            break
+                if ('Aqueous Saturation' in line):
+                    # continue reading the following lines
+                    for line in fin:
+                        line = line.strip()
+                        words = line.split()
+                        # get saturation
+                        for sat in words:
+                            saturation.append(float(sat))
+                        if not words:
+                            break
+                if ('Aqueous Pressure, pa' in line):
+                    for line in fin:
+                        line = line.strip()
+                        words = line.split()
+                        # get pressure
+                        for pres in words:
+                            pressure.append(float(pres))
+                        if not words:
+                            break
+            fin.close()
 
     def update_dict(self, output_options):
         debug_push('QASimulatorSTOMP update_dict')
