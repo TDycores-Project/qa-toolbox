@@ -27,11 +27,6 @@ class QASimulatorSTOMP(QASimulator):
         self._name = 'input'
         debug_pop()
 
-    # Check if this function is needed:
-    def output_file_patterns(self):
-        patterns = ['.*_run\d*_pflotran\.h5', '.*_run\d*_pft\.h5']
-        return patterns
-
     def run(self, filename, annotation):
         debug_push('QASimulatorSTOMP _run')
         command = []
@@ -44,12 +39,14 @@ class QASimulatorSTOMP(QASimulator):
         debug_pop()
         return solution_filename
 
+    def output_file_patterns(self):
+        patterns = ['plot*','surface', 'output', 'connect', '.*_run\d*_stomp\.h5']
+        return patterns 
+
     def convert_solution_to_common_h5(self, filename):
         debug_push('QASimulatorSTOMP convert_solution_to_common_h5')
-        # root = filename.rsplit('.', 1)[0]
         solution_filename = '{}_stomp.h5'.format(filename)
         solution = QASolutionWriter(solution_filename)
-        root = os.path.dirname(filename)
 
         tslice_out = []
         x = []
@@ -57,10 +54,10 @@ class QASimulatorSTOMP(QASimulator):
         z = []
         first_file = True
 
-        for r, dirct, files in os.walk(root):
+        for r, dirct, files in os.walk('.'):
             for name in files:
                 if name.startswith('plot') and not name.endswith('.dat'):
-                    tslice_out.append(root + '/' + name)
+                    tslice_out.append(name)
 
         for i in range(len(tslice_out)):
             if first_file:
@@ -101,6 +98,16 @@ class QASimulatorSTOMP(QASimulator):
                             z.append(z_centroid)
 
                 fin.close()
+                #check if all points are the same for one of the directions
+                x_equal = all(elem == x[0] for elem in x)
+                y_equal = all(elem == y[0] for elem in y)
+                z_equal = all(elem == z[0] for elem in z)
+                if x_equal:
+                    x = [x[0]]
+                if y_equal:
+                    y = [y[0]]
+                if z_equal:
+                    z = [z[0]]
                 solution.write_coordinates(x,y,z)
                 first_file = False
             # read file
@@ -120,6 +127,7 @@ class QASimulatorSTOMP(QASimulator):
                     solution.set_time_unit(t_units)
 
                 for j, (key, v_name) in enumerate(time_mapping.items()):
+                    all_values = []
                     if (key in line):
                         for line in fin:
                             line = line.strip()
@@ -129,6 +137,8 @@ class QASimulatorSTOMP(QASimulator):
                             for var_values in words:
                                 all_values.append(float(var_values))
                         all_values_np = np.asarray(all_values, dtype=np.float64).transpose()
-                        solution.write_dataset(time,all_values_np, key,'Time Slice')
+                        solution.write_dataset(time,all_values_np, v_name,'Time Slice')
             fin.close()
+        debug_pop()
+        return solution_filename
 
