@@ -66,7 +66,7 @@ class QASimulatorPFLOTRAN(QASimulator):
             '{}_pflotran.h5'.format(root)
       solution = QASolutionWriter(solution_filename)
       h5_filename = '{}_pft.h5'.format(root)
-      tec_filename = '{}_pft-obs-0.tec'.format(root)
+      obs_filename = '{}_pft-obs-0.pft'.format(root)
       time_slice = False
       observation_file = False      
       
@@ -105,7 +105,7 @@ class QASimulatorPFLOTRAN(QASimulator):
           f.close()
       
       try:
-          fin = open(tec_filename,'r')
+          fin = open(obs_filename,'r')
           observation_file = True
       except:
           print('No observation file found')

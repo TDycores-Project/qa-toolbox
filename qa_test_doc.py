@@ -599,7 +599,7 @@ class QATestDocIndex(object):
         else:
             self._doc_dir = _doc_dir
         if not os.path.isdir(self._doc_dir):
-            print_err_msg('Document Directory Path: {} does not exsist'.format(self._doc_dir))
+            print_err_msg('Document Directory Path: {} does not exist'.format(self._doc_dir))
         
         
     def write_index(self):
