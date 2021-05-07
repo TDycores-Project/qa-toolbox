@@ -1,3 +1,0 @@
-[simulators]
-python = python3
-pflotran = $PFLOTRAN_DIR/src/pflotran/pflotran
