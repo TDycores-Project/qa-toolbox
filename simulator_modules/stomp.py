@@ -10,13 +10,11 @@ from qa_solution import QASolutionWriter
 
 from simulator_modules.simulator import QASimulator
 
-eps = 1e-6
 successful_exit_code = 86
 
-time_mapping = {}
-time_mapping['Aqueous Saturation'] = 'Liquid Saturation'
-time_mapping['Aqueous Pressure, pa'] = 'Liquid Pressure'
-n_variables = len(time_mapping)
+time_slice_mapping = {}
+time_slice_mapping['Aqueous Saturation'] = 'Liquid Saturation'
+time_slice_mapping['Aqueous Pressure, pa'] = 'Liquid Pressure'
 
 class QASimulatorSTOMP(QASimulator):
 
@@ -126,7 +124,7 @@ class QASimulatorSTOMP(QASimulator):
                     t_units = time_units[1]
                     solution.set_time_unit(t_units)
 
-                for j, (key, v_name) in enumerate(time_mapping.items()):
+                for j, (key, v_name) in enumerate(time_slice_mapping.items()):
                     all_values = []
                     if (key in line):
                         for line in fin:

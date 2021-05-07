@@ -52,19 +52,19 @@ def create_simulator(simulator_name,path):
     debug_push('simulator_factory.create_simulator')
     simulator = ''
     if simulator_name == 'crunchflow':
-         simulator = QASimulatorCrunchFlow(path)
+        simulator = QASimulatorCrunchFlow(path)
     elif simulator_name == 'pflotran':
-         simulator = QASimulatorPFLOTRAN(path)
+        simulator = QASimulatorPFLOTRAN(path)
     elif simulator_name == 'python':
-         simulator = QASimulatorPython(path)
+        simulator = QASimulatorPython(path)
     elif simulator_name == 'tough2':
-         simulator = QASimulatorTOUGH2(path)
+        simulator = QASimulatorTOUGH2(path)
     elif simulator_name == 'tough3':
-         simulator = QASimulatorTOUGH3(path)
+        simulator = QASimulatorTOUGH3(path)
     elif simulator_name == 'tdycore':
-         simulator = QASimulatorTDycore(path)
+        simulator = QASimulatorTDycore(path)
     elif simulator_name == 'stomp':
-         simulator = QASimulatorSTOMP(path)
+        simulator = QASimulatorSTOMP(path)
 
     else:
         print_err_msg('Simulator {} not recognized in simulator_factor.py.'

@@ -1,4 +1,3 @@
 [simulators]
 python = python3
 pflotran = $PFLOTRAN_DIR/src/pflotran/pflotran
-stomp = $STOMP_BLD_DIR/stomp-w_bd.d
