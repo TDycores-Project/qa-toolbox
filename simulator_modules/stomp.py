@@ -18,7 +18,6 @@ time_slice_mapping['Aqueous Pressure, pa'] = 'Liquid Pressure'
 
 class QASimulatorSTOMP(QASimulator):
 
-    # check if we can use another input file name
     def __init__(self, path):
         debug_push('QASimulatorSTOMP init')
         super(QASimulatorSTOMP, self).__init__(path)
@@ -36,6 +35,42 @@ class QASimulatorSTOMP(QASimulator):
         solution_filename = self.convert_solution_to_common_h5(filename)
         debug_pop()
         os.unlink('input')
+
+        # Rename output files
+        # List of output files that can't fail
+        output_required = ['output', 'connect']
+        for i in range(len(output_required)):
+            try:
+                new_name = filename + '_' + output_required[i]
+                os.rename(output_required[i], new_name)
+            except OSError:
+                print('ERROR: STOMP output file {} does not exist.'.format(output_required[i]))
+        
+        output_optional = ['surface']
+        # Go through files in the directory and look for files starting with plot
+        for r, dirct, files in os.walk('.'):
+            for name in files:
+                if name.startswith('plot'):
+                    output_optional.append(name)
+
+        for i in range(len(output_optional)):
+            try:
+                new_name = filename + '_' + output_optional[i]
+                os.rename(output_optional[i], new_name)
+            except OSError:
+                pass
+
+        # If you think we don't need to set "try" for the optional filenmanes,
+        # we can just join lines 58-63 into the os.walk, with something like this:
+
+        # output_optional = ['surface', 'plot']
+        # for r, dirct, files in os.walk('.'):
+        #     for name in files:
+        #         for i in range(len(output_optional)):
+        #             if name.startswith(output_optional[i]):
+        #                 new_name = filename + '_' + output_optional[i]
+        #                 os.rename(output_optional[i], new_name)
+
         return solution_filename
 
     def output_file_patterns(self):
