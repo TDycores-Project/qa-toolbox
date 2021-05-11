@@ -28,13 +28,14 @@ class QASimulatorSTOMP(QASimulator):
     def run(self, filename, annotation):
         debug_push('QASimulatorSTOMP _run')
         command = []
+        os.symlink(filename, 'input')
         command.append(self._get_full_executable_path())
-        command.append(filename)
         debug_push('Running STOMP')
         status = self._submit_process(command, filename, annotation)
         debug_pop()
         solution_filename = self.convert_solution_to_common_h5(filename)
         debug_pop()
+        os.unlink('input')
         return solution_filename
 
     def output_file_patterns(self):
