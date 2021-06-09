@@ -86,6 +86,7 @@ class QASimulatorSTOMP(QASimulator):
         x = []
         y = []
         z = []
+        dim = [''] * 3
         first_file = True
 
         for r, dirct, files in os.walk('.'):
@@ -100,6 +101,20 @@ class QASimulatorSTOMP(QASimulator):
                     line = line.strip()
                     if line == []:
                         continue
+                    #get dimensions
+                    if ('Number of X' in line):
+                        words = line.split('=')
+                        n = words[1].split()
+                        dim[0] = int(n[0])
+                    if ('Number of Y' in line):
+                        words = line.split('=')
+                        n = words[1].split()
+                        dim[1] = int(n[0]) 
+                    if ('Number of Z' in line):
+                        words = line.split('=')
+                        n = words[1].split()
+                        dim[2] = int(n[0])
+
                     #get coordinates
                     if ('X-Direction Nodal Vertices, m' in line):
                         for line in fin:
@@ -110,6 +125,7 @@ class QASimulatorSTOMP(QASimulator):
                             # get x-centroid
                             x_centroid = (float(words[0]) + float(words[1])) * 0.5
                             x.append(x_centroid)
+                        x = x[:dim[0]]
 
                     if ('Y-Direction Nodal Vertices, m' in line):
                         for line in fin:
@@ -120,6 +136,7 @@ class QASimulatorSTOMP(QASimulator):
                             # get y-centroid
                             y_centroid = (float(words[0]) + float(words[2])) * 0.5
                             y.append(y_centroid)
+                        y = y[:dim[1]]
 
                     if ('Z-Direction Nodal Vertices, m' in line):
                         for line in fin:
@@ -130,6 +147,7 @@ class QASimulatorSTOMP(QASimulator):
                             # get z-centroid
                             z_centroid = (float(words[0]) + float(words[3])) * 0.5
                             z.append(z_centroid)
+                        z = z[:dim[2]]
 
                 fin.close()
                 #check if one of the coordinates is empty and if so, populate with a (0.5 value)
@@ -140,17 +158,7 @@ class QASimulatorSTOMP(QASimulator):
                     y = [0.5]
                 if not z:
                     z = [0.5]
-                    
-                #check if all points are the same for one of the directions
-                x_equal = all(elem == x[0] for elem in x)
-                y_equal = all(elem == y[0] for elem in y)
-                z_equal = all(elem == z[0] for elem in z)
-                if x_equal:
-                    x = [x[0]]
-                if y_equal:
-                    y = [y[0]]
-                if z_equal:
-                    z = [z[0]]
+
                 solution.write_coordinates(x,y,z)
                 first_file = False
             # read file
@@ -180,6 +188,7 @@ class QASimulatorSTOMP(QASimulator):
                             for var_values in words:
                                 all_values.append(float(var_values))
                         all_values_np = np.asarray(all_values, dtype=np.float64).transpose()
+                        all_values_np = np.reshape(all_values_np, (dim[0], dim[1], dim[2]))
                         solution.write_dataset(time,all_values_np, v_name,'Time Slice')
             fin.close()
         debug_pop()
