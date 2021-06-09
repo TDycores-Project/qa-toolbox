@@ -128,10 +128,19 @@ class QASimulatorSTOMP(QASimulator):
                             if not words:
                                 break
                             # get z-centroid
-                            z_centroid = (float(words[0]) + float(words[4])) * 0.5
+                            z_centroid = (float(words[0]) + float(words[3])) * 0.5
                             z.append(z_centroid)
 
                 fin.close()
+                #check if one of the coordinates is empty and if so, populate with a (0.5 value)
+                #Note: For 2D problems, Stomp only output 2 of the 3 dimensions
+                if not x:
+                    x = [0.5]
+                if not y:
+                    y = [0.5]
+                if not z:
+                    z = [0.5]
+                    
                 #check if all points are the same for one of the directions
                 x_equal = all(elem == x[0] for elem in x)
                 y_equal = all(elem == y[0] for elem in y)
