@@ -136,7 +136,11 @@ class QASimulatorSTOMP(QASimulator):
                             # get y-centroid
                             y_centroid = (float(words[0]) + float(words[2])) * 0.5
                             y.append(y_centroid)
-                        y = y[:dim[1]]
+                        start = 0
+                        stop = dim[0]*dim[1]
+                        step = dim[0]
+                        keep_ind = np.arange(start,stop,step)
+                        y = [y[ind] for ind in keep_ind]
 
                     if ('Z-Direction Nodal Vertices, m' in line):
                         for line in fin:
@@ -147,7 +151,11 @@ class QASimulatorSTOMP(QASimulator):
                             # get z-centroid
                             z_centroid = (float(words[0]) + float(words[3])) * 0.5
                             z.append(z_centroid)
-                        z = z[:dim[2]]
+                        start = 0
+                        stop = dim[0]*dim[1]*dim[2]
+                        step = dim[0]*dim[1]
+                        keep_ind = np.arange(start,stop,step)
+                        z = [z[ind] for ind in keep_ind]
 
                 fin.close()
                 #check if one of the coordinates is empty and if so, populate with a (0.5 value)
@@ -188,7 +196,7 @@ class QASimulatorSTOMP(QASimulator):
                             for var_values in words:
                                 all_values.append(float(var_values))
                         all_values_np = np.asarray(all_values, dtype=np.float64).transpose()
-                        all_values_np = np.reshape(all_values_np, (dim[0], dim[1], dim[2]))
+                        all_values_np = np.reshape(all_values_np, (dim[0], dim[1], dim[2]), order='F')
                         solution.write_dataset(time,all_values_np, v_name,'Time Slice')
             fin.close()
         debug_pop()
