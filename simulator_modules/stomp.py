@@ -15,6 +15,7 @@ successful_exit_code = 86
 time_slice_mapping = {}
 time_slice_mapping['Aqueous Saturation'] = 'Liquid Saturation'
 time_slice_mapping['Aqueous Pressure, pa'] = 'Liquid Pressure'
+time_slice_mapping['Rock/Soil Type'] = 'Material_ID'
 
 class QASimulatorSTOMP(QASimulator):
 
