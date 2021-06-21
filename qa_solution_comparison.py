@@ -125,12 +125,12 @@ class QASolutionComparison(object):
                 for simulator in self.mapped_simulator_names:
 
                     filename = self.solution_dictionary[simulator]
-                
                     solution_object = QASolutionReader(filename)
                     x, y, z = solution_object.get_coordinates()
 
                     solution = solution_object.get_solution(time,variable,Time_Slice=True)
                     solution_object.destroy()
+                    solution = solution.transpose()
                
                     if plot_error or print_error:
 
@@ -172,7 +172,7 @@ class QASolutionComparison(object):
                             plt.figure(figsize=(8,6))
                             levels = np.linspace(s_min,s_max,11)
                             X,Y = np.meshgrid(x_axis,y_axis)
-                            surface = plt.contourf(Y,X,solution[:,:],
+                            surface = plt.contourf(X,Y,solution[:,:],
                                                  levels,alpha=0.75)
                             x_axis_old=x_axis
                             y_axis_old=y_axis
@@ -194,7 +194,7 @@ class QASolutionComparison(object):
                             fill_legend = '{} (fill)'.format(simulator)
                         else:
                             check_coordinates_2D(x_axis,x_axis_old,y_axis,y_axis_old)
-                            surface = plt.contour(Y,X,solution[:,:],levels,
+                            surface = plt.contour(X,Y,solution[:,:],levels,
                                                 colors='black',
                                                 linewidth=0.5)
                             plt.clabel(surface,inline=True,fontsize=10)
