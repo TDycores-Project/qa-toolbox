@@ -15,10 +15,10 @@ successful_exit_code = 86
 time_slice_mapping = {}
 time_slice_mapping['Aqueous Saturation'] = 'Liquid Saturation'
 time_slice_mapping['Aqueous Pressure, pa'] = 'Liquid Pressure'
+time_slice_mapping['Rock/Soil Type'] = 'Material_ID'
 
 class QASimulatorSTOMP(QASimulator):
 
-    # check if we can use another input file name
     def __init__(self, path):
         debug_push('QASimulatorSTOMP init')
         super(QASimulatorSTOMP, self).__init__(path)
@@ -28,13 +28,50 @@ class QASimulatorSTOMP(QASimulator):
     def run(self, filename, annotation):
         debug_push('QASimulatorSTOMP _run')
         command = []
+        os.symlink(filename, 'input')
         command.append(self._get_full_executable_path())
-        command.append(filename)
         debug_push('Running STOMP')
         status = self._submit_process(command, filename, annotation)
         debug_pop()
         solution_filename = self.convert_solution_to_common_h5(filename)
         debug_pop()
+        os.unlink('input')
+
+        # Rename output files
+        # List of output files that can't fail
+        output_required = ['output', 'connect']
+        for i in range(len(output_required)):
+            try:
+                new_name = filename + '_' + output_required[i]
+                os.rename(output_required[i], new_name)
+            except OSError:
+                print('ERROR: STOMP output file {} does not exist.'.format(output_required[i]))
+        
+        output_optional = ['surface']
+        # Go through files in the directory and look for files starting with plot
+        for r, dirct, files in os.walk('.'):
+            for name in files:
+                if name.startswith('plot'):
+                    output_optional.append(name)
+
+        for i in range(len(output_optional)):
+            try:
+                new_name = filename + '_' + output_optional[i]
+                os.rename(output_optional[i], new_name)
+            except OSError:
+                pass
+
+        # If you think we don't need to set "try" for the optional filenmanes,
+        # we can just join lines 58-63 into the os.walk, with something like this:
+
+        # output_optional = ['surface', 'plot']
+        # for r, dirct, files in os.walk('.'):
+        #     for name in files:
+        #         for i in range(len(output_optional)):
+        #             if name.startswith(output_optional[i]):
+        #                 new_name = filename + '_' + output_optional[i]
+        #                 os.rename(output_optional[i], new_name)
+
         return solution_filename
 
     def output_file_patterns(self):
@@ -50,6 +87,7 @@ class QASimulatorSTOMP(QASimulator):
         x = []
         y = []
         z = []
+        dim = [''] * 3
         first_file = True
 
         for r, dirct, files in os.walk('.'):
@@ -64,6 +102,20 @@ class QASimulatorSTOMP(QASimulator):
                     line = line.strip()
                     if line == []:
                         continue
+                    #get dimensions
+                    if ('Number of X' in line):
+                        words = line.split('=')
+                        n = words[1].split()
+                        dim[0] = int(n[0])
+                    if ('Number of Y' in line):
+                        words = line.split('=')
+                        n = words[1].split()
+                        dim[1] = int(n[0]) 
+                    if ('Number of Z' in line):
+                        words = line.split('=')
+                        n = words[1].split()
+                        dim[2] = int(n[0])
+
                     #get coordinates
                     if ('X-Direction Nodal Vertices, m' in line):
                         for line in fin:
@@ -74,6 +126,7 @@ class QASimulatorSTOMP(QASimulator):
                             # get x-centroid
                             x_centroid = (float(words[0]) + float(words[1])) * 0.5
                             x.append(x_centroid)
+                        x = x[:dim[0]]
 
                     if ('Y-Direction Nodal Vertices, m' in line):
                         for line in fin:
@@ -84,6 +137,11 @@ class QASimulatorSTOMP(QASimulator):
                             # get y-centroid
                             y_centroid = (float(words[0]) + float(words[2])) * 0.5
                             y.append(y_centroid)
+                        start = 0
+                        stop = dim[0]*dim[1]
+                        step = dim[0]
+                        keep_ind = np.arange(start,stop,step)
+                        y = [y[ind] for ind in keep_ind]
 
                     if ('Z-Direction Nodal Vertices, m' in line):
                         for line in fin:
@@ -92,20 +150,24 @@ class QASimulatorSTOMP(QASimulator):
                             if not words:
                                 break
                             # get z-centroid
-                            z_centroid = (float(words[0]) + float(words[4])) * 0.5
+                            z_centroid = (float(words[0]) + float(words[3])) * 0.5
                             z.append(z_centroid)
+                        start = 0
+                        stop = dim[0]*dim[1]*dim[2]
+                        step = dim[0]*dim[1]
+                        keep_ind = np.arange(start,stop,step)
+                        z = [z[ind] for ind in keep_ind]
 
                 fin.close()
-                #check if all points are the same for one of the directions
-                x_equal = all(elem == x[0] for elem in x)
-                y_equal = all(elem == y[0] for elem in y)
-                z_equal = all(elem == z[0] for elem in z)
-                if x_equal:
-                    x = [x[0]]
-                if y_equal:
-                    y = [y[0]]
-                if z_equal:
-                    z = [z[0]]
+                #check if one of the coordinates is empty and if so, populate with a (0.5 value)
+                #Note: For 2D problems, Stomp only output 2 of the 3 dimensions
+                if not x:
+                    x = [0.5]
+                if not y:
+                    y = [0.5]
+                if not z:
+                    z = [0.5]
+
                 solution.write_coordinates(x,y,z)
                 first_file = False
             # read file
@@ -135,6 +197,7 @@ class QASimulatorSTOMP(QASimulator):
                             for var_values in words:
                                 all_values.append(float(var_values))
                         all_values_np = np.asarray(all_values, dtype=np.float64).transpose()
+                        all_values_np = np.reshape(all_values_np, (dim[0], dim[1], dim[2]), order='F')
                         solution.write_dataset(time,all_values_np, v_name,'Time Slice')
             fin.close()
         debug_pop()
