@@ -176,7 +176,7 @@ class QASolutionComparison(object):
                                                  levels,alpha=0.75)
                             x_axis_old=x_axis
                             y_axis_old=y_axis
-#                            cbar = plt.colorbar()
+                            #cbar = plt.colorbar()
                             if np.mean(solution[:,:]) < 1:
                                 cbar = plt.colorbar(format='%.2e')
                   
@@ -206,8 +206,9 @@ class QASolutionComparison(object):
 
                         y_min = min(y_min,math.floor(np.amin(y)))
                         y_max = max(y_max,math.ceil(np.amax(y)))
-                        z_min = min(y_min,math.floor(np.amin(z)))
-                        z_max = max(y_max,math.ceil(np.amax(z)))
+                        z_min = min(z_min,math.floor(np.amin(z)))
+                        z_max = max(z_max,math.ceil(np.amax(z)))
+
                         if isimulator == 0:
                             fig=plt.figure()
                             ax = fig.gca(projection='3d')
