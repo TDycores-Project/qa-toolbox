@@ -20,7 +20,7 @@ from scipy import special
 import traceback
 
 from qa_debug import *
-from analytical_modules.xerf import exp_erf
+from analytical_modules.xerf import exp_erfc
 from analytical_modules.analytical_transport import AnalyticalTransport1D
 from analytical_modules.analytical import Analytical
 
@@ -49,8 +49,8 @@ class Ogata(AnalyticalTransport1D):
             xx = x[i]
             twosqrtDT = 2.*math.sqrt(self._D*t)
             c[i] = 0.5*(special.erfc((xx-self._v*t)/twosqrtDT) + \
-                        exp_erf(self._v*xx/self._D, \
-                                (xx+self._v*t)/twosqrtDT))
+                        exp_erfc(self._v*xx/self._D, \
+                                 (xx+self._v*t)/twosqrtDT))
         c[:] *= self._c0
         debug_pop()
         return x, c

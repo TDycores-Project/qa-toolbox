@@ -30,7 +30,7 @@ import traceback
 
 from qa_debug import *
 from analytical_modules.analytical_transport import AnalyticalTransport1D
-from analytical_modules.xerf import exp_erf
+from analytical_modules.xerf import exp_erfc
 
 class Javandel(AnalyticalTransport1D):
   
@@ -118,13 +118,13 @@ class Javandel(AnalyticalTransport1D):
         # Equation (37)
         A1_ = \
             self._v/(self._v+U)* \
-            exp_erf(0.5*x*(self._v-U)/self._D,
+            exp_erfc(0.5*x*(self._v-U)/self._D,
                     0.5*(self._R*x-U*t)/math.sqrt(self._D*self._R*t))+ \
             self._v/(self._v-U)* \
-            exp_erf(0.5*x*(self._v+U)/self._D,
+            exp_erfc(0.5*x*(self._v+U)/self._D,
                     0.5*(self._R*x+U*t)/math.sqrt(self._D*self._R*t))+ \
             0.5*self._v*self._v/(self._D*self._R*(self._lambda-self._alpha))* \
-            exp_erf(self._v*x/self._D+(self._alpha-self._lambda)*t,
+            exp_erfc(self._v*x/self._D+(self._alpha-self._lambda)*t,
                     0.5*(self._R*x+self._v*t)/math.sqrt(self._D*self._R*t))
         return A1_            
 
@@ -134,13 +134,13 @@ class Javandel(AnalyticalTransport1D):
         # Equation (41)
         A1_constant_ = \
             self._v/(self._v+U)* \
-            exp_erf(0.5*x*(self._v-U)/self._D,
+            exp_erfc(0.5*x*(self._v-U)/self._D,
                     0.5*(self._R*x-U*t)/math.sqrt(self._D*self._R*t))+ \
             self._v/(self._v-U)* \
-            exp_erf(0.5*x*(self._v+U)/self._D,
+            exp_erfc(0.5*x*(self._v+U)/self._D,
                     0.5*(self._R*x+U*t)/math.sqrt(self._D*self._R*t))+ \
             0.5*self._v*self._v/(self._D*self._R*self._lambda)* \
-            exp_erf(self._v*x/self._D-self._lambda*t,
+            exp_erfc(self._v*x/self._D-self._lambda*t,
                     0.5*(self._R*x+self._v*t)/math.sqrt(self._D*self._R*t))
         return A1_constant_
 
@@ -153,7 +153,7 @@ class Javandel(AnalyticalTransport1D):
             math.exp(-0.25*(self._R*x-self._v*t)*(self._R*x-self._v*t)/ \
                      (self._D*self._R*t))- \
             0.5*(1.+self._v*x/self._D+self._v*self._v*t/(self._D*self._R))* \
-            exp_erf(self._v*x/self._D,
+            exp_erfc(self._v*x/self._D,
                     0.5*(self._R*x+self._v*t)/math.sqrt(self._D*self._R*t))
         return A2_            
 
@@ -164,7 +164,7 @@ class Javandel(AnalyticalTransport1D):
             math.sqrt(self._v*self._v*t/(math.pi*self._D))* \
             math.exp(-0.25*(x-self._v*t)*(x-self._v*t)/(self._D*t)) - \
             0.5*(1.+self._v*x/self._D+self._v*self._v*t/self._D)* \
-            exp_erf(self._v*x/self._D,
+            exp_erfc(self._v*x/self._D,
                     0.5*(x+self._v*t)/math.sqrt(self._D*t))
         return A3_            
   

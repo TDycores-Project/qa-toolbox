@@ -12,14 +12,14 @@ import math
 # exp() will throw an error.
 amax = 500. # this number is platform dependent. it prevents over/underflow.
 
-def exp_erf(a,b):
+def exp_erfc(a,b):
   '''This subroutine is based on Fortran code from:
   
     van Genuchten, M. T. and W.J. Alves, (1982) Analytical solutions of the 
     one-dimensional convective-dispersive solute transport equation, USDA 
     Tech. Bull. 1661.
 
-    where exp(a)*erf(b) is evaluated at extreme values of a and b.
+    where exp(a)*erfc(b) is evaluated at extreme values of a and b.
   '''
   value = 0.
   if abs(a) > amax and b <= 0.:
