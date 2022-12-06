@@ -37,17 +37,18 @@ class QASimulatorTOUGH3(QASimulator):
                   'MESHB','MESHB','INCON','.*_run\d*_tough3\.h5']
         return patterns 
 
-    def run(self,filename,annotation):
+    def run(self,filename,annotation,np):
         debug_push('QASimulatorTOUGH3 _run')
         command = []
         command.append(self._get_full_executable_path())
         command.append(filename)#+'.in')
-#        command.append(filename+'.out')
+##        command.append(filename+'.out')
         debug_push('Running TOUGH3')
-        status=self._submit_process(command,filename,annotation)
+        #uncomment below if have tough3 simulator
+        #status=self._submit_process(command,filename,annotation)
         debug_pop()        
-        if status != 0:
-            print_err_msg('Tough3 simulator failed. Check {}_tough3.stdout'.format(filename.split('.')[0]))
+       # if status != 0:
+       #     print_err_msg('Tough3 simulator failed. Check {}_tough3.stdout'.format(filename.split('.')[0]))
         solution_filename = self.convert_solution_to_common_h5(filename)
         debug_pop()        
         return solution_filename
@@ -107,22 +108,26 @@ class QASimulatorTOUGH3(QASimulator):
   
     def _process_output_time_slice(self,filename,solution):
         first = True
+        var= False
         with open(filename,'r') as f:
             row = csv.reader(f)
             all_values = []
             for line in row:
-                if 'ELEM' in line[0].strip():
-                    variables = [x.strip() for x in line[1:]]
+                if 'Z' in line[0].strip():
+
+                    if var==False:
+                      variables = [x.strip() for x in line[1:]]
+                      var = True
                 elif 'TIME' in line[0].strip():
                     if len(all_values) != 0:
                         all_values = np.asarray(all_values, dtype=np.float64).transpose()
                         ###remove dummy variables
-                        all_values = self._remove_bad_values(all_values)
-                        for n in range(3,len(all_values)):
-                            if variables[n] in time_mapping:
-                                new_key = time_mapping[variables[n]]
+                     #   all_values = self._remove_bad_values(all_values)
+                        for n in range(1,len(all_values)):
+                            if variables[n-1] in time_mapping:
+                                new_key = time_mapping[variables[n-1]]
                             else:
-                                new_key = variables[n]
+                                new_key = variables[n-1]
 
                             solution.write_dataset(time,all_values[n], new_key,'Time Slice')
                         all_values = []
@@ -132,27 +137,30 @@ class QASimulatorTOUGH3(QASimulator):
                     if first == True:
                         solution.set_time_unit(time_unit)
                         first = False
-                elif '' == line[0].strip():
+                elif 'Z' in line[0].strip() or '(M)' in line[0].strip():
                     continue
-                else:
-                    values = line[1:]
-                    all_values.append(values)
-                                
+                else:     
+                    values = line[0:]
+                    all_values.append(values)                     
         all_values = np.asarray(all_values, dtype=np.float64).transpose()
         ##remove dummy variables
-        all_values = self._remove_bad_values(all_values)
-        
-        x = all_values[0]
-        y = all_values[1]
-        z = all_values[2]
+     #   all_values = self._remove_bad_values(all_values)
+
+        z = all_values[0]
+        x = 0.5 * np.ones(len(all_values[0]))
+        y = 0.5 * np.ones(len(all_values[0]))
+#        y = all_values[1]
+#        z = all_values[2]
                
         solution.write_coordinates(x,y,z)
-        
-        for n in range(3,len(all_values)):
-            if variables[n] in time_mapping:
-                new_key = time_mapping[variables[n]]
+        #####change
+      #  for n in range(3,len(all_values)):
+
+        for n in range(1,len(all_values)):
+            if variables[n-1] in time_mapping:
+                new_key = time_mapping[variables[n-1]]
             else:
-                new_key = variables[n]
+                new_key = variables[n-1]
             solution.write_dataset(time,all_values[n], new_key,'Time Slice')
         
     def _process_output_observation_file(self,solution,tough_obs):

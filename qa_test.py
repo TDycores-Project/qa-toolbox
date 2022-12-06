@@ -57,6 +57,7 @@ class QATest(object):
         self.swap_dict = {}
         self._template = self._section_dict['template']
         self.regression=qa_lookup(self._section_dict,'regression_test',False)
+        self.attributes = self._section_dict['attributes']
         debug_pop()
 
     def __str__(self):
@@ -169,17 +170,25 @@ class QATest(object):
             print (self._section_dict)
         simulator_list = self._section_dict['simulators'].split(',')
         num_simulators = 0
-
+        
         self._simulators = []
         self._mapped_simulator_names = []
+        self._np=[]
         debug_simulator_list = []
         for simulator in simulator_list:
-            s = re.split(r'\s*:\s*',simulator.strip())
+            np = 1
+            s = re.split(r'\s*:\s*',simulator.strip()) #split up here to get number of proccessers
             simulator_name = s[0]
             if len(s) > 1:
-                mapped_simulator_name = s[1]
+                sp = re.split(r'\s*-\s*',s[1].strip())
+                mapped_simulator_name = sp[0]
+                if len(sp) > 1:
+                    np = int(sp[1])
             else:
-                mapped_simulator_name = s[0]
+                sp = re.split(r'\s*-\s*',s[0].strip())
+                mapped_simulator_name = sp[0]
+                if len(sp) > 1:
+                    np = int(sp[1])
             if simulator_name not in available_simulators:
                 print_err_msg('Simulator {} requested in .cfg file, section [{}] not found \
                               among available simulators.'.format(simulator_name,self.name))
@@ -189,6 +198,7 @@ class QATest(object):
                 s = available_simulators[simulator_name]
                 self._simulators.append(s)
                 self._mapped_simulator_names.append(mapped_simulator_name)
+                self._np.append(np)
                 debug_simulator_list.append(mapped_simulator_name)
         if num_simulators < 2:
             print_err_msg('Insufficient number of available simulators in '
@@ -196,7 +206,7 @@ class QATest(object):
         print('simulators: '+list_to_string(debug_simulator_list))
         debug_pop()
 
-    def initialize_run(self,available_simulators):
+    def initialize_run(self,available_simulators,doc_dir):
         debug_push('QATest initialize_run')
         list_of_swap_dict=self._process_swap_options()
         self._check_simulators(available_simulators)
@@ -206,7 +216,7 @@ class QATest(object):
 #        print(self.root_dir)
 #        print(cwd.replace(self.root_dir,''))
 
-        self.doc = QATestDoc(cwd,cwd.replace(self.root_dir,''))
+        self.doc = QATestDoc(cwd,doc_dir)
         self.doc.set_title(self.title)
         self.doc.set_template(self._template)
         
@@ -247,6 +257,7 @@ class QATest(object):
         
         for simulator in self._simulators:
             mapped_simulator_name = self._mapped_simulator_names[isimulator]
+            np = self._np[isimulator]
             if run_number == 1:
                  self.doc.add_simulator(mapped_simulator_name)
             print_header('-',mapped_simulator_name)
@@ -256,7 +267,7 @@ class QATest(object):
             if len(self.map_options) > 0:
                 simulator.update_dict(self.map_options)
             solutions[mapped_simulator_name] = \
-                simulator.run(filename,annotation)
+                simulator.run(filename,annotation,np)
             isimulator += 1
         #self._compare_solutions(solutions)
         ##pass in template and run number

@@ -49,9 +49,12 @@ class QASolutionWriter(object):
         ###add units??
         debug_pop()
         
-    def write_time(self,t):
+    def write_time(self,t,observation=True):
         debug_push('QASolutionWriter write_time')
-        group_name = 'Observation/Time'
+        if observation:
+            group_name = 'Observation/Time'
+        else:
+            group_name = 'Mass Balance/Time'
         self._f[group_name+'/times'] = t
         self._f[group_name].attrs['time unit'] = self._tunit   
         debug_pop()
@@ -79,13 +82,16 @@ class QASolutionWriter(object):
             self._f[group_name].attrs['location'] = '{} {} {}'.format(dimension[0], \
                                                   dimension[1],dimension[2])
             self._f[group_name].attrs['location unit'] = '{}'.format(self._sunit)
+        elif group == 'Mass Balance':
+            group_name = '{}/Solutions'.format(group)
+            self._f[group_name + '/' + dataset_name] = soln
         else:
             print_err_msg('Unrecognized group "{}" in '.format(group),
                             'QASolutionWriter write_dataset. '
                             'Available groups include: Time Slice or Observation') 
         
         if debug_verbose():
-            print(group_name+'/'+dataset_name)
+           print(group_name+'/'+dataset_name) #fix
         debug_pop()
 
     def destroy(self):
@@ -156,6 +162,12 @@ class QASolutionReader(object):
                     print_err_msg('No time array found in Observation h5 file {}'.format(self._filename))
                 elif len(self._observation_solutions)==0:
                     print_err_msg('No solutions found in Observation h5 file {}'.format(self._filename))
+            elif key.startswith('Mass'):
+                for mkey in list(self._f[key].keys()):
+                    if mkey.startswith('Time'):
+                        self._time_group = self._f[key+'/'+mkey]
+                    elif mkey.startswith('Solution'):
+                       self._mass_balance_group=self._f[key+'/'+mkey]
             else:
                 print_err_msg('Unrecognized key "{}" in '.format(key),
                                 'QASolutionReader process_groups')
@@ -240,10 +252,10 @@ class QASolutionReader(object):
             print('Coordinates match')
         debug_pop()
     
-    def get_solution(self,dimension,variable,Observation=False,Time_Slice=False):
+    def get_solution(self,dimension,variable,plot_type):
         debug_push('QASolutionReader get_solution')
         
-        if Time_Slice==True:
+        if plot_type == 'Time_Slice':
             array = self.get_solution_3D(dimension,variable)
             if not array.ndim == 3:
                 print_err_msg('Solutions read in QASolutionReader.get_solution ',
@@ -266,14 +278,33 @@ class QASolutionReader(object):
             elif sizex == 1 and sizey > 1 and sizez > 1:
                 array = self.convert_to_2D(array,'YZ')
 
-        elif Observation == True:
+        elif plot_type == 'Observation':
             array = self.get_observation_solution(dimension,variable)            
+
+        elif plot_type == 'Mass_Balance':
+            array = self._get_mass_balance_solution(variable)   
             
         else:
-            print_err_msg('Must specify observation or time slice in QASolutionReader get_solution')
+            print_err_msg('Unrecognized plot type in QASolutionReader get_solution')
         debug_pop()
         return array
 
+    def _get_mass_balance_solution(self,variable):
+        debug_push('QASolutionReader get_mass_balance_solution')
+        
+        for key in self._mass_balance_group:
+            if key.startswith(variable):
+                variable_key = key
+                break
+        if not variable_key:
+              print_err_msg('Variable "{}" specified in options file not found in Mass Balance group in h5 file {}. Available variables include:{}'. \
+                            format(variable,self._filename,list(self._mass_balance_group.keys())))
+        array = np.array(self._mass_balance_group[variable_key])
+        array = np.array(array[:,0,0])
+        
+        debug_pop()
+        return array
+            
             
     def get_observation_solution(self,location,variable):
         debug_push('QASolutionReader get_observation_solution')
@@ -320,7 +351,7 @@ class QASolutionReader(object):
                 group = g
         if not group:
             print_err_msg('Time "{}" specified in options file not found in Time Slice group in h5 file {}. '
-                          'Available times: {}'.format(t,self._filename,available_times))
+                          'Available times: {}'.format(time,self._filename,available_times))
 
         variable_key = None
 

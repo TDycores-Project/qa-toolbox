@@ -39,13 +39,21 @@ class QATestDocObservation():
         self._variables = []
 
     def add_variable(self,variable):
-       self._variables.append(variable)       
+       self._variables.append(variable)  
+       
+class QATestDocMassBalance():
+    def __init__(self):
+        self._variables = []
+
+    def add_variable(self,variable):
+       self._variables.append(variable)
 
 class QATestDocRun():
     def __init__(self,run_number):
         self._run_number = run_number
         self._time_slices = []
         self._observations = []
+        self._mass_balances = []
         self._overall = []
         self._filenames = {}
         self._rst_filename = ''
@@ -96,6 +104,9 @@ class QATestDocRun():
     
     def add_observation(self,doc_observation):
         self._observations.append(doc_observation)
+        
+    def add_mass_balance(self,doc_mass_balance):
+        self._mass_balances.append(doc_mass_balance)
         
     def add_max_absolute_error(self,variable,error):
         maximum_absolute_error_all_times = self._format_documentation_values(error.maximum_absolute_error_all_times)
@@ -173,11 +184,12 @@ class QATestDocRun():
     
 class QATestDoc(object):
     
-    def __init__(self,doc_dir,local_path):
+    def __init__(self,abs_path,doc_dir):
         debug_push('QATestDoc init')
         
+        self._abs_path = abs_path
         self._doc_dir = doc_dir
-        self._local_path = local_path
+#        self._local_path = local_path
         self._title = ''
         self._template = ''
         self._filename_root = ''
@@ -208,7 +220,11 @@ class QATestDoc(object):
 
     def write(self):   
 
-        f = open(self._filename_root+'_doc.rst','w')
+        test_dir = "{}/tests".format(self._doc_dir)
+        if not os.path.isdir(test_dir):
+            os.makedirs(test_dir)
+        file = '{}/{}_doc.rst'.format(test_dir,self._filename_root)
+        f = open(file,'w')
         f.write("""
 .. _{0}:
     
@@ -461,7 +477,7 @@ Results Summary
                     run._maximum_average_relative_errors_observation[variable_string],
                     run._maximum_average_relative_error_location_observation[variable_string]))
                         
-        description_file = '{}/{}.description'.format(self._doc_dir,self._template) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
+        description_file = '{}/{}.description'.format(self._abs_path,self._template) ##make so this is try--> don't need it ###written in markup --> description of problem description_template... what if don't want description etc...
 
         try:
             with open(description_file,'r') as file:
@@ -483,7 +499,7 @@ The Problem Description
                 split_text = description_text[i].split()
                 relative_path = split_text[-1]
 
-                path = '/'+self._doc_dir+'/'+relative_path
+                path = '/'+self._abs_dir+'/'+relative_path
                 split_text[-1] = path
                 description_text[i] = " ".join(split_text) +'\n'
             f.write('{}'.format(description_text[i]))
@@ -500,9 +516,10 @@ Detailed Results
         width_percent = 60
                 
         for run in self._runs:
-            scenario_string = 'Scenario {} - Time Slice'.format(run._run_number)
-            f.write("{}\n".format(scenario_string))
-            f.write("{}\n".format('-'*len(scenario_string)))
+            if len(run._time_slices) > 0:
+                scenario_string = 'Scenario {} - Time Slice'.format(run._run_number)
+                f.write("{}\n".format(scenario_string))
+                f.write("{}\n".format('-'*len(scenario_string)))
             f.write("\n")
             simulators = self._simulators
            
@@ -521,17 +538,17 @@ Detailed Results
                     # absolute here make it relative to the top source dir
                     # in the sphinx repo (usually: sphinx/doc/source/.)
                     f.write(".. literalinclude:: /{}/{}\n\n".format(
-                                                         self._doc_dir,
+                                                         self._abs_path,
                                               variable._error_stat))
                     f.write(".. _{}_{}_{}_figure{}:\n".format(self._filename_root,
                                                 run._run_number,variable_string,n))
                     f.write("\n")
 
                     f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
-                                   self._doc_dir,variable._solution_png[0],width_percent))
+                                   self._abs_path,variable._solution_png[0],width_percent))
                     if variable._error_png:
                         f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
-                                   self._doc_dir,variable._error_png[0],width_percent))
+                                   self._abs_path,variable._error_png[0],width_percent))
                 n += 1
                 
 
@@ -557,16 +574,41 @@ Detailed Results
                     f.write("\n")
 
                     f.write(".. literalinclude:: /{}/{}\n\n".format(
-                                 self._doc_dir,variable._error_stat))
+                                 self._abs_path,variable._error_stat))
                     f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
-                                 self._doc_dir,
+                                 self._abs_path,
                                  variable._solution_png[0],width_percent))
                     if variable._error_png:
                         f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
-                                 self._doc_dir,
+                                 self._abs_path,
                                  variable._error_png[0],width_percent))
                 k += 1
                 
+            if len(run._mass_balances) > 0:
+                scenario_string = 'Scenario {} - Mass Balance'.format(run._run_number)
+                f.write("{}\n".format(scenario_string))
+                f.write("{}\n".format('-'*len(scenario_string)))
+
+            k = 0
+            for mass_balance in run._mass_balances:
+                for variable in mass_balance._variables:
+                    variable_string = variable._name
+                    f.write("Mass balance of {} for {} \n".format(variable_string,scenario_string))
+                    f.write("\n")
+                    f.write(".. _{}_{}_{}_mass_balance_figure{}:\n".format(self._filename_root,
+                                                            run._run_number,variable_string,k))
+                    f.write("\n")
+                    f.write(".. literalinclude:: /{}/{}\n\n".format(
+                                 self._abs_path,variable._error_stat))
+                    f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
+                                 self._abs_path,
+                                 variable._solution_png[0],width_percent))  
+                    if variable._error_png:
+                        f.write(".. figure:: /{}/{}\n   :width: {} %\n\n".format(
+                                 self._abs_path,
+                                 variable._error_png[0],width_percent))
+                    
+                k += 1
         f.write("""
 .. _{}-input files:
     
@@ -586,7 +628,7 @@ Input Files
 The {} input file can be downloaded
 :download:`here </{}/{}>`                       
 
-                        """.format(simulator,self._doc_dir,run._filenames[simulator]))
+                        """.format(simulator,self._abs_path,run._filenames[simulator]))
 
         f.close()
 
@@ -603,137 +645,182 @@ class QATestDocIndex(object):
         
         
     def write_index(self):
-        file_dict = self.testlog.read_contents()
-        regression_dict = self.testlog.read_contents(regression=True)
-        directory_titles = self.testlog.get_directory_titles()
+ #       file_dict = self.testlog.read_contents()
+ #       regression_dict = self.testlog.read_contents(regression=True)
+ #       directory_titles = self.testlog.get_directory_titles()
+ 
+        intro_file = "{}/introduction.txt".format(self._doc_dir)
+        with open(intro_file,'r') as file:
+            intro_text = file.readlines()
         
         f = open('{}/index.rst'.format(self._doc_dir),'w')
-        
-        intro = """
-***************************
-QA Test Suite Documentation        
-***************************
 
-.. toctree::
-   :maxdepth: 2
+#read in introduction above       
+        intro = """
+*********************
+GDSA QA Documentation        
+*********************
+
+INTRODUCTION AN SCOPE
+=====================
 """ 
         
         f.write(intro)
         
-        for folder_path in file_dict.keys():
-            folder = folder_path.strip().split('/')[-1]
-            f.write("""
-   intro_{}.rst
-            """.format(folder))
-#####must add toctree label back in or else will not work
-        f.write("""
-----  
-
+        for i in range(len(intro_text)):
+#            if re.match('.*\.\. figure:: (?!/).*',description_text[i]): #does not start with /
+##                split_text = description_text[i].split()
+ #               relative_path = split_text[-1]
+                
+#                path = '/' + self._doc_dir + '/' +relative_path
+#                split_text[-1] = path
+#                description_text[i] = " ".join(split_text) + '\n' 
+             f.write('{}'.format(intro_text[i]))
+             
+        requirements = """
+        
+REQUIREMENTS
+============
+                
 .. toctree::
    :maxdepth: 2              
-        """)
-        for folder_path in regression_dict.keys():
-            folder = folder_path.strip().split('/')[-1]
-            f.write("""
-   intro_{}.rst                
-            """.format(folder))
-           
-        file_dict.update(regression_dict)   
-        
-        toctree_intro = """
-.. toctree::
-   :hidden:
-"""
-        f.write(toctree_intro)
-        for folder_path,tests in file_dict.items(): 
-            folder = folder_path.strip().split('/')[-1]
-            for i in range(len(tests)):
-                test=tests[i].lower().replace(" ","_")
-                toctree="""
-   include_toctree_{}_{}.rst""".format(folder,test)
-                f.write(toctree)                
+        """
+        f.write(requirements)
+        f.write("""
+   requirements.rst
+                 """)
+         
+        self.write_requirements_doc()
         f.close()
-        
-        self.write_toctree(file_dict)
-        self.write_introfiles(file_dict,directory_titles)
-        
-    def write_toctree(self,file_dict):
-        
-        for folder_path,tests in file_dict.items():
-            folder = folder_path.strip().split('/')[-1]            
-            for i in range(len(tests)):
-                test=tests[i].lower().replace(" ","_")
-                filename = '{}/include_toctree_{}_{}.rst'.format(self._doc_dir,folder,test)
-                f = open(filename, 'w')
-                toctree = """
-.. include:: //{}/{}_doc.rst                
-                """.format(folder_path,test)
-                f.write(toctree)
-                f.close()
-        
-    def write_introfiles(self, file_dict,directory_titles):        
-        for folder_path, test in file_dict.items():
-            folder = folder_path.strip().split('/')[-1]
+           
+#        file_dict.update(regression_dict)   
+#        
+#        toctree_intro = """
+#.. toctree::
+#   :hidden:
+#"""
+#        f.write(toctree_intro)
+#        for folder_path,tests in file_dict.items(): 
+#            folder = folder_path.strip().split('/')[-1]
+#            for i in range(len(tests)):
+#                test=tests[i].lower().replace(" ","_")
+#                toctree="""
+#   include_toctree_{}_{}.rst""".format(folder,test)
+#                f.write(toctree)                
+#        f.close()
+#        
+#        self.write_toctree(file_dict)
+#        self.write_introfiles(file_dict,directory_titles)
+  
+    def write_requirements_doc(self):
+        number = 1
+        requirements_dict = self.testlog.get_requirements()
 
-            if folder_path in directory_titles.keys():
-                title = directory_titles[folder_path]
-            else:
-                title = folder
-            filename = '{}/intro_{}.rst'.format(self._doc_dir,folder)
-            intro = """
-.. {}-qa-tests:
-
-{}
-{}
-
-            """.format(folder,title,'='*(len(title)+9))
-            
-            intro_links = [None]*len(test)
-            if len(test) == 1:
-                intro_links[0] = """
-* :ref:`{}`
-                """.format(test[0])
-            else:
-                for i in range(len(test)):
-                    intro_links[i] = """
-{}
-{}
-* :ref:`{}`
-                """.format(test[i],'-'*len(test[i]),test[i])
+        f2 = open('{}/requirements.rst'.format(self._doc_dir),'w')
+        f2.write("""
+Functional Requirements
+=======================
+""")
+        for requirement, tests in requirements_dict.items():
+            requirement_string = "R {} {} \n".format(number,requirement)
+           # requirement_dir = "{}/{}".format(self._doc_dir,requirement)
+           # if not os.path.isdir(requirement_dir):
+           #     os.makedirs(requirement_dir)
+            f2.write(requirement_string)
+            f2.write("{} \n".format('-'*len(requirement_string)))
+            f2.write("""
+.. toctree::
+   :maxdepth: 1
+                     """)
+            f2.write("\n")
+            number += 1
+            for test in tests:
+                test_name = test.lower().replace(" ","_")#lower all of pah
+                # hack for now
+                # shutil.copy(test[0],requirement_dir)
+                test_rst = "   /tests/{}_doc.rst \n".format(test_name)
+                f2.write(test_rst)
+                f2.write("\n")
+        f2.close()
                 
-            f = open(filename, 'w')
-            f.write(intro)
-            for i in range(len(test)):
-                f.write(intro_links[i])
- 
-            description_file = "{}/{}.description".format(folder_path,folder)
-
-            try:
-                with open(description_file,'r') as file:
-                    description_text = file.readlines()
-            except:
-                description_text = [" "]
-    
-            f.write("\n")
-            
-            for i in range(len(description_text)):
-                if re.match('.*\.\. figure:: (?!/).*',description_text[i]): #does not start with /
-                    split_text = description_text[i].split()
-                    relative_path = split_text[-1]
-    
-                    path = '/'+folder_path+'/'+relative_path
-                    split_text[-1] = path
-                    description_text[i] = " ".join(split_text) +'\n'
-                f.write('{}'.format(description_text[i]))
                 
-            f.write("\n")
-            
-#            f.write("""
+#    def write_toctree(self,file_dict): 
+#        
+#        for folder_path,tests in file_dict.items():
+#            folder = folder_path.strip().split('/')[-1]            
+#            for i in range(len(tests)):
+#                test=tests[i].lower().replace(" ","_")
+#                filename = '{}/include_toctree_{}_{}.rst'.format(self._doc_dir,folder,test)
+#                f = open(filename, 'w')
+#                toctree = """
+#.. include:: //{}/{}_doc.rst                
+#                """.format(folder_path,test)
+#                f.write(toctree)
+#                f.close()
+        
+#    def write_introfiles(self, file_dict,directory_titles):        
+#        for folder_path, test in file_dict.items():
+#            folder = folder_path.strip().split('/')[-1]
+#
+#            if folder_path in directory_titles.keys():
+#                title = directory_titles[folder_path]
+#            else:
+#                title = folder
+#            filename = '{}/intro_{}.rst'.format(self._doc_dir,folder)
+#            intro = """
+#.. {}-qa-tests:
 #
 #{}
-#                    
-#            """.format(description_text))
-                
-            f.close()
+#{}
+#
+#            """.format(folder,title,'='*(len(title)+9))
+#            
+#            intro_links = [None]*len(test)
+#            if len(test) == 1:
+#                intro_links[0] = """
+#* :ref:`{}`
+#                """.format(test[0])
+#            else:
+#                for i in range(len(test)):
+#                    intro_links[i] = """
+#{}
+#{}
+#* :ref:`{}`
+#                """.format(test[i],'-'*len(test[i]),test[i])
+#                
+#            f = open(filename, 'w')
+#            f.write(intro)
+#            for i in range(len(test)):
+#                f.write(intro_links[i])
+# 
+#            description_file = "{}/{}.description".format(folder_path,folder)
+#
+#            try:
+#                with open(description_file,'r') as file:
+#                    description_text = file.readlines()
+#            except:
+#                description_text = [" "]
+#    
+#            f.write("\n")
+#            
+#            for i in range(len(description_text)):
+#                if re.match('.*\.\. figure:: (?!/).*',description_text[i]): #does not start with /
+#                    split_text = description_text[i].split()
+#                    relative_path = split_text[-1]
+#    
+#                    path = '/'+folder_path+'/'+relative_path
+#                    split_text[-1] = path
+#                    description_text[i] = " ".join(split_text) +'\n'
+#                f.write('{}'.format(description_text[i]))
+#                
+#            f.write("\n")
+#            
+##            f.write("""
+##
+##{}
+##                    
+##            """.format(description_text))
+#                
+#            f.close()
         
       

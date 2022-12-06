@@ -25,7 +25,7 @@ class QASimulatorTDycore(QASimulator):
         patterns = ['.*_run\d*_tdycore\.h5']
         return patterns 
     
-    def run(self,filename,annotation):
+    def run(self,filename,annotation,np):
         debug_push('QASimulatorTDycore _run')
         command = []
         command.append(self._get_full_executable_path())

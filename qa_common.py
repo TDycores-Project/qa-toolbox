@@ -183,10 +183,10 @@ def find_axis_1D(x,y,z):
     if len(x) > 1:
         if check_array_equal(x)==False:
             x_axis = x
-    elif len(y)>1:
+    if len(y)>1:
         if check_array_equal(y)==False:
             x_axis = y
-    elif len(z)>1:
+    if len(z)>1:
         if check_array_equal(z)==False:
             x_axis = z
     try:   

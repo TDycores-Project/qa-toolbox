@@ -75,14 +75,15 @@ class QATestManager(object):
                 
         debug_pop()
             
-    def run_tests(self,testlog):
+    def run_tests(self,testlog,doc_dir):
         debug_push('QATestManager run_tests')
         for key, test_case in self._tests.items():
-            list_of_swap_dict = test_case.initialize_run(self.available_simulators)
+            list_of_swap_dict = test_case.initialize_run(self.available_simulators,doc_dir)
             test_case.run(list_of_swap_dict)
             if self.regression:
                 testlog.log_regression(self._path,test_case.title)
             else:
+                testlog.log_attributes(test_case.attributes,test_case.title)
                 testlog.log_success(self._path,test_case.title)
         debug_pop()
         

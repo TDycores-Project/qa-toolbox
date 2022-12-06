@@ -37,38 +37,66 @@ class QATestError(object):
                 return [True,x]
         return [False,-999.]
   
-    def plot_error(self,x1,y1,z1,values1,x2,y2,z2,values2,x_label='x',y_label='y',difference_string='all'):
+    def plot_error(self,dimension,values,analytical,x_label='x',y_label='y',difference_string='all'):
         debug_push('QAPlotError init')
 
         if self.dimension == '1D':
-            dimension1 = find_axis_1D(x1,y1,z1)
-            dimension2 = find_axis_1D(x2,y2,z2)
+   #         dimension1 = find_axis_1D(x1,y1,z1)
+   #         dimension2 = find_axis_1D(x2,y2,z2) find dimension ahead of this
                 
-            filename = self.plot_error_1D(dimension1,values1,dimension2,values2,x_label,difference_string)
+            filename = self.plot_error_1D(dimension,values,analytical,x_label,difference_string)
             
         elif self.dimension == '2D':
-            dimension1,dimension2 = find_axis_2D(x1,y1,z1)                
-            filename = self._plot_error_2D(dimension1,dimension2,values1,values2,x_label,y_label)
+        #    dimension1,dimension2 = find_axis_2D(x1,y1,z1)                
+            filename = self._plot_error_2D(dimension,values[0],values[1],x_label,y_label)
         
         debug_pop()
         return filename
         
         
-    def plot_error_1D(self,times1,values1,times2,values2,x_label,difference_string='all'):
-        [absolute_area,absolute_times,absolute_values] = self._calc_absolute_error(times1,values1,times2,values2,difference_string)
-        [relative_times,relative_values] = self._calc_relative_error(times1,values1,times2,values2,difference_string)
-      
-        maximum_absolute_error = self._get_maximum_error(absolute_values)
-        maximum_relative_error = self._get_maximum_error(relative_values)
-      
-        average_absolute_error = self._get_average_absolute_error(absolute_area,absolute_times)
-        average_relative_error = self._calc_average_relative_error(relative_times,relative_values)
-      
+    def plot_error_1D(self,times,values,analytical,x_label,difference_string='all'):
         f,ax = plt.subplots(2,1,figsize=(11,9))  #9,8
         plt.subplots_adjust(hspace=0.5)
 
-        ax[0].plot(absolute_times,absolute_values,marker='x')
-        ax[1].plot(relative_times,relative_values*100,marker='x')
+        if analytical:
+            maximum_absolute_error = -999.0
+            maximum_relative_error = 0.0
+            absolute_area_total = 0.0
+            absolute_time_span = 0.0
+            relative_area_total = 0.0
+            relative_time_span = 0.0
+            for i in range(len(values)):
+                [absolute_area,absolute_times,absolute_values] = self._calc_absolute_error(analytical[1],analytical[0],times[i],values[i],difference_string)
+                [relative_times,relative_values] = self._calc_relative_error(analytical[1],analytical[0],times[i],values[i],difference_string)
+                ax[0].plot(absolute_times,absolute_values,marker='x')
+                ax[1].plot(relative_times,relative_values*100,marker='x')
+                maximum_absolute_error_simulator = self._get_maximum_error(absolute_values)
+                maximum_relative_error_simulator = self._get_maximum_error(relative_values)
+                if maximum_absolute_error_simulator > maximum_absolute_error:
+                    maximum_absolute_error = maximum_absolute_error_simulator
+                if maximum_relative_error_simulator > maximum_relative_error:
+                    maximum_relative_error = maximum_relative_error_simulator
+                absolute_area_total = absolute_area_total + absolute_area
+                absolute_time_span = absolute_time_span + (max(absolute_times)-min(absolute_times))
+                [relative_area,relative_area_times]=self._calc_average_relative_error(relative_times,relative_values)
+                relative_area_total = relative_area_total + relative_area
+                relative_time_span = relative_time_span + (max(relative_area_times)-min(relative_area_times))
+            average_absolute_error = self._get_average_absolute_error(absolute_area_total,absolute_time_span)
+            average_relative_error = self._get_average_absolute_error(relative_area_total,relative_time_span) #change name of this function to be more general
+        else:
+            #error messaging if no analytical solution can only calculate error for 2 simulators
+            [absolute_area,absolute_times,absolute_values] = self._calc_absolute_error(times[0],values[0],times[1],values[1],difference_string)
+            [relative_times,relative_values] = self._calc_relative_error(times[0],values[0],times[1],values[1],difference_string)
+
+            ax[0].plot(absolute_times,absolute_values,marker='x')
+            ax[1].plot(relative_times,relative_values*100,marker='x')
+            maximum_absolute_error = self._get_maximum_error(absolute_values)
+            maximum_relative_error = self._get_maximum_error(relative_values)
+      
+            average_absolute_error = self._get_average_absolute_error(absolute_area,(max(absolute_times)-min(absolute_times)))
+            [relative_area,relative_area_times] = self._calc_average_relative_error(relative_times,relative_values)
+            average_relative_error = self._get_average_absolute_error(relative_area,(max(relative_area_times)-min(relative_area_times)))
+              
       
         ax[0].set_xlabel(x_label,fontsize=14) 
         if self.units == ' ':
@@ -130,17 +158,17 @@ class QATestError(object):
         plt.close()
         return filename 
       
-    def print_error(self,x1,y1,z1,values1,x2,y2,z2,values2):
+    def print_error(self,dimension,values,analytical):
         if self.dimension == '1D':
-            dimension1 = find_axis_1D(x1,y1,z1)
-            dimension2 = find_axis_1D(x2,y2,z2)
+         #   dimension1 = find_axis_1D(x1,y1,z1)
+         #   dimension2 = find_axis_1D(x2,y2,z2)
 
-            filename = self.print_error_1D(dimension1,values1,dimension2,values2)
+            filename = self.print_error_1D(dimension,values,analytical)
                         
         elif self.dimension=='2D':           
-            dimension1, dimension2 = find_axis_2D(x1,y1,z1)
+         #   dimension1, dimension2 = find_axis_2D(x1,y1,z1)
     
-            filename = self.print_error_2D(dimension1,dimension2,values1,values2)
+            filename = self.print_error_2D(dimension[0],dimension[1],values[0],values[1])
             
         return filename
             
@@ -168,8 +196,8 @@ class QATestError(object):
               
         return filename
         
-    def print_error_1D(self,dimension1,values1,dimension2,values2,time_unit = ' ', difference_string='all'):
-        self.calc_error_stats_1D(dimension1,values1,dimension2,values2,difference_string)
+    def print_error_1D(self,dimension,values,analytical,time_unit = ' ', difference_string='all'):
+        self.calc_error_stats_1D(dimension,values,analytical,difference_string)
 
         variable_string = self.variable.replace(" ","_")
         
@@ -195,15 +223,15 @@ class QATestError(object):
         return filename
     
     def _NonOverlappingAreaOfNonIntersectingLines(self,tstart,tend,line1,line2):
-        if tend <= tstart:
-            if tend < tstart:
-                print('Error in NonOverlappingAreaOfNonIntersectingLines:')
-                print('  end time (%f) < start time (%f)' % (tend,tstart))
-                exit(0)
-            return 0.
+#        if tend <= tstart:
+#            if tend < tstart:
+#                print('Error in NonOverlappingAreaOfNonIntersectingLines:')
+#                print('  end time (%f) < start time (%f)' % (tend,tstart))
+#                exit(0)
+#            return 0.
         return abs((line1.ValueYAtX(tstart)+line1.ValueYAtX(tend))-
                    (line2.ValueYAtX(tstart)+line2.ValueYAtX(tend)))/2.*(tend-tstart)
-                
+  #combine from below... redundant code              
     def _calc_relative_error(self,times1,values1,times2,values2,difference_string):  
         difference_flag = 3
         if difference_string.startswith('first') or \
@@ -223,7 +251,8 @@ class QATestError(object):
             print('Size of times1 (%d) does not match size of values1 (%d)' %
                   (times1.size,values1.size))
             exit(0)
-        
+   #     times1=abs(times1)
+   #     times2=abs(times2)
         max_time = min(amax(times1),amax(times2))
         min_time = max(amin(times1),amin(times2))
         size1 = times1.size
@@ -235,7 +264,14 @@ class QATestError(object):
         i1 = 0
         i2 = 0
         count3 = 0
-
+    #    times1 = times1[::-1]
+        inds1=argsort(times1)
+        inds2=argsort(times2)
+        times1 = times1[inds1]
+   #     values1 = values1[::-1]
+        values1 = values1[inds1]
+        times2=times2[inds2]
+        values2=values2[inds2]
         while tstart < max_time:
             while tstart >= times1[i1+1]:
                 i1 += 1
@@ -312,9 +348,10 @@ class QATestError(object):
             print('Size of times1 (%d) does not match size of values1 (%d)' %
                  (times1.size,values1.size))
             exit(0)
-        
+
         max_time = min(amax(times1),amax(times2))
         min_time = max(amin(times1),amin(times2))
+
         size1 = times1.size
         size2 = times2.size
         times3 = zeros(3,dtype='f8')
@@ -325,10 +362,20 @@ class QATestError(object):
         i2 = 0
         count3 = 0
         total_area = 0.
+
+        inds1=argsort(times1)
+        inds2=argsort(times2)
+        times1 = times1[inds1]
+        values1 = values1[inds1]
+        times2=times2[inds2]
+        values2=values2[inds2]
+
         while tstart < max_time:
+
             while tstart >= times1[i1+1]:
                 i1 += 1
             while tstart >= times2[i2+1]:
+
                 i2 += 1
             if i1+1 >= size1 and i2+1 >= size2:
                 break
@@ -400,17 +447,19 @@ class QATestError(object):
         
         return relative_error
   
-    
+    #change to calculate relative area, or just put in relative area calculation, make one function
     def _calc_average_relative_error(self,relative_times,relative_values):
         #calculate average relative error given relative error
         times2 = relative_times
         values2 = zeros(len(relative_values))
         
         [relative_area,times3,values3] = self._calc_absolute_error(relative_times,relative_values,times2,values2,'all')
-
-        average_relative_error = relative_area / (max(times3)-min(times3)) 
         
-        return average_relative_error
+        return relative_area, times3
+
+  #      average_relative_error = relative_area / (max(times3)-min(times3)) 
+        
+ #       return average_relative_error
         
     def _get_maximum_error(self,values):
         return amax(abs(values))
@@ -419,28 +468,59 @@ class QATestError(object):
         index = unravel_index(argmax(abs(values)),values.shape)
         return index
         
-    def _get_average_absolute_error(self,absolute_area,absolute_times):
-        return absolute_area / (max(absolute_times)-min(absolute_times))
+    def _get_average_absolute_error(self,absolute_area,absolute_time_span):
+        return absolute_area / (absolute_time_span)
         
-    def calc_error_stats_1D(self,times1,values1,times2,values2,difference_string='all'):
-        [absolute_area,absolute_times,absolute_values] = self._calc_absolute_error(times1,values1,times2,values2,difference_string)
-        [relative_times,relative_values] = self._calc_relative_error(times1,values1,times2,values2,difference_string)
+    def calc_error_stats_1D(self,times,values,analytical,difference_string='all'):
+        
+        if analytical:
+            self.maximum_absolute_error = -999.0
+            self.maximum_relative_error = 0.0
+            absolute_area_total = 0.0
+            absolute_time_span = 0.0
+            relative_area_total = 0.0
+            relative_time_span = 0.0
+            for i in range(len(values)):
+                [absolute_area,absolute_times,absolute_values] = self._calc_absolute_error(analytical[1],analytical[0],times[i],values[i],difference_string)
+                [relative_times,relative_values] = self._calc_relative_error(analytical[1],analytical[0],times[i],values[i],difference_string)
+                maximum_absolute_error_simulator = self._get_maximum_error(absolute_values)
+                maximum_relative_error_simulator = self._get_maximum_error(relative_values)
+                if maximum_absolute_error_simulator > self.maximum_absolute_error:
+                    self.maximum_absolute_error = maximum_absolute_error_simulator
+                    maximum_absolute_error_index = self._get_index_max_error(absolute_values)
+                    self.maximum_absolute_error_location = absolute_times[maximum_absolute_error_index]
+                    #add in which simulator maybe....
+                if maximum_relative_error_simulator > self.maximum_relative_error:
+                    self.maximum_relative_error = maximum_relative_error_simulator
+                    maximum_relative_error_index = self._get_index_max_error(relative_values)
+                    self.maximum_relative_error_location = relative_times[maximum_relative_error_index]
+                absolute_area_total = absolute_area_total + absolute_area
+                absolute_time_span = absolute_time_span + (max(absolute_times)-min(absolute_times))
+                [relative_area,relative_area_times]=self._calc_average_relative_error(relative_times,relative_values)
+                relative_area_total = relative_area_total + relative_area
+                relative_time_span = relative_time_span + (max(relative_area_times)-min(relative_area_times))
+            self.average_absolute_error = self._get_average_absolute_error(absolute_area_total,absolute_time_span)
+            self.average_relative_error = self._get_average_absolute_error(relative_area_total,relative_time_span) 
+        else:
+            [absolute_area,absolute_times,absolute_values] = self._calc_absolute_error(times[0],values[0],times[1],values[1],difference_string)
+            [relative_times,relative_values] = self._calc_relative_error(times[0],values[0],times[1],values[1],difference_string)
 
-        self.maximum_absolute_error = self._get_maximum_error(absolute_values)
-        self.average_absolute_error = self._get_average_absolute_error(absolute_area,absolute_times)
-        self.maximum_relative_error = self._get_maximum_error(relative_values)
-        self.average_relative_error = self._calc_average_relative_error(relative_times,relative_values)
+            self.maximum_absolute_error = self._get_maximum_error(absolute_values)
+            self.maximum_relative_error = self._get_maximum_error(relative_values)
+            self.average_absolute_error = self._get_average_absolute_error(absolute_area,(max(absolute_times)-min(absolute_times)))
+            [relative_area,relative_area_times] = self._calc_average_relative_error(relative_times,relative_values)
+            self.average_relative_error = self._get_average_absolute_error(relative_area,(max(relative_area_times)-min(relative_area_times)))
+#commented out below does not get used anywhere       
+#        self.absolute_relative_error = self._calc_absolute_relative_error(times1,values1,absolute_area)
         
-        self.absolute_relative_error = self._calc_absolute_relative_error(times1,values1,absolute_area)
+ #       self.absolute_error = absolute_values
+ #       self.relative_error = relative_values
         
-        self.absolute_error = absolute_values
-        self.relative_error = relative_values
+            maximum_absolute_error_index = self._get_index_max_error(absolute_values)
+            maximum_relative_error_index = self._get_index_max_error(relative_values)
         
-        maximum_absolute_error_index = self._get_index_max_error(absolute_values)
-        maximum_relative_error_index = self._get_index_max_error(relative_values)
-        
-        self.maximum_absolute_error_location = absolute_times[maximum_absolute_error_index]
-        self.maximum_relative_error_location = relative_times[maximum_relative_error_index]
+            self.maximum_absolute_error_location = absolute_times[maximum_absolute_error_index]
+            self.maximum_relative_error_location = relative_times[maximum_relative_error_index]
                 
     def calc_error_stats_2D(self,x,y,values1,values2,difference_string='all'):
 
@@ -492,8 +572,10 @@ class QATestError(object):
         
         return average_relative_error
       
-    def _plot_error_2D(self,x,y,solution1,solution2,xlabel,ylabel):
+    def _plot_error_2D(self,dimension,solution1,solution2,xlabel,ylabel):
 
+        x = dimension[0]
+        y = dimension[1]
         [absolute_error,relative_error,absolute_area,total_area] = self._calc_error_2D(x,y,solution1,solution2)
         
         maximum_absolute_error = self._get_maximum_error(absolute_error)
@@ -586,6 +668,18 @@ class QATestError(object):
         total_area = area_of_cell*len(x)*len(y)
                 
         return absolute_error,relative_error,total_absolute_error,total_area
+
+
+####diff class?
+class QATestErrorCompile():
+    def __init__(self,template,run_number,variable,units=' ',dimension='1D'):
+        debug_push('QATestErrorCompile init')
+        self.variable = variable
+        self.template = template
+        self.run_number = run_number
+        self.dimension = dimension
+        self.units = units
+        debug_pop()
         
     def calc_error_metrics_over_all_times(self,stat_file,tunit):
         

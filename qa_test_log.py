@@ -5,7 +5,7 @@ from pathlib import Path
 
 class QATestLog(object):
     
-    def __init__(self,root_dir,incremental_testing):
+    def __init__(self,root_dir,incremental_testing,requirements_dict):
 
         self.successful_tests = root_dir+'/successful_tests.log'
         self.successful_regression_tests = root_dir+'/successful_regression_tests.log'
@@ -15,6 +15,8 @@ class QATestLog(object):
         self.past_tests = None
         self.past_regression_tests = None
         self.directory_dict = {}
+        self.requirements_dict = requirements_dict
+        self.test_requirements = {}
         # initialize each file
         if incremental_testing:
 
@@ -55,7 +57,26 @@ class QATestLog(object):
             with open(file_to_write, "a+") as f2:
                 for line in f1:
                     f2.write(line)
-                    
+    
+    def log_attributes(self,attributes,test):
+        requirements_dict = self.requirements_dict
+
+        attributes = attributes.split(',')
+        for attribute in attributes:
+            attribute = attribute.strip()
+            if attribute in requirements_dict.keys():
+                requirements = requirements_dict[attribute]
+                for requirement in requirements:
+                    if requirement in self.test_requirements.keys():
+                        if not test in self.test_requirements[requirement]:
+                            self.test_requirements[requirement].append(test)
+                    else:
+                        self.test_requirements[requirement] = [test]
+
+                        
+    def get_requirements(self):
+        return self.test_requirements
+                           
     def read_contents(self,regression=False):
         if regression:
             tests = self.successful_regression_tests

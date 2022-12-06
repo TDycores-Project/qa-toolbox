@@ -25,7 +25,7 @@ class QASimulatorSTOMP(QASimulator):
         self._name = 'input'
         debug_pop()
 
-    def run(self, filename, annotation):
+    def run(self, filename, annotation,np):
         debug_push('QASimulatorSTOMP _run')
         command = []
         os.symlink(filename, 'input')

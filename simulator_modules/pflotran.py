@@ -26,6 +26,7 @@ obs_mapping['Liquid_Pressure'] ='Liquid Pressure'
 obs_mapping['Liquid_Saturation'] = 'Liquid Saturation'
 obs_mapping['Liquid Pressure [Pa]'] = 'Liquid Pressure'
 
+mass_mapping = {}
 
 class QASimulatorPFLOTRAN(QASimulator):
 
@@ -40,11 +41,17 @@ class QASimulatorPFLOTRAN(QASimulator):
         patterns = ['.*_run\d*_pflotran\.h5','.*_run\d*_pft\.h5']
         return patterns     
 
-    def run(self,filename,annotation):
+    def run(self,filename,annotation,np):
         debug_push('QASimulatorPFLOTRAN _run')
         root = filename.rsplit('.',1)[0]
         command = []
-        command.append(self._get_full_executable_path())
+        if np>1:
+            command.append('/usr/bin/mpirun')
+            command.append('-n')
+            command.append('{}'.format(np))
+            command.append(self._get_full_executable_path())
+        else:
+            command.append(self._get_full_executable_path())
         command.append('-input_prefix')
         command.append(root)
         command.append('-successful_exit_code')
@@ -52,6 +59,7 @@ class QASimulatorPFLOTRAN(QASimulator):
         command.append('-output_prefix')
         command.append('{}_pft'.format(root))
         debug_push('Running PFLOTRAN')
+
         status = self._submit_process(command,filename,annotation)
         debug_pop()        
         if status != 86:
@@ -67,8 +75,10 @@ class QASimulatorPFLOTRAN(QASimulator):
       solution = QASolutionWriter(solution_filename)
       h5_filename = '{}_pft.h5'.format(root)
       obs_filename = '{}_pft-obs-0.pft'.format(root)
+      mass_filename = '{}_pft-mas.dat'.format(root)
       time_slice = False
-      observation_file = False      
+      observation_file = False     
+      mass_balance_file = False
       
       try: 
           f = File(h5_filename,'r')
@@ -143,6 +153,37 @@ class QASimulatorPFLOTRAN(QASimulator):
                   new_key = dkey
               solution.write_dataset(location_floats,
                                      variable,new_key,group_name)
+              
+      try:
+          fin = open(mass_filename,'r')
+          mass_balance_file = True
+      except:
+          print('No mass balance file found')
+     
+      if mass_balance_file:
+          group_name = 'Mass Balance'
+          headers = []
+          all_values = []
+          for line in fin:
+            if line.strip().startswith('"'):
+              w = line.strip().split(',')
+              for i in range(len(w)):
+                  headers.append(w[i].strip('"'))
+            else: 
+                all_values.append(line.strip().split())
+                
+          all_values = np.asarray(all_values, dtype=np.float64).transpose()
+          solution.set_time_unit(headers[0].split()[1].strip('[').strip(']'))
+          solution.write_time(all_values[0],False)
+
+          for i in range(1,len(headers)):
+              if headers[i] in mass_mapping:
+                  key = mass_mapping[header[i]]
+              else:
+                  key = headers[i]
+              solution.write_dataset(-999,all_values[i],key,group_name)    
+              
+              
       debug_pop()                     
       return solution_filename   
 

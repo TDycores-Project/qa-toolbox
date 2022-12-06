@@ -63,7 +63,7 @@ class QATestConvergence(QATest):
                 max_error = self.compare_solutions.get_time_slice_max_error() 
             print('Max Error = {}'.format(max_error))
             print('Attempt # = {}'.format(self.num_tries))
-                  
+            #add in relative error under curve, multiple simulators all must pass   
             if max_error > self._tolerance:
                 if self._verbose:
                     self.doc.add_run(doc_run)                    
@@ -79,7 +79,7 @@ class QATestConvergence(QATest):
         if self._verbose:
             self.doc.write()
         elif self.test_pass:
-            self.doc.write()
+            self.doc.write() ##add in test pass statistics....
 
             
         debug_pop()

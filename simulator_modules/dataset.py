@@ -18,7 +18,7 @@ class QASimulatorDatasetSin(QASimulator):
         self._suffix='.py'
         debug_pop()
         
-    def run(self,filename,annotation):
+    def run(self,filename,annotation,np):
 #        command = []
 #        command.append(self._get_full_executable_path())
 #        command.append(filename)

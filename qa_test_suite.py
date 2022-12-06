@@ -29,6 +29,7 @@ from qa_test_doc import QATestDocIndex
 from qa_test_manager import QATestManager
 from qa_common import *
 from simulator_modules.simulator_factory import locate_simulators
+from qa_requirements import compile_requirements
 
 def commandline_options():
     """
@@ -97,7 +98,7 @@ def main(options):
     # regression tests must come first in list of config files
     config_files = []
     path = os.path.dirname(os.path.realpath(__file__))
-    config_files.append('{}/regression_tests/test.cfg'.format(path))
+#    config_files.append('{}/regression_tests/test.cfg'.format(path))
     for line in open(config_filename,'r'):
         line=line.strip()
           # rstrip to remove EOL. otherwise, errors when opening file
@@ -109,8 +110,10 @@ def main(options):
             config_files.append(full_path) 
 
     simulators_dict = locate_simulators(options.simulators_file) 
+    requirements_filepath = root_dir + '/requirements'
+    requirements_dict = compile_requirements(requirements_filepath)
 
-    testlog = QATestLog(root_dir,options.incremental_testing)
+    testlog = QATestLog(root_dir,options.incremental_testing,requirements_dict)
 
     # loop through config files, cd into the appropriate directory,
     # read the appropriate config file and run the various tests.
@@ -121,7 +124,7 @@ def main(options):
         
         test_manager = QATestManager(simulators_dict)
         test_manager.process_config_file(root_dir,config_file,testlog)
-        test_manager.run_tests(testlog)
+        test_manager.run_tests(testlog,options.doc_dir)
 
     doc = QATestDocIndex(testlog,options.doc_dir)
     doc.write_index()

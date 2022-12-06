@@ -16,7 +16,7 @@ class QASimulatorPython(QASimulator):
         self._suffix = '.py'
         debug_pop()
 
-    def run(self,filename,annotation):
+    def run(self,filename,annotation,np):
         debug_push('QASimulatorPython _run')
         command = []
         command.append(self._get_full_executable_path())

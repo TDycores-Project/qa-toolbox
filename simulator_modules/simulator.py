@@ -17,7 +17,7 @@ class QASimulator:
         self._name = ''
         self._suffix = ''
         self._path = path
-        self._timeout = 300.
+        self._timeout = 3000000000000.
         debug_pop()
 
     def get_name(self):
@@ -39,8 +39,8 @@ class QASimulator:
     def _add_annotation(self,f_stdout,annotation):
         if annotation:
             f_stdout.write(annotation)
-
-    def run(self,filename,annotation=None):
+        
+    def run(self,filename,annotation=None,np=1):
         debug_push('QASimulator _run')
         print('QASimulator.run must be extended') 
         raise

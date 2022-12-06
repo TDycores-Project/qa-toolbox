@@ -13,7 +13,7 @@ class QASimulatorTOUGH2(QASimulator):
         self._suffix = '.in'
         debug_pop()
 
-    def run(self,filename,annotation):
+    def run(self,filename,annotation,np):
         debug_push('QASimulatorTOUGH2 _run')
         command = []
         command.append(self._get_full_executable_path())
