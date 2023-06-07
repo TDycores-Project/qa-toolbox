@@ -110,10 +110,19 @@ def main(options):
             config_files.append(full_path) 
 
     simulators_dict = locate_simulators(options.simulators_file) 
-    requirements_filepath = root_dir + '/requirements'
-    requirements_dict = compile_requirements(requirements_filepath)
+    
+    requirements_base_filepath = root_dir + '/requirements-base'
+    requirements_base_dict = compile_requirements(requirements_base_filepath)
+    requirements_flow_filepath = root_dir + '/requirements-flow'
+    requirements_flow_dict = compile_requirements(requirements_flow_filepath)
+    requirements_th_filepath = root_dir + '/requirements-th'
+    requirements_th_dict = compile_requirements(requirements_th_filepath)
+    requirements_general_filepath = root_dir + '/requirements-general'
+    requirements_general_dict = compile_requirements(requirements_general_filepath)
 
-    testlog = QATestLog(root_dir,options.incremental_testing,requirements_dict)
+    requirements_dict_dict = {'base': requirements_base_dict, 'flow': requirements_flow_dict, 
+                         'th': requirements_th_dict, 'general': requirements_general_dict}
+    testlog = QATestLog(root_dir,options.incremental_testing,requirements_dict_dict)
 
     # loop through config files, cd into the appropriate directory,
     # read the appropriate config file and run the various tests.

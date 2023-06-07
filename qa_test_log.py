@@ -5,7 +5,7 @@ from pathlib import Path
 
 class QATestLog(object):
     
-    def __init__(self,root_dir,incremental_testing,requirements_dict):
+    def __init__(self,root_dir,incremental_testing,requirements_dict_dict):
 
         self.successful_tests = root_dir+'/successful_tests.log'
         self.successful_regression_tests = root_dir+'/successful_regression_tests.log'
@@ -15,7 +15,7 @@ class QATestLog(object):
         self.past_tests = None
         self.past_regression_tests = None
         self.directory_dict = {}
-        self.requirements_dict = requirements_dict
+        self.requirements_dict_dict = requirements_dict_dict
         self.test_requirements = {}
         # initialize each file
         if incremental_testing:
@@ -59,24 +59,31 @@ class QATestLog(object):
                     f2.write(line)
     
     def log_attributes(self,attributes,test):
-        requirements_dict = self.requirements_dict
-
+        requirements_dict_dict = self.requirements_dict_dict
         attributes = attributes.split(',')
-        for attribute in attributes:
-            attribute = attribute.strip()
-            if attribute in requirements_dict.keys():
-                requirements = requirements_dict[attribute]
-                for requirement in requirements:
-                    if requirement in self.test_requirements.keys():
-                        if not test in self.test_requirements[requirement]:
-                            self.test_requirements[requirement].append(test)
-                    else:
-                        self.test_requirements[requirement] = [test]
-
-                        
+        number = 1
+        
+        for requirements_type, requirements_dict in requirements_dict_dict.items():
+            for attribute in attributes:
+                attribute = attribute.strip()
+                if attribute in requirements_dict.keys():
+                    requirements = requirements_dict[attribute]
+                    for requirement in requirements:
+                        if requirement in self.test_requirements.keys():
+                            if not test in self.test_requirements[requirement]:
+                                self.test_requirements[requirement].append(test)
+                        else:
+                            self.test_requirements[requirement] = [test]
+                            print(number)
+                            number += 1
+            
     def get_requirements(self):
         return self.test_requirements
                            
+    def get_specific_requirements(self, option):
+        base_requirements_list = [req[0] for req in self.requirements_dict_dict[option].values()]
+        return {key: self.test_requirements[key] for key in base_requirements_list if key in self.test_requirements.keys()}
+    
     def read_contents(self,regression=False):
         if regression:
             tests = self.successful_regression_tests
