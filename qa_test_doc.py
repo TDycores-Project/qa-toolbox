@@ -713,16 +713,17 @@ REQUIREMENTS
 #        self.write_introfiles(file_dict,directory_titles)
   
     def write_requirements_doc(self):
-        number = 1    
-        requirements_base_dict = self.testlog.get_specific_requirements('base')
-                           
+        number_dict = self.testlog.get_number_dict()
         f2 = open('{}/requirements.rst'.format(self._doc_dir),'w')
+
+# Base
+        requirements_base_dict = self.testlog.get_specific_requirements('base')               
         f2.write("""
 Requirements - Base
 ===================
 """)
         for requirement, tests in requirements_base_dict.items():
-            requirement_string = "R {} {} \n".format(number,requirement)
+            requirement_string = "R {} {} \n".format(number_dict[requirement],requirement)
            # requirement_dir = "{}/{}".format(self._doc_dir,requirement)
            # if not os.path.isdir(requirement_dir):
            #     os.makedirs(requirement_dir)
@@ -733,7 +734,6 @@ Requirements - Base
    :maxdepth: 1
                      """)
             f2.write("\n")
-            number += 1
             for test in tests:
                 test_name = test.lower().replace(" ","_")#lower all of pah
                 # hack for now
@@ -743,15 +743,13 @@ Requirements - Base
                 f2.write("\n")
                 
 # Flow        
-        number = 1
         requirements_flow_dict = self.testlog.get_specific_requirements('flow')
-
         f2.write("""
 Requirements - Flow
 ===================
 """)
         for requirement, tests in requirements_flow_dict.items():
-            requirement_string = "R {} {} \n".format(number,requirement)
+            requirement_string = "R {} {} \n".format(number_dict[requirement],requirement)
            # requirement_dir = "{}/{}".format(self._doc_dir,requirement)
            # if not os.path.isdir(requirement_dir):
            #     os.makedirs(requirement_dir)
@@ -762,7 +760,6 @@ Requirements - Flow
    :maxdepth: 1
                      """)
             f2.write("\n")
-            number += 1
             for test in tests:
                 test_name = test.lower().replace(" ","_")#lower all of pah
                 # hack for now
@@ -772,15 +769,13 @@ Requirements - Flow
                 f2.write("\n")
                 
 # TH Mode                
-        number = 1
         requirements_th_dict = self.testlog.get_specific_requirements('th')
-        
         f2.write("""
 Requirements - TH
 =================
 """)
         for requirement, tests in requirements_th_dict.items():
-            requirement_string = "R {} {} \n".format(number,requirement)
+            requirement_string = "R {} {} \n".format(number_dict[requirement],requirement)
            # requirement_dir = "{}/{}".format(self._doc_dir,requirement)
            # if not os.path.isdir(requirement_dir):
            #     os.makedirs(requirement_dir)
@@ -791,7 +786,6 @@ Requirements - TH
    :maxdepth: 1
                      """)
             f2.write("\n")
-            number += 1
             for test in tests:
                 test_name = test.lower().replace(" ","_")#lower all of pah
                 # hack for now
@@ -801,15 +795,13 @@ Requirements - TH
                 f2.write("\n")
                 
 # General Mode                
-        number = 1
         requirements_general_dict = self.testlog.get_specific_requirements('general')
-  
         f2.write("""
 Requirements - General
 ======================
 """)
         for requirement, tests in requirements_general_dict.items():
-            requirement_string = "R {} {} \n".format(number,requirement)
+            requirement_string = "R {} {} \n".format(number_dict[requirement],requirement)
            # requirement_dir = "{}/{}".format(self._doc_dir,requirement)
            # if not os.path.isdir(requirement_dir):
            #     os.makedirs(requirement_dir)
@@ -820,7 +812,6 @@ Requirements - General
    :maxdepth: 1
                      """)
             f2.write("\n")
-            number += 1
             for test in tests:
                 test_name = test.lower().replace(" ","_")#lower all of pah
                 # hack for now

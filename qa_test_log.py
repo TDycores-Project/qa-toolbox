@@ -16,6 +16,7 @@ class QATestLog(object):
         self.past_regression_tests = None
         self.directory_dict = {}
         self.requirements_dict_dict = requirements_dict_dict
+        self.number_dict = {}
         self.test_requirements = {}
         # initialize each file
         if incremental_testing:
@@ -61,9 +62,8 @@ class QATestLog(object):
     def log_attributes(self,attributes,test):
         requirements_dict_dict = self.requirements_dict_dict
         attributes = attributes.split(',')
-        number = 1
         
-        for requirements_type, requirements_dict in requirements_dict_dict.items():
+        for requirements_dict in requirements_dict_dict.values():
             for attribute in attributes:
                 attribute = attribute.strip()
                 if attribute in requirements_dict.keys():
@@ -74,15 +74,28 @@ class QATestLog(object):
                                 self.test_requirements[requirement].append(test)
                         else:
                             self.test_requirements[requirement] = [test]
-                            print(number)
-                            number += 1
             
     def get_requirements(self):
         return self.test_requirements
                            
     def get_specific_requirements(self, option):
-        base_requirements_list = [req[0] for req in self.requirements_dict_dict[option].values()]
-        return {key: self.test_requirements[key] for key in base_requirements_list if key in self.test_requirements.keys()}
+        # For options of either 'base', 'flow', 'th', or 'general'
+        # returns in test_requirements form, only the requirements of the specified mode
+        
+        requirements_list = [req[0] for req in self.requirements_dict_dict[option].values()]
+        return {key: (self.test_requirements[key]) for key in requirements_list if key in self.test_requirements.keys()}
+    
+    def get_number_dict(self):
+        number = 1
+        for key in self.requirements_dict_dict.keys():
+            requirements_list = [req[0] for req in self.requirements_dict_dict[key].values()]
+            for requirement in requirements_list:
+                if requirement in self.test_requirements.keys():
+                    if requirement not in self.number_dict.keys():
+                        self.number_dict[requirement] = number
+                        number += 1
+
+        return self.number_dict
     
     def read_contents(self,regression=False):
         if regression:
