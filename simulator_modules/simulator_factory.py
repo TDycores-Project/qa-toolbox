@@ -13,6 +13,8 @@ from simulator_modules.tough2 import QASimulatorTOUGH2
 from simulator_modules.tough3 import QASimulatorTOUGH3
 from simulator_modules.tdycore import QASimulatorTDycore
 from simulator_modules.stomp import QASimulatorSTOMP
+from simulator_modules.phydrus import QASimulatorPhydrus
+
 
 def locate_simulators(simulators_filename):
     debug_push('simulator_factory.locate_simulators')
@@ -65,6 +67,8 @@ def create_simulator(simulator_name,path):
         simulator = QASimulatorTDycore(path)
     elif simulator_name == 'stomp':
         simulator = QASimulatorSTOMP(path)
+    elif simulator_name == 'phydrus':
+        simulator = QASimulatorPhydrus(path)
 
     else:
         print_err_msg('Simulator {} not recognized in simulator_factor.py.'
