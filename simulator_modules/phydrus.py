@@ -1,8 +1,3 @@
-import sys
-import shutil
-import os
-
-import h5py
 from qa_debug import *
 from qa_common import *
 from qa_solution import QASolutionWriter
@@ -10,6 +5,20 @@ import numpy as np
 
 from simulator_modules.simulator import QASimulator
 
+"""
+Class for running the phydrus simulator. Must include a dummy file
+in the form "test_name.phydrus" in order to run the QATest. You must 
+also have the folder called "test_name_phydrus_run1_folder" in the
+tests/flow directory with phydrus input files SELECTOR.IN and
+PROFILE.DAT in order to correctly run an analyze the test. If 
+testing phydrus, you must also have an executable path in .bashrc
+exporting $PHYDRUS_DIR to your hydrus executable directory which
+stores the hydrus executable. Also must have the 4 requirement
+text files, requirements-base, requirements-flow, requirements-general,
+and requirements-th in the directory with the Makefile.
+
+Calvin Madsen: 6/14/23
+"""
 class QASimulatorPhydrus(QASimulator):
     
     def __init__(self,path):
