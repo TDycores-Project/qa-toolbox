@@ -57,12 +57,15 @@ class QASimulatorPhydrus(QASimulator):
         data_dict = {}
         h5_dataset_name_mapping = {'Temp': 'Temperature [C]', 
                                    'Depth': 'Depth [m]',
-                                   'Head': 'Head [m]'}
+                                   'Head': 'Head [m]',
+                                   'Moisture' : 'Liquid Saturation'}
         group_name = 'Time Slice'  
-        i = 0
         units_first = 1
         labels_first = 1
         coords_first = 1
+        moisture_first = 1
+        
+        liquid_sat_denom = 1
         time = 0
         
         try:
@@ -110,6 +113,13 @@ class QASimulatorPhydrus(QASimulator):
                                 value *= 0.01
                             elif measurement_units[i-1] == '[1/L]': # 1/cm
                                 value *= 100.
+                            
+                            # convert moisture to liquid saturation
+                            if moisture_first and measurements[i] == 'Moisture':
+                                liquid_sat_denom = value
+                                moisture_first = 0    
+                            if  measurements[i] == 'Moisture':
+                                value /= liquid_sat_denom
                             
                             # append data values to corresponding measurement key
                             if measurements[i] not in data_dict.keys():
