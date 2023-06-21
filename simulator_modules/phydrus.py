@@ -66,7 +66,7 @@ class QASimulatorPhydrus(QASimulator):
         data_dict = {}
         h5_dataset_name_mapping = {'Temp': 'Temperature [C]', 
                                    'Depth': 'Depth [m]',
-                                   'Head': 'Head [m]',
+                                   'Head': 'Liquid Pressure',
                                    'Moisture' : 'Liquid Saturation'}
         group_name = 'Time Slice'  
         units_first = 1
@@ -129,6 +129,10 @@ class QASimulatorPhydrus(QASimulator):
                                 moisture_first = 0    
                             if  measurements[i] == 'Moisture':
                                 value /= liquid_sat_denom
+                                
+                            # convert head to liquid pressure:
+                            if  measurements[i] == 'Head':
+                                value = (value * 9780) + 101325
                             
                             # append data values to corresponding measurement key
                             if measurements[i] not in data_dict.keys():
@@ -148,12 +152,12 @@ class QASimulatorPhydrus(QASimulator):
                             solution.write_dataset(time, data_dict[key], dataset_name, group_name)
                             
                             # Write the coords
-                            # TODO:figure out where phydrus lists coords / where pflotran gets this from
                             if coords_first:
                                 coords_first = 0
+                                # for 1D tests
                                 x = 0.5 * (np.arange(1) + 1)
                                 y = 0.5 * (np.arange(1) + 1)
-                                z = np.linspace(0, -1, len(values))
+                                z = np.reshape(data_dict['Depth'], -1)
                                 solution.write_coordinates(x, y, z)
                             
                         data_dict = {}  # reset the dict for next time value
