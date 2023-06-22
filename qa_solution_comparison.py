@@ -312,7 +312,7 @@ class QASolutionComparison(object):
                     doc_var.add_error_png(filename)
                 if print_error: 
 
- #                   filename = error.print_error(x_loc[0],y_loc[0],z_loc[0],solutions[0],x_loc[1],y_loc[1],z_loc[1],solutions[1]) 
+                    #filename = error.print_error(x_loc[0],y_loc[0],z_loc[0],solutions[0],x_loc[1],y_loc[1],z_loc[1],solutions[1]) 
                     filename = error.print_error(xyz_loc,solutions,analytical) 
 
                     if variable in stat_files_by_var_dict.keys():
