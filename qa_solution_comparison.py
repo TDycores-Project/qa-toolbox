@@ -223,7 +223,7 @@ class QASolutionComparison(object):
 
                         if isimulator == 0:
                             fig=plt.figure()
-                            ax = fig.gca(projection='3d')
+                            ax = fig.add_subplot(projection='3d')
                             X,Y= np.meshgrid(x,y)
                             surface=ax.contourf(Y,X,solution[0,:,:],zdir='z',offset =z_max)
                             surface1=ax.contourf(Y,X,solution[1,:,:],zdir='z',offset =0)
@@ -267,9 +267,12 @@ class QASolutionComparison(object):
 
                     placeholder = 1
                     
-                
-                plt.xlabel(self.x_string_time_slice,fontsize=16)
-                plt.ylabel(self.y_string_time_slice,fontsize=16)
+                if len(self.variables) > 1:
+                    plt.xlabel(self.x_string_time_slice, fontsize=16)
+                    plt.ylabel(variable, fontsize=16)
+                else:
+                    plt.xlabel(self.x_string_time_slice,fontsize=16)
+                    plt.ylabel(self.y_string_time_slice,fontsize=16)
                 
                 ax.tick_params(labelsize=14)
                 temp_title = self.title
