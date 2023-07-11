@@ -214,7 +214,26 @@ def find_axis_2D(x,y,z):
 #        raise Exception('Invalid coordinates, check x,y, and z')
         
     return x_axis, y_axis
+
+# creates a 2D slice from 3D solution given axis and index to slice through
+def create_2D_slice(x,y,z,axis,axis_index,solution):
+    if axis == 'x':
+        x_axis = y
+        y_axis = z
+        solution = solution[axis_index, :, :]
+    elif axis == 'y':
+        x_axis = x
+        y_axis = z
+        solution = solution[:, axis_index, :]
+    elif axis == 'z':
+        x_axis = x
+        y_axis = y
+        solution = solution[:, :, axis_index]  
+    else:
+        raise Exception('Invalid axis for 3D, must be x, y, or z')
     
+    return x_axis, y_axis, solution
+
 def print_err_msg(*strings):
     list = []
     for string in strings:

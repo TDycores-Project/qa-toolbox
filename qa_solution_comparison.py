@@ -10,6 +10,7 @@ import shutil
 from h5py import *
 import numpy as np
 
+import math
 import matplotlib as mpl
 if os.environ.get('DISPLAY','') == '':
    mpl.use('Agg')
@@ -52,6 +53,8 @@ class QASolutionComparison(object):
             
         plot_type = [x.strip() for x in qa_lookup(self.output_options,'plot_type','time slice').split(',')]   
         
+        self.axis = qa_lookup(self.output_options, 'axis', False)
+        self.axis_index = [x.strip() for x in qa_lookup(self.output_options, 'axis_index', '0').split(',')]
         plot_error = qa_lookup(self.output_options,'plot_error',False)
         print_error = qa_lookup(self.output_options,'print_error',False)
         self.plot_to_screen = qa_lookup(self.output_options,'plot_to_screen',False)
@@ -73,6 +76,13 @@ class QASolutionComparison(object):
                 self.x_string_time_slice = x_string[i]
                 self.y_string_time_slice = y_string[i]
                 self.plot_time_slice(times,plot_error,print_error)
+                
+                # for multiple slices in a 2D slice of 3D data
+                while len(self.axis_index) > 1:
+                    self.axis_index.pop(0)
+                    self.run_number += 1
+                    self.plot_time_slice(times,plot_error,print_error)
+                    
             elif plot == 'mass balance':
                 self.x_string_observation = x_string[i]
                 self.y_string_observation = y_string[i]
@@ -166,7 +176,12 @@ class QASolutionComparison(object):
                               xyz_loc.append(x_axis)
                                             
                     elif self.plot_dimension == '2D':
-                        x_axis, y_axis = find_axis_2D(x,y,z)
+                        if self.axis: # 3D plot changed into 2D slice
+                            axis = self.axis.lower()
+                            axis_index = int(self.axis_index[0])
+                            x_axis, y_axis, solution = create_2D_slice(x, y, z, axis, axis_index, solution)
+                        else: # Normal 2D plot
+                            x_axis, y_axis = find_axis_2D(x,y,z)
                         
                         x_min = min(x_min,math.floor(np.amin(x_axis)))
                         x_max = max(x_max,math.ceil(np.amax(x_axis)))
@@ -206,7 +221,7 @@ class QASolutionComparison(object):
                             check_coordinates_2D(x_axis,x_axis_old,y_axis,y_axis_old)
                             surface = plt.contour(X,Y,solution[:,:],levels,
                                                 colors='black',
-                                                linewidth=0.5)
+                                                linewidths=0.5)
                             plt.clabel(surface,inline=True,fontsize=10)
                             contour_legend = '{} (contour)'.format(simulator)
                             if plot_error or print_error:
