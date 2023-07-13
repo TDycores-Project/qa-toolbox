@@ -30,11 +30,12 @@ mass_mapping = {}
 
 class QASimulatorPFLOTRAN(QASimulator):
 
-    def __init__(self,path):
+    def __init__(self,path,mpiexec):
         debug_push('QASimulatorPFLOTRAN init')
         super(QASimulatorPFLOTRAN,self).__init__(path)
         self._name = 'pflotran'
         self._suffix = '.in'
+        self.mpiexec = mpiexec
         debug_pop()
         
     def output_file_patterns(self):
@@ -46,7 +47,7 @@ class QASimulatorPFLOTRAN(QASimulator):
         root = filename.rsplit('.',1)[0]
         command = []
         if np>1:
-            command.append('/usr/bin/mpirun')
+            command.append(self.mpiexec)
             command.append('-n')
             command.append('{}'.format(np))
             command.append(self._get_full_executable_path())

@@ -36,7 +36,7 @@ patterns = ['.*\.stat(?!\.gold)','.*_doc\.rst','^include_.*\.rst','^intro_.*\.rs
 #process simulators.sim
 #######################
 
-sim_dict = locate_simulators(sim_file)
+sim_dict = locate_simulators(sim_file,None)
 for simulator in sim_dict.values():
     patterns = patterns + simulator.output_file_patterns()
 

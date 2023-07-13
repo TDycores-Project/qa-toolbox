@@ -6,6 +6,7 @@ DOC_DIR = ${PWD}/docs
 CURRENT_DIR = ${PWD}
 CONFIG_FILE = config_files.txt
 SIMULATORS_FILE = simulators.sim
+MPIEXEC = /usr/bin/mpirun
 
 
 all : clean_tests run_tests
@@ -14,7 +15,7 @@ clean_tests :
 	$(PYTHON) qa_clean_tests.py $(CURRENT_DIR) $(CONFIG_FILE) $(SIMULATORS_FILE)
 
 run_tests :
-	$(PYTHON) $(QA_TEST_SUITE) --doc_dir $(DOC_DIR) --config_file $(CONFIG_FILE) --simulators_file $(SIMULATORS_FILE)
+	$(PYTHON) $(QA_TEST_SUITE) --doc_dir $(DOC_DIR) --config_file $(CONFIG_FILE) --simulators_file $(SIMULATORS_FILE) --mpiexec $(MPIEXEC)
 
 run_incremental_tests :
 	$(PYTHON) $(QA_TEST_SUITE) --doc_dir $(DOC_DIR) --config_file $(CONFIG_FILE) --simulators_file $(SIMULATORS_FILE) --incremental_testing

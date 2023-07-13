@@ -49,9 +49,8 @@ def commandline_options():
     parser.add_argument('--simulators_file', action='store',
                         help='user defined simulators file')
 
-#    parser.add_argument('-m', '--mpiexec', nargs=1, default=None,
-#                        help="path to the executable for mpiexec (mpirun, etc)"
-#                        "on the current machine.")
+    parser.add_argument('-m', '--mpiexec', action = 'store', default='/usr/bin/mpirun',
+                        help="path to the executable for mpiexec (mpirun, etc) on the current machine.")
 
     options = parser.parse_args()
     return options
@@ -109,7 +108,7 @@ def main(options):
                 full_path = root_dir+'/'+line.rstrip()
             config_files.append(full_path) 
 
-    simulators_dict = locate_simulators(options.simulators_file) 
+    simulators_dict = locate_simulators(options.simulators_file,options.mpiexec) 
     
     requirements_base_filepath = root_dir + '/requirements-base'
     requirements_base_dict = compile_requirements(requirements_base_filepath)

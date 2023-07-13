@@ -16,7 +16,7 @@ from simulator_modules.stomp import QASimulatorSTOMP
 from simulator_modules.phydrus import QASimulatorPhydrus
 
 
-def locate_simulators(simulators_filename):
+def locate_simulators(simulators_filename,mpiexec):
     debug_push('simulator_factory.locate_simulators')
     sim_file = simulators_filename
     if not os.path.exists(sim_file):
@@ -37,7 +37,7 @@ def locate_simulators(simulators_filename):
             if shutil.which(path):
                 if debug_verbose():
                     print('  "{}" found in PATH...'.format(path))
-                simulator_dict[simulator] = create_simulator(simulator,path)
+                simulator_dict[simulator] = create_simulator(simulator,path,mpiexec)
             else:
                 if debug_verbose():
                     print('  "{}" not found in path either. Removing it '
@@ -46,17 +46,17 @@ def locate_simulators(simulators_filename):
         else:
             if debug_verbose():
                 print('  {} found...'.format(path))
-            simulator_dict[simulator] = create_simulator(simulator,path)
+            simulator_dict[simulator] = create_simulator(simulator,path,mpiexec)
     debug_pop()
     return simulator_dict
 
-def create_simulator(simulator_name,path):
+def create_simulator(simulator_name,path,mpiexec):
     debug_push('simulator_factory.create_simulator')
     simulator = ''
     if simulator_name == 'crunchflow':
         simulator = QASimulatorCrunchFlow(path)
     elif simulator_name == 'pflotran':
-        simulator = QASimulatorPFLOTRAN(path)
+        simulator = QASimulatorPFLOTRAN(path,mpiexec)
     elif simulator_name == 'python':
         simulator = QASimulatorPython(path)
     elif simulator_name == 'tough2':
