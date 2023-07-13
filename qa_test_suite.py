@@ -118,9 +118,21 @@ def main(options):
     requirements_th_dict = compile_requirements(requirements_th_filepath)
     requirements_general_filepath = root_dir + '/requirements-general'
     requirements_general_dict = compile_requirements(requirements_general_filepath)
+    requirements_transport_base_filepath = root_dir + '/requirements-transport-base'
+    requirements_transport_base_dict = compile_requirements(requirements_transport_base_filepath)
+    requirements_multicontinuum_filepath = root_dir + '/requirements-multicontinuum'
+    requirements_multicontinuum_dict = compile_requirements(requirements_multicontinuum_filepath)
+    requirements_ufd_decay_filepath = root_dir + '/requirements-ufd-decay'
+    requirements_ufd_decay_dict = compile_requirements(requirements_ufd_decay_filepath)
+    requirements_waste_form_filepath = root_dir + '/requirements-waste-form'
+    requirements_waste_form_dict = compile_requirements(requirements_waste_form_filepath)
 
     requirements_dict_dict = {'base': requirements_base_dict, 'flow': requirements_flow_dict, 
-                         'th': requirements_th_dict, 'general': requirements_general_dict}
+                         'th': requirements_th_dict, 'general': requirements_general_dict,
+                         'transport-base' : requirements_transport_base_dict, 
+                         'multicontinuum' : requirements_multicontinuum_dict,
+                         'ufd-decay' : requirements_ufd_decay_dict,
+                         'waste-form' : requirements_waste_form_dict }
     testlog = QATestLog(root_dir,options.incremental_testing,requirements_dict_dict)
 
     # loop through config files, cd into the appropriate directory,

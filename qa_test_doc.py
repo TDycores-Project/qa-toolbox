@@ -819,7 +819,111 @@ Requirements - General
                 test_rst = "   /tests/{}_doc.rst \n".format(test_name)
                 f2.write(test_rst)
                 f2.write("\n")
+
+# transport base                
+        requirements_transport_base_dict = self.testlog.get_specific_requirements('transport-base')
+        f2.write("""
+Requirements - Transport-Base
+=============================
+""")
+        for requirement, tests in requirements_transport_base_dict.items():
+            requirement_string = "R {} {} \n".format(number_dict[requirement],requirement)
+           # requirement_dir = "{}/{}".format(self._doc_dir,requirement)
+           # if not os.path.isdir(requirement_dir):
+           #     os.makedirs(requirement_dir)
+            f2.write(requirement_string)
+            f2.write("{} \n".format('-'*len(requirement_string)))
+            f2.write("""
+.. toctree::
+   :maxdepth: 1
+                     """)
+            f2.write("\n")
+            for test in tests:
+                test_name = test.lower().replace(" ","_")#lower all of pah
+                # hack for now
+                # shutil.copy(test[0],requirement_dir)
+                test_rst = "   /tests/{}_doc.rst \n".format(test_name)
+                f2.write(test_rst)
+                f2.write("\n")
                 
+# multicontinuum               
+        requirements_multicontinuum_dict = self.testlog.get_specific_requirements('multicontinuum')
+        f2.write("""
+Requirements - Multicontinuum
+=============================
+""")
+        for requirement, tests in requirements_multicontinuum_dict.items():
+            requirement_string = "R {} {} \n".format(number_dict[requirement],requirement)
+           # requirement_dir = "{}/{}".format(self._doc_dir,requirement)
+           # if not os.path.isdir(requirement_dir):
+           #     os.makedirs(requirement_dir)
+            f2.write(requirement_string)
+            f2.write("{} \n".format('-'*len(requirement_string)))
+            f2.write("""
+.. toctree::
+   :maxdepth: 1
+                     """)
+            f2.write("\n")
+            for test in tests:
+                test_name = test.lower().replace(" ","_")#lower all of pah
+                # hack for now
+                # shutil.copy(test[0],requirement_dir)
+                test_rst = "   /tests/{}_doc.rst \n".format(test_name)
+                f2.write(test_rst)
+                f2.write("\n")
+                
+# ufd-decay               
+        requirements_ufd_decay_dict = self.testlog.get_specific_requirements('ufd-decay')
+        f2.write("""
+Requirements - ufd-decay
+========================
+""")
+        for requirement, tests in requirements_ufd_decay_dict.items():
+            requirement_string = "R {} {} \n".format(number_dict[requirement],requirement)
+           # requirement_dir = "{}/{}".format(self._doc_dir,requirement)
+           # if not os.path.isdir(requirement_dir):
+           #     os.makedirs(requirement_dir)
+            f2.write(requirement_string)
+            f2.write("{} \n".format('-'*len(requirement_string)))
+            f2.write("""
+.. toctree::
+   :maxdepth: 1
+                     """)
+            f2.write("\n")
+            for test in tests:
+                test_name = test.lower().replace(" ","_")#lower all of pah
+                # hack for now
+                # shutil.copy(test[0],requirement_dir)
+                test_rst = "   /tests/{}_doc.rst \n".format(test_name)
+                f2.write(test_rst)
+                f2.write("\n")
+                
+# waste-form               
+        requirements_waste_form_dict = self.testlog.get_specific_requirements('waste-form')
+        f2.write("""
+Requirements - Waste-Form
+=========================
+""")
+        for requirement, tests in requirements_waste_form_dict.items():
+            requirement_string = "R {} {} \n".format(number_dict[requirement],requirement)
+           # requirement_dir = "{}/{}".format(self._doc_dir,requirement)
+           # if not os.path.isdir(requirement_dir):
+           #     os.makedirs(requirement_dir)
+            f2.write(requirement_string)
+            f2.write("{} \n".format('-'*len(requirement_string)))
+            f2.write("""
+.. toctree::
+   :maxdepth: 1
+                     """)
+            f2.write("\n")
+            for test in tests:
+                test_name = test.lower().replace(" ","_")#lower all of pah
+                # hack for now
+                # shutil.copy(test[0],requirement_dir)
+                test_rst = "   /tests/{}_doc.rst \n".format(test_name)
+                f2.write(test_rst)
+                f2.write("\n")       
+                        
         f2.close()
                 
                 
