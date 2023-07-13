@@ -48,6 +48,8 @@ class QASolutionComparison(object):
         self.plot_dimension = qa_lookup(self.output_options, 'plot_dimension','fail_on_missing_keyword')
         x_string = qa_lookup(self.output_options,'plot_x_label','fail_on_missing_keyword').split(',')
         y_string = qa_lookup(self.output_options,'plot_y_label','fail_on_missing_keyword').split(',')
+        self.z_string = qa_lookup(self.output_options,'plot_z_label',False)
+
         self.title = qa_lookup(self.output_options,'plot_title','fail_on_missing_keyword')
         self.variables = [x.strip() for x in qa_lookup(self.output_options,'variables','fail_on_missing_keyword').split(',')]
             
@@ -231,23 +233,64 @@ class QASolutionComparison(object):
                                                     
                     elif self.plot_dimension == '3D':
 
+                        x_min = min(x_min,math.floor(np.amin(x)))
+                        x_max = max(x_max,math.ceil(np.amax(x)))
                         y_min = min(y_min,math.floor(np.amin(y)))
                         y_max = max(y_max,math.ceil(np.amax(y)))
                         z_min = min(z_min,math.floor(np.amin(z)))
                         z_max = max(z_max,math.ceil(np.amax(z)))
+                        
+                        xmin = x.min()
+                        xmax = x.max()
+                        ymin = y.min()
+                        ymax = y.max()
+                        zmin = z.min()
+                        zmax = z.max()
 
-                        if isimulator == 0:
-                            fig=plt.figure()
-                            ax = fig.add_subplot(projection='3d')
-                            X,Y= np.meshgrid(x,y)
-                            surface=ax.contourf(Y,X,solution[0,:,:],zdir='z',offset =z_max)
-                            surface1=ax.contourf(Y,X,solution[1,:,:],zdir='z',offset =0)
-                            surface1=ax.contourf(Y,X,solution[2,:,:],zdir='z',offset =0.2)
-                            ax.set_zlim((0.,1.))
-                            plt.colorbar(surface)
-                        else:
-                            surface=ax.contour(Y,X,solution[0,:,:],zdir='z',offset=z_max,colors='black')
-                            plt.clabel(surface,inline=True,fontsize=18)
+                        if isimulator == 0:                           
+                            kw = {
+                                'vmin': s_min,
+                                'vmax': s_max,
+                                'levels': np.linspace(s_min, s_max, 11),
+                                }
+                            fig=plt.figure(figsize=(8, 6))
+                            ax = fig.add_subplot(111, projection='3d')
+                            X,Y,Z= np.meshgrid(x,y,z)
+                            
+                            # plot surfaces
+                            surface_z = ax.contourf(X[:, :, -1], Y[:, :, -1], solution[:, :, -1], zdir='z', offset=zmax, **kw)
+                            surface_y = ax.contourf(X[0, :, :], solution[0, :, :], Z[0, :, :],zdir='y', offset=ymin, **kw)
+                            surface_x = ax.contourf(solution[:, -1, :], Y[:,-1, :], Z[:, -1, :],zdir='x', offset=xmax, **kw)
+                            
+                            # Plot edges
+                            edges_kw = dict(color='0.4', linewidth=1, zorder=1e3)
+                            ax.plot([xmax, xmax], [ymin, ymax], [zmax, zmax], **edges_kw)
+                            ax.plot([xmin, xmax], [ymin, ymin], [zmax, zmax], **edges_kw)
+                            ax.plot([xmax, xmax], [ymin, ymin], [zmin, zmax], **edges_kw)
+                            
+                            # set axis limits, labels, and box angle
+                            ax.set(xlim=[x_min, x_max], ylim=[y_min, y_max], zlim=[z_min, z_max])
+                            ax.set(xlabel = self.x_string_time_slice, ylabel = self.y_string_time_slice, zlabel = self.z_string)
+                            ax.view_init(30, -45, 0)
+                            ax.set_box_aspect(None, zoom=0.9)
+                            
+                            #set colorbar
+                            fig.colorbar(surface_x, ax=ax, fraction=0.03, pad=0.1, label=variable)
+                            
+                        else: # other sim contour lines
+                            kw = {
+                                'vmin': s_min,
+                                'vmax': s_max,
+                                'levels': np.linspace(s_min, s_max, 11),
+                                'linewidths' : 0.5,
+                                'colors' : 'black'
+                                }
+                            surface_z = ax.contour(X[:, :, -1],Y[:, :, -1],solution[:, :, -1],zdir='z',offset=z_max, **kw)
+                            surface_y = ax.contour(X[0, :, :], solution[0, :, :], Z[0, :, :],zdir='y', offset=ymin, **kw)
+                            surface_x = ax.contour(solution[:, -1, :], Y[:,-1, :], Z[:, -1, :],zdir='x', offset=xmax, **kw)
+                            
+                            #ax.clabel() does not work with 3D plots. Can't label contour lines.
+
                     else:
                         print_err_msg('{} not recognized for plot_dimension in '
                                       'options file. Available options include: '
@@ -282,12 +325,13 @@ class QASolutionComparison(object):
 
                     placeholder = 1
                     
-                if len(self.variables) > 1:
-                    plt.xlabel(self.x_string_time_slice, fontsize=16)
-                    plt.ylabel(variable, fontsize=16)
-                else:
-                    plt.xlabel(self.x_string_time_slice,fontsize=16)
-                    plt.ylabel(self.y_string_time_slice,fontsize=16)
+                if not self.plot_dimension == '3D':    
+                    if len(self.variables) > 1:
+                        plt.xlabel(self.x_string_time_slice, fontsize=16)
+                        plt.ylabel(variable, fontsize=16)
+                    else:
+                        plt.xlabel(self.x_string_time_slice,fontsize=16)
+                        plt.ylabel(self.y_string_time_slice,fontsize=16)
                 
                 ax.tick_params(labelsize=14)
                 temp_title = self.title
