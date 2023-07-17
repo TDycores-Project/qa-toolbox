@@ -22,7 +22,7 @@ Calvin Madsen: 6/14/23
 class QASimulatorPhydrus(QASimulator):
     
     def __init__(self,path):
-        debug_push('QASimulatorPython init')
+        debug_push('QASimulatorPhydrus init')
         super(QASimulatorPhydrus,self).__init__(path)
         self._name = 'phydrus'
         self._suffix = ''
@@ -55,7 +55,7 @@ class QASimulatorPhydrus(QASimulator):
         return solution_filename
     
     def convert_solution_to_common_h5(self,input_file_path):
-        debug_push('QASimulatorPHydrus convert_solution_to_common_h5')
+        debug_push('QASimulatorPhydrus convert_solution_to_common_h5')
         solution_raw_data = input_file_path + '/NOD_INF.OUT'
         input_file = input_file_path.split('_folder')[0]
         solution_filename = get_h5_output_filename(input_file, self._name)
@@ -163,7 +163,7 @@ class QASimulatorPhydrus(QASimulator):
                         data_dict = {}  # reset the dict for next time value
                             
         except FileNotFoundError:
-            print('NOD_INF.OUT file found')
+            print('NOD_INF.OUT file not found')
                 
         debug_pop()
         return solution_filename
