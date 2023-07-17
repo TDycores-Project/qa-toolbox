@@ -14,6 +14,7 @@ from simulator_modules.tough3 import QASimulatorTOUGH3
 from simulator_modules.tdycore import QASimulatorTDycore
 from simulator_modules.stomp import QASimulatorSTOMP
 from simulator_modules.phydrus import QASimulatorPhydrus
+from simulator_modules.phreeqc import QASimulatorPHREEQC
 
 
 def locate_simulators(simulators_filename,mpiexec):
@@ -69,6 +70,8 @@ def create_simulator(simulator_name,path,mpiexec):
         simulator = QASimulatorSTOMP(path)
     elif simulator_name == 'phydrus':
         simulator = QASimulatorPhydrus(path)
+    elif simulator_name == 'phreeqc':
+        simulator = QASimulatorPHREEQC(path)
 
     else:
         print_err_msg('Simulator {} not recognized in simulator_factor.py.'
