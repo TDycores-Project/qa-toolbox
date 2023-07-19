@@ -11,7 +11,8 @@ time slice file comparisons. In the .opt file used for tests, should specify
 the time units with plot_time_units. This class is under the assumption
 PHREEQC calculates in seconds. Additional variables needed to display 
 should be added to the mapping dicitonaries in the convert_solution_to_common_h5
-function.
+function. Uses PHREEQC selected output file, should specify as the 
+test_name.sel in the PHREEQC input file.
 
 Calvin Madsen: 7/19/23
 """
