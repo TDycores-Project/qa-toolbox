@@ -12,7 +12,9 @@ the time units with plot_time_units. This class is under the assumption
 PHREEQC calculates in seconds. Additional variables needed to display 
 should be added to the mapping dicitonaries in the convert_solution_to_common_h5
 function. Uses PHREEQC selected output file, should specify as the 
-test_name.sel in the PHREEQC input file.
+test_name.sel in the PHREEQC input file. Don't include molalities as output
+option in pflotran input deck, it changes the units from [M] to [m]. Instead
+include the 'ALL' option.
 
 Calvin Madsen: 7/19/23
 """
@@ -63,6 +65,9 @@ class QASimulatorPHREEQC(QASimulator):
         locations = []
         measurement_labels = []
         data_dict = {}
+        labels_first = 1
+        labels_first_dist = 1
+        coords_first = 1
         
         # analyze .opt file
         with open(options_file, 'r') as f:
@@ -79,22 +84,23 @@ class QASimulatorPHREEQC(QASimulator):
                     time_units = line[2]
         
         # mapping from phreeqc to pflotran labels
-        h5_dataset_name_mapping = {'m_Ca+2': 'Free_Ca++ [m]',
-                                   'm_H+': 'Free_H+ [m]',
-                                   'm_HCO3-' : 'Free_HCO3- [m]'
+        h5_dataset_name_mapping = {'m_Ca+2': 'Free_Ca++ [M]',
+                                   'm_H+': 'Free_H+ [M]',
+                                   'm_HCO3-' : 'Free_HCO3- [M]'
                                    }
         if group_name == 'Observation':
+            if not locations:
+                print_err_msg('An observation plot needs the \'locations\' keyword in the .opt file with 3 coords')
+            
             obs_dataset_name_mapping = {'m_Ca+2': 'Free Ca++ [M] all (1) ({} {} {})'.format(*locations),
                                         'm_H+': 'Free H+ [M] all (1) ({} {} {})'.format(*locations),
                                         'm_HCO3-' : 'Free HCO3- [M] all (1) ({} {} {})'.format(*locations)
                                         }
-        labels_first = 1
-        labels_first_dist = 1
-        coords_first = 1
-        
+            
+        # Convert selected output to common h5 type
         try:
             with open(selected_output, 'r') as f:   
-                # Find the max distance in dist_x    
+                # Find the max distance in dist_x (only for time slice)   
                 max_dist = 0
                 if group_name == 'Time Slice':
                     for line in f:
