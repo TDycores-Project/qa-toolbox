@@ -72,17 +72,14 @@ class QASimulatorPHREEQC(QASimulator):
         # analyze .opt file
         with open(options_file, 'r') as f:
             for line in f:
-                line = line.strip().split()
-                if line[0] == 'plot_type':
-                        group_name = line[2].capitalize()
-                        if group_name == 'Time':
-                            group_name = 'Time Slice'
-                if line[0] == 'locations':
-                    for i in range(2, len(line)):
-                        locations.append(float(line[i]))
-                if line[0] == 'plot_time_units':
-                    time_units = line[2]
-        
+                data = [x.lstrip().rstrip() for x in line.strip().split("=")]
+                if data[0] == 'plot_type':
+                    group_name = data[1].title()
+                if data[0] == 'locations':
+                    locations = [float(x) for x in data[1].split(' ')]
+                if data[0] == 'plot_time_units':
+                    time_units = data[1]
+
         # mapping from phreeqc to pflotran labels
         h5_dataset_name_mapping = {'m_Ca+2': 'Free_Ca++ [M]',
                                    'm_H+': 'Free_H+ [M]',
